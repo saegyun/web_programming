@@ -1,0 +1,85 @@
+:root {
+	--canvas-bg-color: rgba(239, 238, 183, 0.402);
+	--ui-bg-color: rgba(199, 255, 130, 0.253);
+
+	--ui-btn-bg-color: rgb(0, 0, 0);
+	--ui-back-btn-bg-color: rgb(146, 146, 146);
+
+	--main-width: 1000px;
+	--main-height: 800px;
+}
+* { margin:0; padding: 0; }
+body {
+	position: relative;
+
+	margin: 0 auto;
+}
+li {
+	list-style: none;
+}
+a {
+	text-decoration: none;
+}
+img {
+	border: 0;
+}
+
+#content-wrapper {
+	position: relative;
+	
+	margin: 0 auto;
+	
+	width: var(--main-width);
+}
+#ui {
+	position: absolute;
+	text-align: center;
+
+	z-index: 1;
+
+	/* background-color: var(--ui-bg-color); */
+
+	width: var(--main-width);
+	height: var(--main-height);
+}
+#ui button {
+	width: 150px;
+
+	padding: 10px;
+
+	background-color: var(--ui-btn-bg-color);
+
+	font-weight: bold;
+	color: white;
+
+	border-radius: 20px;
+	border: none;
+}
+#ui button.back {
+	color: white;
+	
+	background-color: var(--ui-back-btn-bg-color);
+}
+
+#title > h1 {
+	margin: 100px;
+	font-size: 60px;
+}
+#title > button {
+	margin-top: 40px;
+}
+
+#stage1 > button {
+	position: absolute;
+	bottom: 0;
+	left: calc(var(--main-width) - 50px);
+}
+
+#screen {	
+	position: absolute;
+
+	left: 100px;
+}
+#myCanvas {
+	background-color: var(--canvas-bg-color);
+}
