@@ -134,15 +134,15 @@ Mob.prototype.hit = function(damage, hurtAudios, deathAudios) {
 class MobZombie extends Mob {
 	constructor(x, y, health, damage, speed, width, height, exp) {
 		super(x, y, health, damage, speed, width, height, 8, 360, exp);
-		MobZombie.idleSprite.src = "../web_programming/resource/sprite/zombieIdle.png";
-		MobZombie.hurtSprite.src = "../web_programming/resource/sprite/zombieHurt.png";
+		MobZombie.idleSprite.src = "resource/sprite/zombieIdle.png";
+		MobZombie.hurtSprite.src = "resource/sprite/zombieHurt.png";
 	}
 	static spawnWeight = 25;
-	static idleSprite = new Image();
+	static idleSprite = new Image(); 
 	static hurtSprite = new Image();
-	static idleAudios = [new Audio("../web_programming/resource/sound/zombieIdle1.mp3"), new Audio("../web_programming/resource/sound/zombieIdle2.mp3"), new Audio("../web_programming/resource/sound/zombieIdle3.mp3")];
-	static hurtAudios = [new Audio("../web_programming/resource/sound/zombieHurt1.mp3"), new Audio("../web_programming/resource/sound/zombieHurt2.mp3")];
-	static deathAudios = [new Audio("../web_programming/resource/sound/zombieDeath.mp3")];
+	static idleAudios = [new Audio("resource/sound/zombieIdle1.mp3"), new Audio("resource/sound/zombieIdle2.mp3"), new Audio("resource/sound/zombieIdle3.mp3")];
+	static hurtAudios = [new Audio("resource/sound/zombieHurt1.mp3"), new Audio("resource/sound/zombieHurt2.mp3")];
+	static deathAudios = [new Audio("resource/sound/zombieDeath.mp3")];
 
 	draw(context) {
 		super.draw(context, MobZombie.idleSprite, MobZombie.hurtSprite);
@@ -161,16 +161,16 @@ class MobZombie extends Mob {
 class MobSpider extends Mob {
 	constructor(x, y, health, damage, speed, width, height, exp) {
 		super(x, y, health, damage, speed, width, height, 4, 600, exp);
-		MobSpider.idleSprite.src = "../web_programming/resource/sprite/spiderIdle.png";
-		MobSpider.hurtSprite.src = "../web_programming/resource/sprite/spiderHurt.png";
+		MobSpider.idleSprite.src = "resource/sprite/spiderIdle.png";
+		MobSpider.hurtSprite.src = "resource/sprite/spiderHurt.png";
 	}
 	static spawnWeight = 15;
 	static idleSprite = new Image();
 	static hurtSprite = new Image();
 	
-	static idleAudios = [new Audio("../web_programming/resource/sound/spiderIdle1.mp3"), new Audio("../web_programming/resource/sound/spiderIdle2.mp3"), new Audio("../web_programming/resource/sound/spiderIdle3.mp3"), new Audio("../web_programming/resource/sound/spiderIdle4.mp3")];
+	static idleAudios = [new Audio("resource/sound/spiderIdle1.mp3"), new Audio("resource/sound/spiderIdle2.mp3"), new Audio("resource/sound/spiderIdle3.mp3"), new Audio("resource/sound/spiderIdle4.mp3")];
 	static hurtAudios = MobSpider.idleAudios;
-	static deathAudios = [new Audio("../web_programming/resource/sound/spiderDeath.mp3")];
+	static deathAudios = [new Audio("resource/sound/spiderDeath.mp3")];
 	
 	static frameWidth = 600;
 	static frameHeight = 600;
@@ -191,15 +191,15 @@ class MobSpider extends Mob {
 class MobCreeper extends Mob {
 	constructor(x, y, health, damage, speed, width, height, exp) {
 		super(x, y, health, damage, speed, width, height, 8, 360, exp);
-		MobCreeper.idleSprite.src = "../web_programming/resource/sprite/creeperIdle.png";
-		MobCreeper.hurtSprite.src = "../web_programming/resource/sprite/creeperHurt.png";
+		MobCreeper.idleSprite.src = "resource/sprite/creeperIdle.png";
+		MobCreeper.hurtSprite.src = "resource/sprite/creeperHurt.png";
 	}
 	static spawnWeight = 10;
 	static idleSprite = new Image();
 	static hurtSprite = new Image();
-	static idleAudios = [new Audio("../web_programming/resource/sound/creeperIdle1.mp3"), new Audio("../web_programming/resource/sound/creeperIdle2.mp3"), new Audio("../web_programming/resource/sound/creeperIdle3.mp3"), new Audio("../web_programming/resource/sound/creeperIdle4.mp3")];
+	static idleAudios = [new Audio("resource/sound/creeperIdle1.mp3"), new Audio("resource/sound/creeperIdle2.mp3"), new Audio("resource/sound/creeperIdle3.mp3"), new Audio("resource/sound/creeperIdle4.mp3")];
 	static hurtAudios = MobCreeper.idleAudios;
-	static deathAudios = [new Audio("../web_programming/resource/sound/creeperDeath.mp3")];
+	static deathAudios = [new Audio("resource/sound/creeperDeath.mp3")];
 	
 	draw(context) {
 		super.draw(context, MobCreeper.idleSprite, MobCreeper.hurtSprite);
@@ -215,7 +215,7 @@ class MobCreeper extends Mob {
 }
 
 // brick breaking main logic
-function startGame(callBack) {
+function startGame(callBack) { 
 	
 	const canvas = document.getElementById("myCanvas");
 	const context = canvas.getContext("2d");
@@ -229,8 +229,8 @@ function startGame(callBack) {
 	let villageHealth = 20;
 	const maxSpawns = 10;
 	const mobSpawnFrequency = 100;
-	const villageHitAudios = [new Audio("../web_programming/resource/sound/villageHit1.mp3"), new Audio("../web_programming/resource/sound/villageHit2.mp3"), new Audio("../web_programming/resource/sound/villageHit3.mp3"), new Audio("../web_programming/resource/sound/villageHit4.mp3")];
-	const villageBreakAudios = [new Audio("../web_programming/resource/sound/villageBreak.mp3")];
+	const villageHitAudios = [new Audio("resource/sound/villageHit1.mp3"), new Audio("resource/sound/villageHit2.mp3"), new Audio("resource/sound/villageHit3.mp3"), new Audio("resource/sound/villageHit4.mp3")];
+	const villageBreakAudios = [new Audio("resource/sound/villageBreak.mp3")];
 	
 	let activeMobs = [];
 	
@@ -378,7 +378,7 @@ function startGame(callBack) {
 			let mob = activeMobs[i];
 			mob.y += mob.speed;
 			
-			if(mob.y > deathLine + 60) {
+			if(mob.y > deathLine - 60) {
 				// make village break sound
 				let villageHitAudio = villageHitAudios[Math.floor(Math.random() * villageHitAudios.length)];
 				villageHitAudio.play();
