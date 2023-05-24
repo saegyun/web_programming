@@ -1,31 +1,3 @@
-const debugObtions = {
-	showHitBox: false,
-};
-
-// level information
-const levels = {
-	"easy": {
-		brick_intenity: 1,
-		brick_count: 40,
-		bricks_in_row: 8,
-		ball_speed: 1,
-		plane_size: 4,
-	},
-	"normal": {
-		brick_intenity: 1,
-		brick_count: 40,
-		bricks_in_row: 10,
-		ball_speed: 1,
-		plane_size: 4,
-	},
-	"hard": {
-		brick_intenity: 1,
-		brick_count: 40,
-		bricks_in_row: 10,
-		ball_speed: 1,
-		plane_size: 4,
-	},
-}
 let currentLevel = "easy";
 
 // canvas size
