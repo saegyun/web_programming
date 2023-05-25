@@ -78,8 +78,23 @@ img {
 #screen {	
 	position: absolute;
 
-	left: 100px;
+	left: 60px;
 }
 #myCanvas {
 	background-color: var(--canvas-bg-color);
+}
+
+@keyframes color-change {
+	0% {border-color: red;}
+	14% {border-color: orange;}
+	28% {border-color: yellow;}
+	42% {border-color: lime;}
+	56% {border-color: cyan;}
+	70% {border-color: blue;}
+	84% {border-color: violet;}
+	100% {border-color: red;}
+}
+canvas {
+	border: 40px solid;
+	animation: color-change 3s infinite linear;
 }
