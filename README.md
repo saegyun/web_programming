@@ -7,17 +7,20 @@
 <p>먼저 stage 3을 누르면 난이도 선택 알림창이 뜨는데, 1, 2, 3 중 하나를 입력하시면 됩니다. 1은 easy, 2는 normal, 3은 hard입니다. 난이도가 높을 수록 더 많은 몬스터가 나오고, 버텨야 되는 시간이 더 길고, 우민(변명자)도 출현합니다.</p>
 
 <h3>Easy</h3>
+
 ![stage 3 preivew 2](images/stage3_preview_2.jpg)
 
 <h3>Normal</h3>
+
 ![stage 3 preivew 4](images/stage3_preview_4.jpg)
 
 <h3>Hard</h3>
+
 ![stage 3 preivew 6](images/stage3_preview_6.jpg)
 
 <p>시간이 지나면 뒷 배경도 바뀌는 모습을 볼 수 있습니다.</p>
 
-![stage 3 preivew 3](images/stage3_preview_6.jpg)
+![stage 3 preivew 3](images/stage3_preview_3.jpg)
 
 <p>만약 주어진 시간을 모두 버티면 승리 화면이 아래와 같이 나옵니다. 얻은 총 경험치와 승리 보상인 보너스 경험치를 볼 수 있습니다.</p>
 
