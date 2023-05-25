@@ -386,7 +386,7 @@ function startGame(callBack) {
 	let maxSpawns = 10; // 한 화면에서 존재할 수 있는 최대 몹 개수
 	let mobSpawnChance = 50; // 몹 생성 함수가 1초마다 호출될 때 몹이 실제로 생성될 확률, 0 ~ 100 사이
 	let mobSpeedModifier = 1; // 몹의 속도를 얼만큼 배수할 것인지
-	let remainingTime = 30; // 버티는 시간, 초단위 (180초)
+	let remainingTime = 180; // 버티는 시간, 초단위 (180초)
 	let addedTime = 0; // 시간 계산에 사용할 변수
 	let bonusEXP = 300; //  끝까지 버텼을 경우 경험치 보상
 	let doSpawnIllager = false; // 우민 생성 여부, 노멀 이상부터 생성됨
