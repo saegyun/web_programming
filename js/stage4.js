@@ -98,7 +98,7 @@ function startGame(callBack) {
 		id: barId,
 		color: "brown",
 		type: "rect",
-		from: [100 + maxWidth / 2 - barWidth / 2, deathLine - 100],
+		loc: [100 + maxWidth / 2 - barWidth / 2, deathLine - 100],
 		size: [barWidth, barHeight],
 	};
 
@@ -147,7 +147,7 @@ function startGame(callBack) {
 				id: brickPosInfo[pos],
 				color: "rgba(60, 10, 10, 0.5)",
 				type: "rect",
-				from: [col + padding / 2, row + padding / 2],
+				loc: [col + padding / 2, row + padding / 2],
 				size: [brickAreaWidth - padding, brickAreaHeight - padding],
 			});
 		}
@@ -164,7 +164,7 @@ function startGame(callBack) {
 		}
 
 		const processBar = (object) => {
-			object.from = [
+			object.loc = [
 				Math.max(
 					0,
 					Math.min(
@@ -172,7 +172,7 @@ function startGame(callBack) {
 						mousePos[0] - mousePadding - barWidth / 2
 					)
 				),
-				object.from[1],
+				object.loc[1],
 			];
 			bar = object;
 		};
@@ -197,13 +197,13 @@ function startGame(callBack) {
 			];
 
 			// collide with bar
-			if ((object.loc[1] <= bar.from[1] && object.loc[1] >= bar.from[1] - object.radius) &&
-				(object.loc[0] >= bar.from[0] && object.loc[0] <= bar.from[0] + barWidth)) {
+			if ((object.loc[1] <= bar.loc[1] && object.loc[1] >= bar.loc[1] - object.radius) &&
+				(object.loc[0] >= bar.loc[0] && object.loc[0] <= bar.loc[0] + barWidth)) {
 				ballRad = (2 * Math.PI - ballRad);
 			}
-			if ((object.loc[1] >= bar.from[1] && object.loc[1] <= bar.from[1] + barHeight) &&
-				((object.loc[0] >= bar.from[0] - object.radius && object.loc[0] <= bar.from[0]) || 
-					(object.loc[0] <= bar.from[0] + barWidth + object.radius && object.loc[0] >= bar.from[0] + barWidth))) {
+			if ((object.loc[1] >= bar.loc[1] && object.loc[1] <= bar.loc[1] + barHeight) &&
+				((object.loc[0] >= bar.loc[0] - object.radius && object.loc[0] <= bar.loc[0]) || 
+					(object.loc[0] <= bar.loc[0] + barWidth + object.radius && object.loc[0] >= bar.loc[0] + barWidth))) {
 				ballRad = Math.PI - ballRad;  
 			}
 
@@ -214,14 +214,14 @@ function startGame(callBack) {
 		};
 
 		const processBrick = (object, callBack) => {
-			const pos = [object.from[0] - padding / 2, object.from[1] - padding / 2];
+			const pos = [object.loc[0] - padding / 2, object.loc[1] - padding / 2];
 
 			pos[1] += brickDy;
-			object.from[1] += brickDy;
+			object.loc[1] += brickDy;
 
 			brickPosInfo[pos] = object.id;
 
-			if (object.from[1] > deathLine) {
+			if (object.loc[1] > deathLine) {
 				callBack();
 		 		draws.splice(draws.indexOf(object), 1);
 				delete brickPosInfo[pos];
@@ -269,7 +269,7 @@ function startGame(callBack) {
 					break;
 				case "rect":
 					context.fillStyle = isTracked ? "red" : object.color || "black";
-					context.fillRect(object.from[0], object.from[1], object.size[0], object.size[1]);
+					context.fillRect(object.loc[0], object.loc[1], object.size[0], object.size[1]);
 					break;
 				default:
 					break;
