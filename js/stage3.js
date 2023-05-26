@@ -470,6 +470,31 @@ function startGame(callBack) {
 	expDiv.text("XP: 0");
 	$(canvas).parent().append(expDiv);
 	
+	const volumeDiv = $("<div />").attr("id", "stage3_volume");
+	let volumeOn = true;
+	volumeDiv.append($("<img />").attr("src", "resource/sprite/volume_on.png").attr("width", "60px").attr("height", "60px"));
+	$(volumeDiv).css({
+		"position": "absolute",
+		"z-index": "1",
+		"height": "60px",
+		"left": (canvasPosition.left + 760) + "px",
+		"top": (canvasPosition.top + 760) + "px",
+		"line-height": "80px",
+	});
+	volumeDiv.on("click", function() {
+		if(volumeOn) {
+			volumeOn = false;
+			mainMusic.volume = 0.0;
+			volumeDiv.find("img").attr("src", "resource/sprite/volume_off.png");
+		}
+		else {
+			volumeOn = true;
+			mainMusic.volume = 1.0;
+			volumeDiv.find("img").attr("src", "resource/sprite/volume_on.png");
+		}
+	});
+	$(canvas).parent().append(volumeDiv);
+	
 	// 현재 화면에 존재하는 모든 몹을 배열에 저장
 	let activeMobs = [];
 	
@@ -572,11 +597,6 @@ function startGame(callBack) {
 		remainingTime -= 1;
 		addedTime += 1;
 		$(timeDiv).text("Time Left: " + formatTime(remainingTime));
-		
-		$(timeDiv).css({
-			"left": (canvasPosition.left + 640) + "px",
-			"top": (canvasPosition.top + 70) + "px",
-		});
 		
 		// 시간에 따라 배경 바꾸기
 		backgroundImage.src = "resource/background/stage3_background_" + (Math.floor(addedTime / backgroundChangeInterval) + 1) + ".png";
@@ -819,6 +839,7 @@ function startGame(callBack) {
 			defeatMusic.play();
 			$("#screen #stage3_time").remove();
 			$("#screen #stage3_exp").remove();
+			$("#screen #stage3_volume").remove();
 			
 			// 마을 불 배경
 			context.drawImage(fireBackground, 0, 0, maxWidth, maxHeight);
@@ -849,6 +870,7 @@ function startGame(callBack) {
 			victoryMusic.play();
 			$("#screen #stage3_time").remove();
 			$("#screen #stage3_exp").remove();
+			$("#screen #stage3_volume").remove();
 			
 			// 승리 배경
 			context.fillStyle = 'rgba(70, 70, 70, 0.4)';
@@ -877,6 +899,7 @@ function startGame(callBack) {
 		context.clearRect(0, 0, maxWidth, maxHeight); // canvas 지우기
 		$("#screen #stage3_time").remove();
 		$("#screen #stage3_exp").remove();
+		$("#screen #stage3_volume").remove();
 		callBack();
 	};
 	// requestAnimationFrame is much better than setInterval for animation and games because of optimization and synchronized with browser rendering loop
