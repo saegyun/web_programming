@@ -10,15 +10,21 @@ let flow;
 let state = "intro";
 
 const moveNext = (idx) => {
-	flow[state].value.hidden = true;
+	// flow[state].value.hidden = true;
+	$(flow[state].value).fadeOut();
 	state = flow[state].next[idx];
-	flow[state].value.hidden = false;
+	setTimeout(() => {
+		$(flow[state].value).fadeIn();
+	}, 500);
+	// flow[state].value.hidden = false;
 };
 
 const moveBack = () => {
-	flow[state].value.hidden = true;
+	$(flow[state].value).fadeOut();
 	state = flow[state].prev;
-	flow[state].value.hidden = false;
+	setTimeout(() => {
+		$(flow[state].value).fadeIn();
+	}, 500);
 }
 
 function initPage() {

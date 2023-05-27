@@ -8,6 +8,8 @@ class Heart {
 
 	status;
 
+	sound;
+
 	constructor(health, max_health) {
 		this.health = health; 
 		this.max_health = max_health;
@@ -20,83 +22,52 @@ class Heart {
 		
 		this.heart_blink_img = new Image();
 		this.heart_blink_img.src = "/resource/ui/heart_blink.png";
+
+		this.sound = new Audio("/resource/sound/player_hurt.mp3");
 	
 		this.status = "";
 	}
 
 	draw(context, x, y, width, height, padding) {
 		for (let i = 0; i <= this.max_health / 2; i++) {
-			context.drawImage(
-				this.heart_bg_img,
-				0,
-				0,
-				90,
-				90,
-				x + i * (width + padding),
-				y,
-				width,
-				height
-			);
-			if (i <= this.health / 2) {
+			const drawHeart = (img, ratio) => {
 				context.drawImage(
-					this.heart_img,
+					img,
 					0,
 					0,
-					90,
+					90 * ratio,
 					90,
 					x + i * (width + padding),
 					y,
-					width,
+					width * ratio,
 					height
 				);
+			}
+			drawHeart(this.heart_bg_img, 1);
+
+			if (i <= this.health / 2) {
+
+				drawHeart(this.heart_img, 1);
 				if (this.status != "") {
-					context.drawImage(
-						this.heart_blink_img,
-						0,
-						0,
-						90,
-						90,
-						x + i * (width + padding),
-						y,
-						width,
-						height
-					);
+					drawHeart(this.heart_blink_img, 1);
 				}
 			}
 			else if (i == Math.ceil(this.health / 2)) {
-				context.drawImage(
-					this.heart_img,
-					0,
-					0,
-					45,
-					90,
-					x + i * (width + padding),
-					y,
-					width / 2,
-					height
-				);
+				drawHeart(this.heart_img, 0.5);
 				if (this.status != "") {
-					context.drawImage(
-						this.heart_blink_img,
-						0,
-						0,
-						45,
-						90,
-						x + i * (width + padding),
-						y,
-						width / 2,
-						height
-					);
+					drawHeart(this.heart_blink_img, 1);
 				}
 			}
 		}
 	}
 
-	attack(damage) {
+	attack(damage, cb) {
 		if (this.status == "") {
-			
 			this.health -= damage;
 			this.status = "attacked";
+
+			this.sound.play();
+
 			setTimeout(() => {
 				this.status = "attacked";
 			}, 250);
@@ -111,6 +82,7 @@ class Heart {
 			}, 500);
 
 			if (this.health <= 0) {
+				cb();
 				return false;
 			} else {
 				return true;

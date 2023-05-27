@@ -9,10 +9,16 @@ const damage = 5;
 
 const gameEnd = (context) => {
 	clearInterval(gameInterval);
+	$("#stage4_exp").remove();
 	setTimeout(() => {
 		context.clearRect(0, 0, maxWidth, maxHeight); // clear canvas			
 	}, 10);
 	$(window).off("mousemove");
+};
+
+const checkResult = (context) => {
+	gameEnd(context);
+	moveNext(0);
 };
 
 $(document).ready(function() {
@@ -27,7 +33,6 @@ $(document).ready(function() {
 	});
 
 	$("#choice .next").eq(3).on("click", () => {
-
 		$(window).on("mousemove", event => {
 			mousePos = [
 				event.pageX,
@@ -145,6 +150,9 @@ function startGame() {
 	const spawnerImg = new Image();
 	spawnerImg.src = "/resource/blocks/mob_spawner.png";
 
+	const paddleImg = new Image();
+	paddleImg.src = "/resource/sprite/magma_slime_paddle.png";
+
 	const heart = new Heart(20, 20);
 
 	// object that maps "position" to "id"
@@ -156,10 +164,10 @@ function startGame() {
 	// bar object
 	let bar = {
 		id: barId,
-		color: "brown",
-		type: "rect",
+		type: "bar",
 		loc: [100 + maxWidth / 2 - barWidth / 2, deathLine - 100],
 		size: [barWidth, barHeight],
+		sound: [new Audio("resource/sound/slime_paddle_1.ogg"), new Audio("resource/sound/slime_paddle_2.ogg"), new Audio("resource/sound/slime_paddle_3.ogg"), new Audio("resource/sound/slime_paddle_4.ogg")],
 	};
 
 	draws[barId] = bar;
@@ -277,24 +285,32 @@ function startGame() {
 			object.loc[1] + Math.sin(ballRad) * levelInfo.ball_speed,
 		];
 
+		let isCollided = false;
+
 		// collide with bar
 		if ((object.loc[1] <= bar.loc[1] && object.loc[1] >= bar.loc[1] - object.radius) &&
 			(object.loc[0] >= bar.loc[0] && object.loc[0] <= bar.loc[0] + barWidth)) {
 			ballRad = (2 * Math.PI - ballRad);
+			isCollided = true;
 		}
 		if ((object.loc[1] <= bar.loc[1] + barHeight + object.radius && object.loc[1] >= bar.loc[1] + barHeight) &&
 			(object.loc[0] >= bar.loc[0] && object.loc[0] <= bar.loc[0] + barWidth)) {
 			ballRad = (2 * Math.PI - ballRad);
+			isCollided = true;
 		}
 		if ((object.loc[0] <= bar.loc[0] && object.loc[0] >= bar.loc[0] - object.radius) &&
 			(object.loc[1] >= bar.loc[1] && object.loc[1] <= bar.loc[1] + barHeight)) {
 			ballRad = Math.PI - ballRad;  
+			isCollided = true;
 		}
 		if ((object.loc[0] <= bar.loc[0] + barWidth + object.radius && object.loc[0] >= bar.loc[0] + object.radius) &&
 			(object.loc[1] >= bar.loc[1] && object.loc[1] <= bar.loc[1] + barHeight)) {
 			ballRad = Math.PI - ballRad;  
+			isCollided = true;
 		}
-		
+		if (isCollided) {
+			bar.sound[Math.floor(Math.random() * bar.sound.length)].play();
+		}
 
 		if (object.loc[1] > deathLine) {
 			callBack();
@@ -370,7 +386,9 @@ function startGame() {
 			// when the object is the ball
 			if (object.id == ballId) {
 				processBall(object, () => {
-					heart.attack(2);
+					heart.attack(2, () => {
+						checkResult(context);
+					});
 				});
 			}
 
@@ -378,7 +396,9 @@ function startGame() {
 			if (brickIds.includes(object.id)) {
 				processBrick(object, () => {
 					object.class.sayAttack();
-					heart.attack(object.class.damage);
+					heart.attack(object.class.damage, () => {
+						checkResult(context);
+					});
 				});
 			}
 
@@ -397,6 +417,19 @@ function startGame() {
 				case "rect":
 					context.fillStyle = isTracked ? "red" : object.color || "black";
 					context.fillRect(object.loc[0], object.loc[1], object.size[0], object.size[1]);
+					break;
+				case "bar":
+					context.drawImage(
+						paddleImg,
+						0,
+						0,
+						barWidth,
+						barHeight,
+						object.loc[0], 
+						object.loc[1], 
+						object.size[0], 
+						object.size[1]
+					);
 					break;
 				case "mob":
 					object.class.draw(context);
@@ -495,5 +528,5 @@ function startGame() {
 		}
 	}
 
-	gameInterval = setInterval(() => draw(gameInterval, gameEnd));
+	gameInterval = setInterval(() => draw(gameInterval, checkResult));
 }
