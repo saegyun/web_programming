@@ -52,36 +52,6 @@ $(document).ready(function() {
 
 });
 
-class MobBlaze extends Mob {
-	constructor(x, y, maxHealth, damage, speed, width, height, exp) {
-		super(x, y, maxHealth, damage, speed, width, height, 8, 200, 192, exp); // Mob 클래스의 생성자 호출
-		MobBlaze.idleSprite.src = "resource/sprite/blaze.png"; // 걷는 sprite
-		MobBlaze.hurtSprite.src = "resource/sprite/blaze_hurt.png"; // 맞았을 때 sprite
-	}
-	static idleSprite = new Image(); 
-	static hurtSprite = new Image();
-	static idleAudios = [new Audio("resource/sound/blaze_idle.mp3")]; // 생성될 때 소리
-	static hurtAudios = [new Audio("resource/sound/blaze_hit.mp3")]; // 맞았을 때 소리
-	static deathAudios = [new Audio("resource/sound/blaze_death.mp3")]; // 죽었을 때 소리
-	static attackAudios = [new Audio("resource/sound/blaze_shoot.mp3")]; // 마을을 때릴 때 소리
-
-	draw(context) { // 캔버스에 그리기, Mob 클래스의 draw() 호출
-		super.draw(context, MobBlaze.idleSprite, MobBlaze.hurtSprite);
-	}
-
-	sayIdle() { // 생성할 때 소리 내기
-		super.say(MobBlaze.idleAudios);
-	}
-	
-	sayAttack() { // 마을에 도착했을 때 소리 내기
-		super.say(MobBlaze.attackAudios);
-	}
-
-	hit(damage) { // 몹이 맞았을 때 함수, hit() 함수의 결과 반환 (죽으면 true, 아직 살아있으면 false) 
-		return super.hit(damage, MobBlaze.hurtAudios, MobBlaze.deathAudios);
-	}
-}
-
 const debugObtions = {
 	showHitBox: false,
 	addTrackBrick: (id) => {
@@ -94,29 +64,110 @@ const stage4Levels = {
 	"easy": {
 		brick_intenity: 1,
 		bricks_in_row: 6,
-		frquency: 0.2,
+		frquency: 0.1,
+		spawnerHitCnt: 3,
 		ball_speed: 2,
-		plane_size: 4,
 	},
 	"normal": {
 		brick_intenity: 1,
-		bricks_in_row: 10,
-		frquency: 0.2,
-		ball_speed: 1,
-		plane_size: 4,
+		bricks_in_row: 8,
+		frquency: 0.15,
+		spawnerHitCnt: 2,
+		ball_speed: 2,
 	},
 	"hard": {
 		brick_intenity: 1,
 		bricks_in_row: 10,
 		frquency: 0.2,
-		ball_speed: 1,
-		plane_size: 4,
+		spawnerHitCnt: 1,
+		ball_speed: 2,
 	},
 }
 
 // brick breaking main logic
 function startGame() {
-	
+		
+	class MobBlaze extends Mob {
+		constructor(x, y, maxHealth, damage, speed, width, height, exp) {
+			super(x, y, maxHealth, damage, speed, width, height, 8, 200, 192, exp); // Mob 클래스의 생성자 호출
+			MobBlaze.idleSprite.src = "resource/sprite/blaze.png"; // 걷는 sprite
+			MobBlaze.hurtSprite.src = "resource/sprite/blaze_hurt.png"; // 맞았을 때 sprite
+		}
+		static idleSprite = new Image(); 
+		static hurtSprite = new Image();
+		static idleAudios = [new Audio("resource/sound/blaze_idle.mp3")]; // 생성될 때 소리
+		static hurtAudios = [new Audio("resource/sound/blaze_hit.mp3")]; // 맞았을 때 소리
+		static deathAudios = [new Audio("resource/sound/blaze_death.mp3")]; // 죽었을 때 소리
+		static attackAudios = [new Audio("resource/sound/blaze_shoot.mp3")]; // 마을을 때릴 때 소리
+
+		draw(context) { // 캔버스에 그리기, Mob 클래스의 draw() 호출
+			super.draw(context, MobBlaze.idleSprite, MobBlaze.hurtSprite);
+		}
+
+		sayIdle() { // 생성할 때 소리 내기
+			super.say(MobBlaze.idleAudios);
+		}
+		
+		sayAttack() { // 마을에 도착했을 때 소리 내기
+			super.say(MobBlaze.attackAudios);
+		}
+
+		hit(damage) { // 몹이 맞았을 때 함수, hit() 함수의 결과 반환 (죽으면 true, 아직 살아있으면 false) 
+			return super.hit(damage, MobBlaze.hurtAudios, MobBlaze.deathAudios);
+		}
+	}
+
+	class Spawner {
+		breakCnt;
+		brokenImgs = [];
+
+		spawnerImg;
+		hitSound;
+
+		constructor(breakCnt) {
+			this.hitCnt = -1;		
+			this.breakCnt = breakCnt;
+				
+			this.spawnerImg = new Image();
+			this.spawnerImg.src = "resource/blocks/mob_spawner.png";
+
+			this.hitSound = new Audio("resource/sound/item_break.ogg");
+
+			for (let i = 0; i <= 9; i++) {
+				const img = new Image();
+				img.src = `resource/blocks/break/broken_${i}.png`;
+				this.brokenImgs.push(img);
+			}
+		}
+
+		draw(context) {
+			const drawImage = (img) => {
+				context.drawImage(
+					img,
+					0,
+					0,
+					200,
+					200,
+					maxWidth / 2 - brickAreaWidth / 2,
+					0,
+					brickAreaWidth,
+					brickAreaHeight
+				);
+			};
+			drawImage(this.spawnerImg);
+			if (this.hitCnt != -1) {
+				drawImage(this.brokenImgs[Math.min(this.hitCnt, 9)]);
+			}
+		}
+
+		hit(increase, cb) {
+			this.hitCnt += increase;
+			this.hitSound.play();
+			if (this.hitCnt >= 9) {
+				cb();
+			}
+		}
+	}
 	const canvas = document.getElementById("myCanvas");
 	const context = canvas.getContext("2d");
 
@@ -142,18 +193,16 @@ function startGame() {
 	const padding = 40;
 
 	const backgroundImg = new Image();
-	backgroundImg.src = "/resource/background/stage4_background.png";
+	backgroundImg.src = "resource/background/stage4_background.png";
 	
 	const wallImg = new Image();
-	wallImg.src = "/resource/background/stage4_background_wall.png";
-	
-	const spawnerImg = new Image();
-	spawnerImg.src = "/resource/blocks/mob_spawner.png";
+	wallImg.src = "resource/background/stage4_background_wall.png";
 
 	const paddleImg = new Image();
-	paddleImg.src = "/resource/sprite/magma_slime_paddle.png";
+	paddleImg.src = "resource/sprite/magma_slime_paddle.png";
 
 	const heart = new Heart(20, 20);
+	const spawner = new Spawner(9);
 
 	// object that maps "position" to "id"
 	let brickPosInfo = {};
@@ -186,13 +235,13 @@ function startGame() {
 
 	draws[ballId] = ball;
 
-	const spawner = {
+	const spawnerBlaze = {
 		id: Math.random(),
 		color: "rgba(60, 10, 10, 0.5)",
 		type: "mob",
 		class: new MobBlaze(maxWidth / 2 - brickAreaWidth / 2, 0, 100, 10, 0, brickAreaWidth, brickAreaHeight, 1000),
 	};
-	draws[spawner.id] = spawner;
+	draws[spawner.id] = spawnerBlaze;
 
 
 	// initial ball shooting radian
@@ -271,12 +320,18 @@ function startGame() {
 				
 		// collide with vertical wall
 		if (object.loc[0] < object.radius || object.loc[0] > maxWidth - object.radius) {
-			ballRad = Math.PI - ballRad;  
+			ballRad = Math.PI - ballRad;
 		}
 
 		// collide with horizontal wall
 		if (object.loc[1] < object.radius + brickAreaHeight || object.loc[1] > maxHeight - object.radius) {
 			ballRad = (2 * Math.PI - ballRad);
+			if (object.loc[1] < maxHeight * 0.5 && 
+				(object.loc[0] > maxWidth / 2 - brickAreaWidth / 2 && object.loc[0] < maxWidth / 2 + brickAreaWidth / 2)) {
+					spawner.hit(levelInfo.spawnerHitCnt, () => {
+						checkResult(context);
+					});
+			}
 		}
 		
 		// refreshing ball's location
@@ -443,18 +498,8 @@ function startGame() {
 			context.stroke();
 			context.closePath();
 		}
-		context.drawImage(
-			spawnerImg,
-			0,
-			0,
-			200,
-			200,
-			maxWidth / 2 - brickAreaWidth / 2,
-			0,
-			brickAreaWidth,
-			brickAreaHeight
-		);
-
+		spawner.draw(context);
+		
 		// 경험치 라벨 그리기
 		for(var i in expLabels) {
 			let expLabel = expLabels[i];

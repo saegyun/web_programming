@@ -1,4 +1,4 @@
-let currentLevel = "easy";
+let currentLevel = "normal";
 
 // canvas size
 const maxWidth = 800;
