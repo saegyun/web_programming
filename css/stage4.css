@@ -1,0 +1,5 @@
+#stage4 .back {
+	position: absolute;
+	bottom: 0;
+	left: calc(var(--main-width) - 50px);
+}

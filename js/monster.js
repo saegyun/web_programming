@@ -81,7 +81,7 @@ Mob.prototype.hit = function(damage, hurtAudios, deathAudios) {
 	{
 		this.status = "death"; // 몹 상태를 "death"로 변경
 		let deathAudio = deathAudios[Math.floor(Math.random() * deathAudios.length)];
-		// deathAudio.play();
+		deathAudio.play();
 		// increase exp
 		
 		return true;
@@ -91,7 +91,7 @@ Mob.prototype.hit = function(damage, hurtAudios, deathAudios) {
 		this.status = "hurt"; // 몹 상태를 "hurt"로 변경
 		this.hitTimer = 20; // 20 frame 동안 draw에서 빨간색 오버레이(hurtSprite) 유지
 		let hurtAudio = hurtAudios[Math.floor(Math.random() * hurtAudios.length)];
-		// hurtAudio.play();
+		hurtAudio.play();
 		return false;
 	}
 }

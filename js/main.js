@@ -4,6 +4,23 @@ let currentLevel = "easy";
 const maxWidth = 800;
 const maxHeight = 800;
 
+let flow;
+
+
+let state = "intro";
+
+const moveNext = (idx) => {
+	flow[state].value.hidden = true;
+	state = flow[state].next[idx];
+	flow[state].value.hidden = false;
+};
+
+const moveBack = () => {
+	flow[state].value.hidden = true;
+	state = flow[state].prev;
+	flow[state].value.hidden = false;
+}
+
 function initPage() {
 	const intro = document.getElementById("intro");
 	const title = document.getElementById("title");
@@ -22,7 +39,7 @@ function initPage() {
 	const stage4_result = document.getElementById("stage4-result");
 	const stage5_result = document.getElementById("stage5-result");
 
-	const flow = {
+	flow = {
 		"intro": {
 			value: intro,
 			next: ["title"],
@@ -100,20 +117,6 @@ function initPage() {
 			prev: "choice",
 		},
 	};
-
-	let state = "intro";
-
-	const moveNext = (idx) => {
-		flow[state].value.hidden = true;
-		state = flow[state].next[idx];
-		flow[state].value.hidden = false;
-	};
-
-	const moveBack = () => {
-		flow[state].value.hidden = true;
-		state = flow[state].prev;
-		flow[state].value.hidden = false;
-	}
 
 	Object.entries(flow).forEach((page) => {
 		if (page[0] != state) {
