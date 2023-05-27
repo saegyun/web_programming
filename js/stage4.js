@@ -1,4 +1,5 @@
 let mousePos = [0, 0];
+let canvasPosition;
 let mousePadding = 0;
 
 let trackIds = [];
@@ -16,6 +17,7 @@ const gameEnd = (context) => {
 
 $(document).ready(function() {
 	const reCalc = () => {
+		canvasPosition = $("canvas").position();
 		mousePadding = ($(window).width() - $("#myCanvas").width()) / 2;
 	};
 	reCalc();
@@ -178,7 +180,7 @@ function startGame() {
 		id: Math.random(),
 		color: "rgba(60, 10, 10, 0.5)",
 		type: "mob",
-		class: new MobBlaze(maxWidth / 2 - brickAreaWidth / 2, 0, 100, 10, 0, brickAreaWidth, brickAreaHeight),
+		class: new MobBlaze(maxWidth / 2 - brickAreaWidth / 2, 0, 100, 10, 0, brickAreaWidth, brickAreaHeight, 1000),
 	};
 	draws[spawner.id] = spawner;
 
@@ -192,6 +194,23 @@ function startGame() {
 
 	// tracking how bricks go down
 	let brickProgress = 0;
+
+	// 획득 경험치를 표시하는 div, 왼쪽 상단에 배치됨
+	const expDiv = $("<div />").attr("id", "stage4_exp");
+	$(expDiv).css({
+		"position": "absolute",
+		"z-index": "1",
+		"left": (canvasPosition.left + 40) + "px",
+		"top": (canvasPosition.top + 70) + "px",
+		"width": "180px",
+		"height": "80px",
+		"line-height": "80px",
+		"text-align": "center",
+		"font": "30px bold Arial",
+		"color": "#7bf318"
+	});
+	expDiv.text("XP: 0");
+	$(canvas).parent().append(expDiv);
 
 	// add bricks to "draws" and initialize "brickPosInfo"
 	const spawnBricks = () => {
@@ -213,7 +232,7 @@ function startGame() {
 				id: brickPosInfo[pos],
 				color: "rgba(60, 10, 10, 0.5)",
 				type: "mob",
-				class: new MobBlaze(col + padding / 2, row + padding / 2, 10, 10, brickDy, brickAreaWidth - padding, brickAreaHeight - padding),
+				class: new MobBlaze(col + padding / 2, row + padding / 2, 10, 10, brickDy, brickAreaWidth - padding, brickAreaHeight - padding, 20),
 			};
 
 			draws[currentMob.id] = currentMob;
@@ -221,6 +240,85 @@ function startGame() {
 		}
 	}
 	spawnBricks();
+
+	
+	const processBar = (object) => {
+		object.loc = [
+			Math.max(
+				0,
+				Math.min(
+					maxWidth - barWidth, 
+					mousePos[0] - mousePadding - barWidth / 2
+				)
+			),
+			object.loc[1],
+		];
+		bar = object;
+	};
+
+	const processBall = (object, callBack) => {
+		ballLoc = object.loc; // location track
+				
+		// collide with vertical wall
+		if (object.loc[0] < object.radius || object.loc[0] > maxWidth - object.radius) {
+			ballRad = Math.PI - ballRad;  
+		}
+
+		// collide with horizontal wall
+		if (object.loc[1] < object.radius + brickAreaHeight || object.loc[1] > maxHeight - object.radius) {
+			ballRad = (2 * Math.PI - ballRad);
+		}
+		
+		// refreshing ball's location
+		object.loc = [
+			object.loc[0] + Math.cos(ballRad) * levelInfo.ball_speed,
+			object.loc[1] + Math.sin(ballRad) * levelInfo.ball_speed,
+		];
+
+		// collide with bar
+		if ((object.loc[1] <= bar.loc[1] && object.loc[1] >= bar.loc[1] - object.radius) &&
+			(object.loc[0] >= bar.loc[0] && object.loc[0] <= bar.loc[0] + barWidth)) {
+			ballRad = (2 * Math.PI - ballRad);
+		}
+		if ((object.loc[1] <= bar.loc[1] + barHeight + object.radius && object.loc[1] >= bar.loc[1] + barHeight) &&
+			(object.loc[0] >= bar.loc[0] && object.loc[0] <= bar.loc[0] + barWidth)) {
+			ballRad = (2 * Math.PI - ballRad);
+		}
+		if ((object.loc[0] <= bar.loc[0] && object.loc[0] >= bar.loc[0] - object.radius) &&
+			(object.loc[1] >= bar.loc[1] && object.loc[1] <= bar.loc[1] + barHeight)) {
+			ballRad = Math.PI - ballRad;  
+		}
+		if ((object.loc[0] <= bar.loc[0] + barWidth + object.radius && object.loc[0] >= bar.loc[0] + object.radius) &&
+			(object.loc[1] >= bar.loc[1] && object.loc[1] <= bar.loc[1] + barHeight)) {
+			ballRad = Math.PI - ballRad;  
+		}
+		
+
+		if (object.loc[1] > deathLine) {
+			callBack();
+		}
+	};
+
+	const processBrick = (object, callBack) => {
+		const mob = object.class;
+		const pos = [mob.x - padding / 2, mob.y - padding / 2];
+		
+		pos[1] += mob.speed;
+		mob.y += mob.speed;
+
+		brickPosInfo[pos] = object.id;
+
+		// 몹이 마을에 도달했을 때 (아래 끝까지)
+		if(mob.y > deathLine - 60) {
+			callBack();
+			delete draws[object.id];
+			delete brickPosInfo[pos];
+			return;
+		}
+	};
+	
+	let expLabels = [];
+	let obtainedXp = 0; 
 
 	// main drawing interval
 	const draw = (callBack) => {
@@ -230,81 +328,6 @@ function startGame() {
 		if (brickProgress < brickDy) {
 			spawnBricks();
 		}
-
-		const processBar = (object) => {
-			object.loc = [
-				Math.max(
-					0,
-					Math.min(
-						maxWidth - barWidth, 
-						mousePos[0] - mousePadding - barWidth / 2
-					)
-				),
-				object.loc[1],
-			];
-			bar = object;
-		};
-
-		const processBall = (object, callBack) => {
-			ballLoc = object.loc; // location track
-					
-			// collide with vertical wall
-			if (object.loc[0] < object.radius || object.loc[0] > maxWidth - object.radius) {
-				ballRad = Math.PI - ballRad;  
-			}
-
-			// collide with horizontal wall
-			if (object.loc[1] < object.radius + brickAreaHeight || object.loc[1] > maxHeight - object.radius) {
-				ballRad = (2 * Math.PI - ballRad);
-			}
-			
-			// refreshing ball's location
-			object.loc = [
-				object.loc[0] + Math.cos(ballRad) * levelInfo.ball_speed,
-				object.loc[1] + Math.sin(ballRad) * levelInfo.ball_speed,
-			];
-
-			// collide with bar
-			if ((object.loc[1] <= bar.loc[1] && object.loc[1] >= bar.loc[1] - object.radius) &&
-				(object.loc[0] >= bar.loc[0] && object.loc[0] <= bar.loc[0] + barWidth)) {
-				ballRad = (2 * Math.PI - ballRad);
-			}
-			if ((object.loc[1] <= bar.loc[1] + barHeight + object.radius && object.loc[1] >= bar.loc[1] + barHeight) &&
-				(object.loc[0] >= bar.loc[0] && object.loc[0] <= bar.loc[0] + barWidth)) {
-				ballRad = (2 * Math.PI - ballRad);
-			}
-			if ((object.loc[0] <= bar.loc[0] && object.loc[0] >= bar.loc[0] - object.radius) &&
-				(object.loc[1] >= bar.loc[1] && object.loc[1] <= bar.loc[1] + barHeight)) {
-				ballRad = Math.PI - ballRad;  
-			}
-			if ((object.loc[0] <= bar.loc[0] + barWidth + object.radius && object.loc[0] >= bar.loc[0] + object.radius) &&
-				(object.loc[1] >= bar.loc[1] && object.loc[1] <= bar.loc[1] + barHeight)) {
-				ballRad = Math.PI - ballRad;  
-			}
-			
-
-			if (object.loc[1] > deathLine) {
-				callBack();
-			}
-		};
-
-		const processBrick = (object, callBack) => {
-			const mob = object.class;
-			const pos = [mob.x - padding / 2, mob.y - padding / 2];
-			
-			pos[1] += mob.speed;
-			mob.y += mob.speed;
-
-			brickPosInfo[pos] = object.id;
-
-			// 몹이 마을에 도달했을 때 (아래 끝까지)
-			if(mob.y > deathLine - 60) {
-				callBack();
-				delete draws[object.id];
-				delete brickPosInfo[pos];
-				return;
-			}
-		};
 
 		context.clearRect(0, 0, maxWidth, maxHeight);
 		context.drawImage(
@@ -438,8 +461,14 @@ function startGame() {
 				if (target.type === "mob") {
 					if (target.class.status === "") {
 						if (target.class.hit(damage)) {
+							let expLabel = new ExperienceLabel(target.class.x, target.class.y, target.class.exp);
+							expLabel.ding();
+							expLabels.push(expLabel);
+							obtainedXp += target.class.exp;
+							$(expDiv).text("XP: " + obtainedXp);
+
 							delete draws[targetId];
-							delete brickPosInfo[[brickX, brickY]];						
+							delete brickPosInfo[[brickX, brickY]];				
 						}
 					}
 

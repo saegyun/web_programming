@@ -95,3 +95,30 @@ Mob.prototype.hit = function(damage, hurtAudios, deathAudios) {
 		return false;
 	}
 }
+// 경험치 라벨 - 몹이 죽었을 때 표시됨
+class ExperienceLabel {
+	constructor(x, y, exp) {
+		this.x = x;
+		this.y = y;
+		this.text = "+" + exp + "XP";
+		this.expTimer = 40; // 경험치 라벨이 너무 빠르게 없어지지 않게 하기 위한 변수
+	}
+	static font = "bold 20px Arial";
+	static textColor = "#7bf318";
+	static expAudio = new Audio("resource/sound/experience.ogg");
+}
+// 소리 내기
+ExperienceLabel.prototype.ding = function() {ExperienceLabel.expAudio.play() }
+// 경험치 라벨 그리기
+ExperienceLabel.prototype.draw = function(context) {
+	if(this.expTimer > 0)
+	{
+		context.font = ExperienceLabel.font;
+		context.fillStyle = ExperienceLabel.textColor;
+		context.fillText(this.text, this.x, this.y);
+		this.expTimer -= 1;
+		return false;
+	}
+	else
+		return true;
+}
