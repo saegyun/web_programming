@@ -3,6 +3,39 @@ let mousePadding = 0;
 
 let trackIds = [];
 
+const damage = 5;
+
+class MobBlaze extends Mob {
+	constructor(x, y, maxHealth, damage, speed, width, height, exp) {
+		super(x, y, maxHealth, damage, speed, width, height, 8, 1197, 1152, exp); // Mob 클래스의 생성자 호출
+		this.animationTime = 20;
+		MobBlaze.idleSprite.src = "resource/sprite/blaze.png"; // 걷는 sprite
+		MobBlaze.hurtSprite.src = "resource/sprite/blaze.png"; // 맞았을 때 sprite
+	}
+	static idleSprite = new Image(); 
+	static hurtSprite = new Image();
+	static idleAudios = [new Audio("resource/sound/blaze_idle.mp3")]; // 생성될 때 소리
+	static hurtAudios = [new Audio("resource/sound/blaze_hit.mp3")]; // 맞았을 때 소리
+	static deathAudios = [new Audio("resource/sound/blaze_death.mp3")]; // 죽었을 때 소리
+	static attackAudios = [new Audio("resource/sound/blaze_shoot.mp3")]; // 마을을 때릴 때 소리
+
+	draw(context) { // 캔버스에 그리기, Mob 클래스의 draw() 호출
+		super.draw(context, MobBlaze.idleSprite, MobBlaze.hurtSprite);
+	}
+
+	sayIdle() { // 생성할 때 소리 내기
+		super.say(MobBlaze.idleAudios);
+	}
+	
+	sayAttack() { // 마을에 도착했을 때 소리 내기
+		super.say(MobBlaze.attackAudios);
+	}
+
+	hit(damage) { // 몹이 맞았을 때 함수, hit() 함수의 결과 반환 (죽으면 true, 아직 살아있으면 false) 
+		return super.hit(damage, MobBlaze.hurtAudios, MobBlaze.deathAudios);
+	}
+}
+
 const debugObtions = {
 	showHitBox: true,
 	addTrackBrick: (id) => {
@@ -14,22 +47,22 @@ const debugObtions = {
 const stage4Levels = {
 	"easy": {
 		brick_intenity: 1,
-		brick_count: 6,
-		bricks_in_row: 6,
-		ball_speed: 3,
+		bricks_in_row: 8,
+		frquency: 0.2,
+		ball_speed: 2,
 		plane_size: 4,
 	},
 	"normal": {
 		brick_intenity: 1,
-		brick_count: 40,
 		bricks_in_row: 10,
+		frquency: 0.2,
 		ball_speed: 1,
 		plane_size: 4,
 	},
 	"hard": {
 		brick_intenity: 1,
-		brick_count: 40,
 		bricks_in_row: 10,
+		frquency: 0.2,
 		ball_speed: 1,
 		plane_size: 4,
 	},
@@ -129,8 +162,8 @@ function startGame(callBack) {
 
 	// add bricks to "draws" and initialize "brickPosInfo"
 	const spawnBricks = () => {
-		for (let i = 0; i < levelInfo.brick_count; i++) {
-			if (Math.random() < 0.5) {
+		for (let i = 0; i < levelInfo.bricks_in_row; i++) {
+			if (Math.random() > levelInfo.frquency) {
 				continue;
 			}
 
@@ -143,13 +176,15 @@ function startGame(callBack) {
 	
 			brickIds.push(brickPosInfo[pos]);
 	
-			draws.push({
+			const currentMob = {
 				id: brickPosInfo[pos],
 				color: "rgba(60, 10, 10, 0.5)",
-				type: "rect",
-				loc: [col + padding / 2, row + padding / 2],
-				size: [brickAreaWidth - padding, brickAreaHeight - padding],
-			});
+				type: "mob",
+				class: new MobBlaze(col + padding / 2, row + padding / 2, 20, 10, brickDy, brickAreaWidth - padding, brickAreaHeight - padding),
+			};
+
+			draws.push(currentMob);
+			// currentMob.class.sayIdle();
 		}
 	}
 	spawnBricks();
@@ -197,16 +232,22 @@ function startGame(callBack) {
 			];
 
 			// collide with bar
-			if ((object.loc[1] <= bar.loc[1] && object.loc[1] >= bar.loc[1] - object.radius) &&
-				(object.loc[0] >= bar.loc[0] && object.loc[0] <= bar.loc[0] + barWidth)) {
-				ballRad = (2 * Math.PI - ballRad);
+			if (object.loc[1] <= bar.loc[1] + bar.size[1] + 2 * ball.radius && object.loc[1] >= bar.loc[1] - 2 * ball.radius) {
+				if ((object.loc[0] >= bar.loc[0] - 2 * ball.radius && object.loc[0] <= bar.loc[0])) {
+					ballRad = Math.PI - ballRad;  
+				}
+				if (object.loc[0] <= bar.loc[0] + bar.size[0] + 2 * ball.radius && object.loc[0] >= bar.loc[0] + bar.size[0]) {
+					ballRad = Math.PI - ballRad;  
+				}
 			}
-			if ((object.loc[1] >= bar.loc[1] && object.loc[1] <= bar.loc[1] + barHeight) &&
-				((object.loc[0] >= bar.loc[0] - object.radius && object.loc[0] <= bar.loc[0]) || 
-					(object.loc[0] <= bar.loc[0] + barWidth + object.radius && object.loc[0] >= bar.loc[0] + barWidth))) {
-				ballRad = Math.PI - ballRad;  
+			if (object.loc[0] <= bar.loc[0] + bar.size[0] + 2 * ball.radius && object.loc[0] >= bar.loc[0] - 2 * ball.radius) {
+				if ((object.loc[1] >= bar.loc[1] - 2 * ball.radius && object.loc[1] <= bar.loc[1])) {
+					ballRad = (2 * Math.PI - ballRad);
+				}
+				if (object.loc[1] <= bar.loc[1] + bar.size[1] + 2 * ball.radius && object.loc[1] >= bar.loc[1] + bar.size[1]) {
+					ballRad = (2 * Math.PI - ballRad);
+				}
 			}
-
 			if (object.loc[1] > deathLine) {
 				clearInterval(interval);
 				callBack();
@@ -214,16 +255,18 @@ function startGame(callBack) {
 		};
 
 		const processBrick = (object, callBack) => {
-			const pos = [object.loc[0] - padding / 2, object.loc[1] - padding / 2];
-
-			pos[1] += brickDy;
-			object.loc[1] += brickDy;
+			const mob = object.class;
+			const pos = [mob.x - padding / 2, mob.y - padding / 2];
+			
+			pos[1] += mob.speed;
+			mob.y += mob.speed;
 
 			brickPosInfo[pos] = object.id;
 
-			if (object.loc[1] > deathLine) {
+			// 몹이 마을에 도달했을 때 (아래 끝까지)
+			if(mob.y > deathLine - 60) {
 				callBack();
-		 		draws.splice(draws.indexOf(object), 1);
+				draws.splice(draws.indexOf(object), 1);
 				delete brickPosInfo[pos];
 				return;
 			}
@@ -271,6 +314,11 @@ function startGame(callBack) {
 					context.fillStyle = isTracked ? "red" : object.color || "black";
 					context.fillRect(object.loc[0], object.loc[1], object.size[0], object.size[1]);
 					break;
+				case "mob":
+					object.class.draw(context);
+					context.fillStyle = isTracked ? "red" : object.color || "black";
+					context.fillRect(object.class.x, object.class.y, object.class.width, object.class.height);
+					break;
 				default:
 					break;
 			}
@@ -295,27 +343,56 @@ function startGame(callBack) {
 
 		// check if brick really exists
 		if (targetId) {
-			debugObtions.addTrackBrick(targetId);
-			console.log(targetId);
+			// debugObtions.addTrackBrick(targetId);
+			// console.log(targetId);
 
 			let isBounced = false;
 
 			// find the real brick object according to its id
 			const target = draws.find(v => v.id === targetId);
 
-			if (((ballLoc[0] >= brickX + padding / 2 - ball.radius && ballLoc[0] <= brickX + padding / 2) || (ballLoc[0] <= brickX - padding / 2 + brickAreaWidth + ball.radius && ballLoc[0] >= brickX - padding / 2 + brickAreaWidth)) && 
-				(ballLoc[1] >= brickY + padding / 2 && ballLoc[1] <= brickY + brickAreaHeight - padding / 2)) {
-				ballRad = Math.PI - ballRad;
-				isBounced = true;
+
+			if ((ballLoc[1] >= brickY && ballLoc[1] <= brickY + brickAreaHeight)) {
+				if ((ballLoc[0] >= brickX + padding / 2 - 2 * ball.radius && ballLoc[0] <= brickX + padding / 2)) {
+					ballRad = Math.PI - ballRad;
+					
+					isBounced = true;
+				}
+				if ((ballLoc[0] <= brickX - padding / 2 + brickAreaWidth + 2 * ball.radius && ballLoc[0] >= brickX - padding / 2 + brickAreaWidth)) {
+					ballRad = Math.PI - ballRad;
+
+					isBounced = true;
+				}
+			}
+			
+
+			if (ballLoc[0] >= brickX && ballLoc[0] <= brickX + brickAreaWidth && !isBounced) {
+				if (ballLoc[1] >= brickY + padding / 2 - 2 * ball.radius && ballLoc[1] <= brickY + padding / 2) {
+
+					ballRad = (2 * Math.PI - ballRad);
+					isBounced = true;
+				}
+				if (ballLoc[1] <= brickY - padding / 2 + brickAreaHeight + 2 * ball.radius && ballLoc[1] >= brickY - padding / 2 + brickAreaHeight) {
+						
+					ballRad = (2 * Math.PI - ballRad);
+					isBounced = true;
+				}
+
 			}
 
-			if ((ballLoc[0] >= brickX + padding / 2 && ballLoc[0] <= brickX + brickAreaWidth - padding / 2) && 
-				((ballLoc[1] >= brickY + padding / 2 - ball.radius && ballLoc[1] <= brickY + padding / 2) || (ballLoc[1] <= brickY - padding / 2 + brickAreaHeight + ball.radius && ballLoc[1] >= brickY - padding / 2 + brickAreaHeight))) {
-				ballRad = (2 * Math.PI - ballRad);
-				isBounced = true;
-			}
 
 			if (isBounced) {
+				if (target.type === "mob") {
+					if (target.class.status === "") {
+						if (target.class.hit(damage)) {
+							draws.splice(draws.indexOf(target), 1);
+	
+							delete brickPosInfo[[brickX, brickY]];						
+						}
+					}
+
+					return;
+				}
 				draws.splice(draws.indexOf(target), 1);
 	
 				delete brickPosInfo[[brickX, brickY]];
