@@ -145,6 +145,8 @@ function startGame() {
 	const spawnerImg = new Image();
 	spawnerImg.src = "/resource/blocks/mob_spawner.png";
 
+	const heart = new Heart(20, 20);
+
 	// object that maps "position" to "id"
 	let brickPosInfo = {};
 
@@ -232,7 +234,7 @@ function startGame() {
 				id: brickPosInfo[pos],
 				color: "rgba(60, 10, 10, 0.5)",
 				type: "mob",
-				class: new MobBlaze(col + padding / 2, row + padding / 2, 10, 10, brickDy, brickAreaWidth - padding, brickAreaHeight - padding, 20),
+				class: new MobBlaze(col + padding / 2, row + padding / 2, 10, 5, brickDy, brickAreaWidth - padding, brickAreaHeight - padding, 20),
 			};
 
 			draws[currentMob.id] = currentMob;
@@ -352,7 +354,7 @@ function startGame() {
 			maxWidth,
 			brickAreaHeight
 		);
-		
+		heart.draw(context, maxWidth / 2 - 270, maxHeight - 40, 40, 40, 10);
 		for (const [key, object] of Object.entries(draws)) {
 			let isTracked = 0;
 
@@ -368,14 +370,15 @@ function startGame() {
 			// when the object is the ball
 			if (object.id == ballId) {
 				processBall(object, () => {
-
+					heart.attack(2);
 				});
 			}
 
 			// when the object is the brick
 			if (brickIds.includes(object.id)) {
 				processBrick(object, () => {
-
+					object.class.sayAttack();
+					heart.attack(object.class.damage);
 				});
 			}
 
@@ -418,6 +421,15 @@ function startGame() {
 			brickAreaWidth,
 			brickAreaHeight
 		);
+
+		// 경험치 라벨 그리기
+		for(var i in expLabels) {
+			let expLabel = expLabels[i];
+			if(expLabel.draw(context)) {
+				expLabels.splice(i, 1);
+			}
+		}
+
 		// calculating brick that the ball will collide with
 		let brickX = (
 			Number.parseInt(
@@ -458,24 +470,20 @@ function startGame() {
 			}
 			
 			if (isBounced) {
-				if (target.type === "mob") {
-					if (target.class.status === "") {
-						if (target.class.hit(damage)) {
-							let expLabel = new ExperienceLabel(target.class.x, target.class.y, target.class.exp);
-							expLabel.ding();
-							expLabels.push(expLabel);
-							obtainedXp += target.class.exp;
-							$(expDiv).text("XP: " + obtainedXp);
+				if (target.class.status === "") {
+					if (target.class.hit(damage)) {
+						let expLabel = new ExperienceLabel(target.class.x, target.class.y, target.class.exp);
+						expLabel.ding();
+						expLabels.push(expLabel);
+						obtainedXp += target.class.exp;
+						$(expDiv).text("XP: " + obtainedXp);
 
-							delete draws[targetId];
-							delete brickPosInfo[[brickX, brickY]];				
-						}
+						delete draws[targetId];
+						delete brickPosInfo[[brickX, brickY]];				
 					}
-
-					return;
 				}
-				delete draws[targetId];
-				delete brickPosInfo[[brickX, brickY]];
+
+				return;
 			}
 		}
 		// if it's true, show the target brick's hitbox
