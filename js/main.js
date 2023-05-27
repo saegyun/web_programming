@@ -152,7 +152,6 @@ function initPage() {
 	$(".back").on("click", moveBack);
 
 	$("#intro .next").on("click", () => moveNext(0));
-	
 	$("#title .next").eq(0).on("click", () => moveNext(0));
 	$("#title .next").eq(1).on("click", () => moveNext(1));
 
