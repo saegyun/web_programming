@@ -6,7 +6,7 @@ let gameOn = false; // 게임이 현재 진행 중인지 체크하기 위한 전
 $(document).ready(function() {
 	let gameQuit = false;
 	const reCalc = () => {
-		canvasPosition = $("canvas").position();
+		canvasPosition = $("#myCanvas").position();
 		mousePadding = ($(window).width() - $("#myCanvas").width()) / 2;
 	};
 	reCalc();
@@ -32,331 +32,394 @@ $(document).ready(function() {
 	
 	$("#stage3 .back").on("click", () => {
 		gameOn = false; // 스테이지를 나가면 게임이 끝난 것으로 취급, 아래 코드에서 루프 종료
-		const canvas = document.getElementById("myCanvas");
+		const canvas = $("#myCanvas")[0];
 		const context = canvas.getContext("2d");
 		context.clearRect(0, 0, maxWidth, maxHeight);
 	});
 });
-// 공에 대한 클래스
-class Ball {
-	constructor(x, y, radius, damage, speed) {
-		this.x = x;
-		this.y = y;
-		this.radius = radius;
-		this.damage = damage; // 몬스터에 대한 공격력
-		this.speed = speed;
-		Ball.ballImage.src = "resource/sprite/ball_diamond.png"; // 임시 공 텍스쳐
-	}
-	static ballImage = new Image();
-}
 
-Ball.prototype.draw = function(context) {
-	context.drawImage(
-		Ball.ballImage, // Image
-		this.x - this.radius, // Destination x
-		this.y - this.radius, // Destination y
-		this.radius * 2, // Destination width
-		this.radius * 2 // Destination height
-	);
-}
-/* 모든 직사각형, 이미지의 구성
-(0, 0)--|
-|		|
-----(좌표 x, y)-----(width)----------|
-		|							|
-		|							|
-		|							|
-	(height) (직사각형 넓이만큼 hitbox)	|
-		|							|
-		|							|
-		-----------------------------
-*/
-// 패들에 대한 클래스
-class Bar {
-	constructor(x, y, width, height) {
-		this.x = x;
-		this.y = y;
-		this.width = width;
-		this.height = height;
-		Bar.barImage.src = "resource/sprite/paddle_slime.png";
-	}
-	static barImage = new Image();
-	static barCollideAudios = [new Audio("resource/sound/slime_paddle_1.ogg"), new Audio("resource/sound/slime_paddle_2.ogg"), new Audio("resource/sound/slime_paddle_3.ogg"), new Audio("resource/sound/slime_paddle_4.ogg")];
-}
-
-Bar.prototype.draw = function(context) {
-	context.drawImage(
-		Bar.barImage, // Image
-		this.x, // Destination x
-		this.y, // Destination y
-		this.width, // Destination width
-		this.height // Destination height
-	);
-}
-
-Bar.prototype.collideSound = function() {
-	Bar.barCollideAudios[Math.floor(Math.random() * Bar.barCollideAudios.length)].play();
-}
-
-
-// 몹에 대한 부모 클래스
-class Mob {
-	constructor(x, y, maxHealth, damage, speed, width, height, maxFrame, frameWidth, frameHeight, exp) {
-		this.x = x;
-		this.y = y;
-		this.maxHealth = maxHealth; // 몹 전체 체력
-		this.health = maxHealth; // 몹 실제 체력
-		this.damage = damage; // 몹 공격력
-		this.speed = speed; // 몹이 걸어오는 속도
-		this.width = width;
-		this.height = height;
-		this.exp = exp; // 몹 경험치
-		this.status = ""; // 몹 현재 상태 - "hurt"면 최근에 맞은 상태, "death"면 죽은 상태, ""이면 기본 상태
-		this.hitTimer = 0; // 몹이 맞았을 때 빨간색 오버레이(hurtSprite) 유지 시간
-		this.currentFrame = 0; // sprite animation에서 현재 프레임
-		this.animationTime = 0; // sprite animation을 너무 빠르게 진행시키지 않기 위한 변수
-		this.maxFrame = maxFrame; // sprite animation의 sprite개수
-		this.frameWidth = frameWidth; // sprite 1개의 가로 길이
-		this.frameHeight = frameHeight; // sprite 1개의 세로 길이
-	}
-}
-// 몹을 canvas에 그리기 위한 함수
-Mob.prototype.draw = function(context, idleSprite, hurtSprite) {
-	let sprite;
-	switch(this.status) { // 몹의 상태에 따라 다른 sprite 적용
-		case "hurt":
-			if(this.hitTimer > 0) { // 빨간색 오버레이(hurtSprite) 유지 시간
-				this.hitTimer -= 1;
-				sprite = hurtSprite;
-			}
-			else {
-				this.status = "";
-				sprite = idleSprite;
-			}
-			break;
-		default:
-			sprite = idleSprite;
-	}
-	//context.fillRect(this.x, this.y, this.width, this.height); // Hitbox 체크를 위한 디버그 함수
-	// 캔버스에 몹 sprite 그리기
-	context.drawImage(
-		sprite, // Image
-		this.currentFrame * this.frameWidth, // Source x
-		0, // Source y
-		this.frameWidth, // Source width
-		this.frameHeight, // Source height
-		this.x, // Destination x
-		this.y, // Destination y
-		this.width, // Destination width
-		this.height // Destination height
-	);
-	if(this.animationTime >= 10) { // sprite animation이 너무 빠르게 진행되지 않도록 함
-		this.animationTime = 0;
-		this.currentFrame = (this.currentFrame + 1) % this.maxFrame;
-	}
-	else {
-		this.animationTime += 1;
-	}
-	
-	// 체력바 그리기
-	context.fillStyle = "#630000"; // 체력바 배경
-	context.fillRect(this.x, this.y - 30, this.width, 10);
-	
-	context.fillStyle = "#ff0000"; // 실제 체력
-	context.fillRect(this.x, this.y - 30, this.width * (this.health / this.maxHealth), 10);
-	
-}
-// 몹 소리내기
-Mob.prototype.say = function(idleAudios) {
-	if (this.status !== "death") {
-		let idleAudio = idleAudios[Math.floor(Math.random() * idleAudios.length)];
-		idleAudio.play();
-	}
-}
-// 몹이 공에 맞았을 때를 위한 함수
-Mob.prototype.hit = function(damage, hurtAudios, deathAudios) {
-	this.health -= damage;
-	
-	if(this.health <= 0) // 몹이 체력을 다 잃고 죽었을 때 - true반환
-	{
-		this.status = "death"; // 몹 상태를 "death"로 변경
-		let deathAudio = deathAudios[Math.floor(Math.random() * deathAudios.length)];
-		deathAudio.play();
-		// increase exp
-		
-		return true;
-	}
-	else // 몹이 죽지 않은 상태 (그냥 맞았을 때)
-	{
-		this.status = "hurt"; // 몹 상태를 "hurt"로 변경
-		this.hitTimer = 20; // 20 frame 동안 draw에서 빨간색 오버레이(hurtSprite) 유지
-		let hurtAudio = hurtAudios[Math.floor(Math.random() * hurtAudios.length)];
-		hurtAudio.play();
-		return false;
-	}
-}
-// 좀비 몹 클래스, 몹 클래스 상속
-class MobZombie extends Mob {
-	constructor(x, y, maxHealth, damage, speed, width, height, exp) {
-		super(x, y, maxHealth, damage, speed, width, height, 8, 360, 360, exp); // Mob 클래스의 생성자 호출
-		MobZombie.idleSprite.src = "resource/sprite/zombie_idle.png"; // 걷는 sprite
-		MobZombie.hurtSprite.src = "resource/sprite/zombie_hurt.png"; // 맞았을 때 sprite
-	}
-	static spawnWeight = 25; // 생성 비중, 아래 spawnMob()함수에서 설명
-	static idleSprite = new Image(); 
-	static hurtSprite = new Image();
-	static idleAudios = [new Audio("resource/sound/zombie_idle_1.ogg"), new Audio("resource/sound/zombie_idle_2.ogg"), new Audio("resource/sound/zombie_idle_3.ogg")]; // 생성될 때 소리
-	static hurtAudios = [new Audio("resource/sound/zombie_hurt_1.ogg"), new Audio("resource/sound/zombie_hurt_2.ogg")]; // 맞았을 때 소리
-	static deathAudios = [new Audio("resource/sound/zombie_death.ogg")]; // 죽었을 때 소리
-	static attackAudios = [new Audio("resource/sound/zombie_attack_1.ogg"), new Audio("resource/sound/zombie_attack_2.ogg"), new Audio("resource/sound/zombie_attack_3.ogg")]; // 마을을 때릴 때 소리
-
-	draw(context) { // 캔버스에 그리기, Mob 클래스의 draw() 호출
-		super.draw(context, MobZombie.idleSprite, MobZombie.hurtSprite);
-	}
-
-	sayIdle() { // 생성할 때 소리 내기
-		super.say(MobZombie.idleAudios);
-	}
-	
-	sayAttack() { // 마을에 도착했을 때 소리 내기
-		super.say(MobZombie.attackAudios);
-	}
-
-	hit(damage) { // 몹이 맞았을 때 함수, hit() 함수의 결과 반환 (죽으면 true, 아직 살아있으면 false) 
-		return super.hit(damage, MobZombie.hurtAudios, MobZombie.deathAudios);
-	}
-}
-// 거미 몹 클래스, 몹 클래스 상속
-class MobSpider extends Mob {
-	constructor(x, y, maxHealth, damage, speed, width, height, exp) {
-		super(x, y, maxHealth, damage, speed, width, height, 4, 600, 440, exp);
-		MobSpider.idleSprite.src = "resource/sprite/spider_idle.png";
-		MobSpider.hurtSprite.src = "resource/sprite/spider_hurt.png";
-	}
-	static spawnWeight = 15;
-	static idleSprite = new Image();
-	static hurtSprite = new Image();
-	
-	static idleAudios = [new Audio("resource/sound/spider_idle_1.ogg"), new Audio("resource/sound/spider_idle_2.ogg"), new Audio("resource/sound/spider_idle_3.ogg"), new Audio("resource/sound/spider_idle_4.ogg")];
-	static hurtAudios = MobSpider.idleAudios;
-	static deathAudios = [new Audio("resource/sound/spider_death.ogg")];
-	static attackAudios = [new Audio("resource/sound/spider_attack_1.ogg"), new Audio("resource/sound/spider_attack_2.ogg")];
-	
-	draw(context) {
-		super.draw(context, MobSpider.idleSprite, MobSpider.hurtSprite);
-	}
-	
-	sayIdle() {
-		super.say(MobSpider.idleAudios);
-	}
-	
-	sayAttack() {
-		super.say(MobSpider.attackAudios);
-	}
-	
-	hit(damage) {
-		return super.hit(damage, MobSpider.hurtAudios, MobSpider.deathAudios);
-	}
-}
-// 크리퍼 몹 클래스, 몹 클래스 상속
-class MobCreeper extends Mob {
-	constructor(x, y, maxHealth, damage, speed, width, height, exp) {
-		super(x, y, maxHealth, damage, speed, width, height, 8, 360, 360, exp);
-		MobCreeper.idleSprite.src = "resource/sprite/creeper_idle.png";
-		MobCreeper.hurtSprite.src = "resource/sprite/creeper_hurt.png";
-	}
-	static spawnWeight = 20;
-	static idleSprite = new Image();
-	static hurtSprite = new Image();
-	static idleAudios = [new Audio("resource/sound/creeper_idle_1.ogg"), new Audio("resource/sound/creeper_idle_2.ogg"), new Audio("resource/sound/creeper_idle_3.ogg"), new Audio("resource/sound/creeper_idle_4.ogg")];
-	static hurtAudios = MobCreeper.idleAudios;
-	static deathAudios = [new Audio("resource/sound/creeper_death.ogg")];
-	static attackAudios = [new Audio("resource/sound/creeper_attack_1.ogg"), new Audio("resource/sound/creeper_attack_2.ogg"), new Audio("resource/sound/creeper_attack_3.ogg"), new Audio("resource/sound/creeper_attack_4.ogg")];
-	
-	draw(context) {
-		super.draw(context, MobCreeper.idleSprite, MobCreeper.hurtSprite);
-	}
-	
-	sayIdle() {
-		super.say(MobCreeper.idleAudios);
-	}
-	
-	sayAttack() {
-		super.say(MobCreeper.attackAudios);
-	}
-	
-	hit(damage) {
-		return super.hit(damage, MobCreeper.hurtAudios, MobCreeper.deathAudios);
-	}
-}
-// 우민 몹 클래스, 몹 클래스 상속
-class MobVindicator extends Mob {
-	constructor(x, y, maxHealth, damage, speed, width, height, exp) {
-		super(x, y, maxHealth, damage, speed, width, height, 8, 270, 380, exp);
-		MobVindicator.idleSprite.src = "resource/sprite/vindicator_idle.png";
-		MobVindicator.hurtSprite.src = "resource/sprite/vindicator_hurt.png";
-	}
-	static spawnWeight = 10;
-	static idleSprite = new Image(); 
-	static hurtSprite = new Image();
-	static idleAudios = [new Audio("resource/sound/vindicator_idle_1.ogg"), new Audio("resource/sound/vindicator_idle_2.ogg"), new Audio("resource/sound/vindicator_idle_3.ogg"), new Audio("resource/sound/vindicator_idle_4.ogg")];
-	static hurtAudios = [new Audio("resource/sound/vindicator_hurt_1.ogg"), new Audio("resource/sound/vindicator_hurt_2.ogg"), new Audio("resource/sound/vindicator_hurt_3.ogg")];
-	static deathAudios = [new Audio("resource/sound/vindicator_death_1.ogg"), new Audio("resource/sound/vindicator_death_2.ogg")];
-	static attackAudios = [new Audio("resource/sound/vindicator_attack_1.ogg"), new Audio("resource/sound/vindicator_attack_2.ogg")];
-
-	draw(context) {
-		super.draw(context, MobVindicator.idleSprite, MobVindicator.hurtSprite);
-	}
-
-	sayIdle() {
-		super.say(MobVindicator.idleAudios);
-	}
-	
-	sayAttack() {
-		super.say(MobVindicator.attackAudios);
-	}
-
-	hit(damage) {
-		return super.hit(damage, MobVindicator.hurtAudios, MobVindicator.deathAudios);
-	}
-}
-// 경험치 라벨 - 몹이 죽었을 때 표시됨
-class ExperienceLabel {
-	constructor(x, y, exp) {
-		this.x = x;
-		this.y = y;
-		this.text = "+" + exp + "XP";
-		this.expTimer = 40; // 경험치 라벨이 너무 빠르게 없어지지 않게 하기 위한 변수
-	}
-	static font = "bold 20px Arial";
-	static textColor = "#7bf318";
-	static expAudio = new Audio("resource/sound/experience.ogg");
-}
-// 소리 내기
-ExperienceLabel.prototype.ding = function() {ExperienceLabel.expAudio.play() }
-// 경험치 라벨 그리기
-ExperienceLabel.prototype.draw = function(context) {
-	if(this.expTimer > 0)
-	{
-		context.font = ExperienceLabel.font;
-		context.fillStyle = ExperienceLabel.textColor;
-		context.fillText(this.text, this.x, this.y);
-		this.expTimer -= 1;
-		return false;
-	}
-	else
-		return true;
-}
-
-// 초를 '분분:초초' 문자열로 바꿔서 반환하는 함수 (180초는 03:00)
-function formatTime(secs) {
-  var minutes = Math.floor(secs / 60);
-  var seconds = secs % 60;
-  return (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
-}
 
 // 스테이지3에 대한 총괄 함수
 function startGame(callBack) { 
+	// 클래스, 함수들 정의
+	// 공에 대한 클래스
+	class Ball {
+		constructor(x, y, radius, damage, speed) {
+			this.x = x;
+			this.y = y;
+			this.radius = radius;
+			this.damage = damage; // 몬스터에 대한 공격력
+			this.speed = speed;
+			Ball.ballImage.src = "resource/sprite/ball_diamond.png"; // 임시 공 텍스쳐
+		}
+		static ballImage = new Image();
+	}
+	
+	Ball.prototype.draw = function(context) {
+		context.drawImage(
+			Ball.ballImage, // Image
+			this.x - this.radius, // Destination x
+			this.y - this.radius, // Destination y
+			this.radius * 2, // Destination width
+			this.radius * 2 // Destination height
+		);
+	}
+	/* 모든 직사각형, 이미지의 구성
+	(0, 0)--|
+	|		|
+	----(좌표 x, y)-----(width)----------|
+			|							|
+			|							|
+			|							|
+		(height) (직사각형 넓이만큼 hitbox)	|
+			|							|
+			|							|
+			-----------------------------
+	*/
+	// 패들에 대한 클래스
+	class Bar {
+		constructor(x, y, width, height) {
+			this.x = x;
+			this.y = y;
+			this.width = width;
+			this.height = height;
+			Bar.barImage.src = "resource/sprite/paddle_slime.png";
+		}
+		static barImage = new Image();
+		static barCollideAudios = [new Audio("resource/sound/slime_paddle_1.ogg"), new Audio("resource/sound/slime_paddle_2.ogg"), new Audio("resource/sound/slime_paddle_3.ogg"), new Audio("resource/sound/slime_paddle_4.ogg")];
+	}
+	
+	Bar.prototype.draw = function(context) {
+		context.drawImage(
+			Bar.barImage, // Image
+			this.x, // Destination x
+			this.y, // Destination y
+			this.width, // Destination width
+			this.height // Destination height
+		);
+	}
+	
+	Bar.prototype.collideSound = function() {
+		Bar.barCollideAudios[Math.floor(Math.random() * Bar.barCollideAudios.length)].play();
+	}
+	
+	// 몹에 대한 부모 클래스
+	class Mob {
+		constructor(x, y, maxHealth, damage, speed, width, height, maxFrame, frameWidth, frameHeight, exp) {
+			this.x = x;
+			this.y = y;
+			this.maxHealth = maxHealth; // 몹 전체 체력
+			this.health = maxHealth; // 몹 실제 체력
+			this.damage = damage; // 몹 공격력
+			this.speed = speed; // 몹이 걸어오는 속도
+			this.width = width;
+			this.height = height;
+			this.exp = exp; // 몹 경험치
+			this.status = ""; // 몹 현재 상태 - "hurt"면 최근에 맞은 상태, "death"면 죽은 상태, ""이면 기본 상태
+			this.hitTimer = 0; // 몹이 맞았을 때 빨간색 오버레이(hurtSprite) 유지 시간
+			this.currentFrame = 0; // sprite animation에서 현재 프레임
+			this.animationTime = 0; // sprite animation을 너무 빠르게 진행시키지 않기 위한 변수
+			this.maxFrame = maxFrame; // sprite animation의 sprite개수
+			this.frameWidth = frameWidth; // sprite 1개의 가로 길이
+			this.frameHeight = frameHeight; // sprite 1개의 세로 길이
+		}
+	}
+	// 몹을 canvas에 그리기 위한 함수
+	Mob.prototype.draw = function(context, idleSprite, hurtSprite) {
+		let sprite;
+		switch(this.status) { // 몹의 상태에 따라 다른 sprite 적용
+			case "hurt":
+				if(this.hitTimer > 0) { // 빨간색 오버레이(hurtSprite) 유지 시간
+					this.hitTimer -= 1;
+					sprite = hurtSprite;
+				}
+				else {
+					this.status = "";
+					sprite = idleSprite;
+				}
+				break;
+			default:
+				sprite = idleSprite;
+		}
+		//context.fillRect(this.x, this.y, this.width, this.height); // Hitbox 체크를 위한 디버그 함수
+		// 캔버스에 몹 sprite 그리기
+		context.drawImage(
+			sprite, // Image
+			this.currentFrame * this.frameWidth, // Source x
+			0, // Source y
+			this.frameWidth, // Source width
+			this.frameHeight, // Source height
+			this.x, // Destination x
+			this.y, // Destination y
+			this.width, // Destination width
+			this.height // Destination height
+		);
+		if(this.animationTime >= 10) { // sprite animation이 너무 빠르게 진행되지 않도록 함
+			this.animationTime = 0;
+			this.currentFrame = (this.currentFrame + 1) % this.maxFrame;
+		}
+		else {
+			this.animationTime += 1;
+		}
+		
+		// 체력바 그리기
+		context.fillStyle = "#630000"; // 체력바 배경
+		context.fillRect(this.x, this.y - 30, this.width, 10);
+		
+		context.fillStyle = "#ff0000"; // 실제 체력
+		context.fillRect(this.x, this.y - 30, this.width * (this.health / this.maxHealth), 10);
+		
+	}
+	// 몹 소리내기
+	Mob.prototype.say = function(idleAudios) {
+		if (this.status !== "death") {
+			let idleAudio = idleAudios[Math.floor(Math.random() * idleAudios.length)];
+			idleAudio.play();
+		}
+	}
+	// 몹이 공에 맞았을 때를 위한 함수
+	Mob.prototype.hit = function(damage, hurtAudios, deathAudios) {
+		this.health -= damage;
+		
+		if(this.health <= 0) // 몹이 체력을 다 잃고 죽었을 때 - true반환
+		{
+			this.status = "death"; // 몹 상태를 "death"로 변경
+			let deathAudio = deathAudios[Math.floor(Math.random() * deathAudios.length)];
+			deathAudio.play();
+			// increase exp
+			
+			return true;
+		}
+		else // 몹이 죽지 않은 상태 (그냥 맞았을 때)
+		{
+			this.status = "hurt"; // 몹 상태를 "hurt"로 변경
+			this.hitTimer = 20; // 20 frame 동안 draw에서 빨간색 오버레이(hurtSprite) 유지
+			let hurtAudio = hurtAudios[Math.floor(Math.random() * hurtAudios.length)];
+			hurtAudio.play();
+			return false;
+		}
+	}
+	// 좀비 몹 클래스, 몹 클래스 상속
+	class MobZombie extends Mob {
+		constructor(x, y, maxHealth, damage, speed, width, height, exp) {
+			super(x, y, maxHealth, damage, speed, width, height, 8, 360, 360, exp); // Mob 클래스의 생성자 호출
+			MobZombie.idleSprite.src = "resource/sprite/zombie_idle.png"; // 걷는 sprite
+			MobZombie.hurtSprite.src = "resource/sprite/zombie_hurt.png"; // 맞았을 때 sprite
+		}
+		static spawnWeight = 25; // 생성 비중, 아래 spawnMob()함수에서 설명
+		static idleSprite = new Image(); 
+		static hurtSprite = new Image();
+		static idleAudios = [new Audio("resource/sound/zombie_idle_1.ogg"), new Audio("resource/sound/zombie_idle_2.ogg"), new Audio("resource/sound/zombie_idle_3.ogg")]; // 생성될 때 소리
+		static hurtAudios = [new Audio("resource/sound/zombie_hurt_1.ogg"), new Audio("resource/sound/zombie_hurt_2.ogg")]; // 맞았을 때 소리
+		static deathAudios = [new Audio("resource/sound/zombie_death.ogg")]; // 죽었을 때 소리
+		static attackAudios = [new Audio("resource/sound/zombie_attack_1.ogg"), new Audio("resource/sound/zombie_attack_2.ogg"), new Audio("resource/sound/zombie_attack_3.ogg")]; // 마을을 때릴 때 소리
+	
+		draw(context) { // 캔버스에 그리기, Mob 클래스의 draw() 호출
+			super.draw(context, MobZombie.idleSprite, MobZombie.hurtSprite);
+		}
+	
+		sayIdle() { // 생성할 때 소리 내기
+			super.say(MobZombie.idleAudios);
+		}
+		
+		sayAttack() { // 마을에 도착했을 때 소리 내기
+			super.say(MobZombie.attackAudios);
+		}
+	
+		hit(damage) { // 몹이 맞았을 때 함수, hit() 함수의 결과 반환 (죽으면 true, 아직 살아있으면 false) 
+			return super.hit(damage, MobZombie.hurtAudios, MobZombie.deathAudios);
+		}
+	}
+	// 거미 몹 클래스, 몹 클래스 상속
+	class MobSpider extends Mob {
+		constructor(x, y, maxHealth, damage, speed, width, height, exp) {
+			super(x, y, maxHealth, damage, speed, width, height, 4, 600, 440, exp);
+			MobSpider.idleSprite.src = "resource/sprite/spider_idle.png";
+			MobSpider.hurtSprite.src = "resource/sprite/spider_hurt.png";
+		}
+		static spawnWeight = 15;
+		static idleSprite = new Image();
+		static hurtSprite = new Image();
+		
+		static idleAudios = [new Audio("resource/sound/spider_idle_1.ogg"), new Audio("resource/sound/spider_idle_2.ogg"), new Audio("resource/sound/spider_idle_3.ogg"), new Audio("resource/sound/spider_idle_4.ogg")];
+		static hurtAudios = MobSpider.idleAudios;
+		static deathAudios = [new Audio("resource/sound/spider_death.ogg")];
+		static attackAudios = [new Audio("resource/sound/spider_attack_1.ogg"), new Audio("resource/sound/spider_attack_2.ogg")];
+		
+		draw(context) {
+			super.draw(context, MobSpider.idleSprite, MobSpider.hurtSprite);
+		}
+		
+		sayIdle() {
+			super.say(MobSpider.idleAudios);
+		}
+		
+		sayAttack() {
+			super.say(MobSpider.attackAudios);
+		}
+		
+		hit(damage) {
+			return super.hit(damage, MobSpider.hurtAudios, MobSpider.deathAudios);
+		}
+	}
+	// 크리퍼 몹 클래스, 몹 클래스 상속
+	class MobCreeper extends Mob {
+		constructor(x, y, maxHealth, damage, speed, width, height, exp) {
+			super(x, y, maxHealth, damage, speed, width, height, 8, 360, 360, exp);
+			MobCreeper.idleSprite.src = "resource/sprite/creeper_idle.png";
+			MobCreeper.hurtSprite.src = "resource/sprite/creeper_hurt.png";
+		}
+		static spawnWeight = 20;
+		static idleSprite = new Image();
+		static hurtSprite = new Image();
+		static idleAudios = [new Audio("resource/sound/creeper_idle_1.ogg"), new Audio("resource/sound/creeper_idle_2.ogg"), new Audio("resource/sound/creeper_idle_3.ogg"), new Audio("resource/sound/creeper_idle_4.ogg")];
+		static hurtAudios = MobCreeper.idleAudios;
+		static deathAudios = [new Audio("resource/sound/creeper_death.ogg")];
+		static attackAudios = [new Audio("resource/sound/creeper_attack_1.ogg"), new Audio("resource/sound/creeper_attack_2.ogg"), new Audio("resource/sound/creeper_attack_3.ogg"), new Audio("resource/sound/creeper_attack_4.ogg")];
+		
+		draw(context) {
+			super.draw(context, MobCreeper.idleSprite, MobCreeper.hurtSprite);
+		}
+		
+		sayIdle() {
+			super.say(MobCreeper.idleAudios);
+		}
+		
+		sayAttack() {
+			super.say(MobCreeper.attackAudios);
+		}
+		
+		hit(damage) {
+			return super.hit(damage, MobCreeper.hurtAudios, MobCreeper.deathAudios);
+		}
+	}
+	// 우민 몹 클래스, 몹 클래스 상속
+	class MobVindicator extends Mob {
+		constructor(x, y, maxHealth, damage, speed, width, height, exp) {
+			super(x, y, maxHealth, damage, speed, width, height, 8, 270, 380, exp);
+			MobVindicator.idleSprite.src = "resource/sprite/vindicator_idle.png";
+			MobVindicator.hurtSprite.src = "resource/sprite/vindicator_hurt.png";
+		}
+		static spawnWeight = 10;
+		static idleSprite = new Image(); 
+		static hurtSprite = new Image();
+		static idleAudios = [new Audio("resource/sound/vindicator_idle_1.ogg"), new Audio("resource/sound/vindicator_idle_2.ogg"), new Audio("resource/sound/vindicator_idle_3.ogg"), new Audio("resource/sound/vindicator_idle_4.ogg")];
+		static hurtAudios = [new Audio("resource/sound/vindicator_hurt_1.ogg"), new Audio("resource/sound/vindicator_hurt_2.ogg"), new Audio("resource/sound/vindicator_hurt_3.ogg")];
+		static deathAudios = [new Audio("resource/sound/vindicator_death_1.ogg"), new Audio("resource/sound/vindicator_death_2.ogg")];
+		static attackAudios = [new Audio("resource/sound/vindicator_attack_1.ogg"), new Audio("resource/sound/vindicator_attack_2.ogg")];
+	
+		draw(context) {
+			super.draw(context, MobVindicator.idleSprite, MobVindicator.hurtSprite);
+		}
+	
+		sayIdle() {
+			super.say(MobVindicator.idleAudios);
+		}
+		
+		sayAttack() {
+			super.say(MobVindicator.attackAudios);
+		}
+	
+		hit(damage) {
+			return super.hit(damage, MobVindicator.hurtAudios, MobVindicator.deathAudios);
+		}
+	}
+	// 경험치 라벨 - 몹이 죽었을 때 표시됨
+	class ExperienceLabel {
+		constructor(x, y, exp) {
+			this.x = x;
+			this.y = y;
+			this.text = "+" + exp + "XP";
+			this.expTimer = 40; // 경험치 라벨이 너무 빠르게 없어지지 않게 하기 위한 변수
+		}
+		static font = "bold 20px Arial";
+		static textColor = "#7bf318";
+		static expAudio = new Audio("resource/sound/experience.ogg");
+	}
+	// 소리 내기
+	ExperienceLabel.prototype.ding = function() {ExperienceLabel.expAudio.play() }
+	// 경험치 라벨 그리기
+	ExperienceLabel.prototype.draw = function(context) {
+		if(this.expTimer > 0)
+		{
+			context.font = ExperienceLabel.font;
+			context.fillStyle = ExperienceLabel.textColor;
+			context.fillText(this.text, this.x, this.y);
+			this.expTimer -= 1;
+			return false;
+		}
+		else
+			return true;
+	}
+	// 하트 - 체력바를 하트 형태로 표시
+	class Heart {
+		constructor(maxHealth, x, y, width, height) {
+			this.health = maxHealth;
+			this.totalHearts = maxHealth / 4;
+			this.status = "";
+			this.blinkTimer = 0;
+			this.x = x;
+			this.y = y;
+			this.width = width;
+			this.height = height;
+			
+			Heart.heartImg.src = "resource/ui/heart.png";
+			Heart.heartBackgroundImg.src = "resource/ui/heart_background.png";
+			Heart.heartBlinkImg.src = "resource/ui/heart_blink.png";
+		}
+		
+		static heartImg = new Image();
+		static heartBackgroundImg = new Image();
+		static heartBlinkImg = new Image();
+		static hurtAudios = [new Audio("resource/sound/steve_hurt.ogg")];
+	}
+	// 하트 그리기
+	Heart.prototype.draw = function(context) {
+		// 현재 상태가 attacked 이면 깜빡깜빡을 추가
+		let addBlink = this.status.startsWith("attacked") && this.blinkTimer-- > 0; // blinkTimer는 깜빡임이 너무 빨리 사라지지 않도록 함
+		if (!addBlink && this.status !== "") {
+			this.status = this.status === "attacked3" ? "" : `attacked${parseInt(this.status[this.status.length - 1]) + 1}`;
+			this.blinkTimer = 10;
+		}
+		
+		let aliveHearts = Math.ceil(this.health / 4);
+		let deadHearts = this.totalHearts - aliveHearts;
+		let drawX = this.x;
+		// 아직 살아있는 하트 그리기
+		for(let i = 0; i < aliveHearts; i++, drawX += this.width + 10) {
+			context.drawImage(Heart.heartImg, drawX, this.y, this.width, this.height);
+		}
+		// 죽은 하트 그리기
+		for(let i = 0; i < deadHearts; i++, drawX += this.width + 10) {
+			context.drawImage(Heart.heartBackgroundImg, drawX, this.y, this.width, this.height);
+		}
+		// 깜빡깜빡 그리기
+		drawX = this.x;
+		if(addBlink) {
+			context.fillStyle = 'rgba(255, 56, 56, 0.4)';
+			context.fillRect(0, 0, maxWidth, maxHeight);
+			for(let i = 0; i < this.totalHearts; i++, drawX += this.width + 10) {
+				context.drawImage(Heart.heartBlinkImg, drawX, this.y, this.width, this.height);
+			}
+		}
+	}
+	// 하트가 데미지를 입었을 때 깜빡임 추가, 그리고 소리 내기
+	Heart.prototype.hit = function(damage) {
+		this.health -= damage;
+		this.health = Math.max(this.health, 0);
+		this.status = "attacked1";
+		this.blinkTimer = 20;
+		
+		let hurtAudio = Heart.hurtAudios[Math.floor(Math.random() * Heart.hurtAudios.length)];
+		hurtAudio.play();
+	}
+	
+	// 초를 '분분:초초' 문자열로 바꿔서 반환하는 함수 (180초는 03:00)
+	function formatTime(secs) {
+	  var minutes = Math.floor(secs / 60);
+	  var seconds = secs % 60;
+	  return (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+	}
 	
 	const canvas = document.getElementById("myCanvas");
 	const context = canvas.getContext("2d");
@@ -381,7 +444,7 @@ function startGame(callBack) {
 	}
 
 	const levelInfo = levels[currentLevel]; // 난이도 정보 가져오기
-	let villageHealthMax = 30; // 마을 전체 체력
+	let villageHealthMax = 40; // 마을 전체 체력
 	let villageHealth = villageHealthMax; // 마을 체력
 	let maxSpawns = 10; // 한 화면에서 존재할 수 있는 최대 몹 개수
 	let mobSpawnChance = 50; // 몹 생성 함수가 1초마다 호출될 때 몹이 실제로 생성될 확률, 0 ~ 100 사이
@@ -419,21 +482,21 @@ function startGame(callBack) {
 	const villageHitAudios = [new Audio("resource/sound/village_hit_1.ogg"), new Audio("resource/sound/village_hit_2.ogg"), new Audio("resource/sound/village_hit_3.ogg"), new Audio("resource/sound/village_hit_4.ogg")];
 	const villageBreakAudios = [new Audio("resource/sound/village_break.ogg")];
 	const mainMusic = new Audio("resource/sound/stage3_music.ogg");
-	mainMusic.volume = 1.0; // 음악 볼륨
+	mainMusic.volume = 0.8; // 음악 볼륨
 	mainMusic.play();
 	const victoryMusic = new Audio("resource/sound/stage3_victory.ogg");
 	const defeatMusic = new Audio("resource/sound/stage3_defeat.ogg");
 	
 	let backgroundImage = new Image();
-	for(var i = 1; i <= 5; i++) {// 배경 미리 가져와서 그리기 (캔버스에 그릴 때 깜빡임 방지)
-		backgroundImage.src = "resource/background/stage3_background_" + i + ".png";
-		context.drawImage(backgroundImage, 0, 0, 1, 1);
-	}
+	let hiddenImage = new Image(); // 배경 미리 가져와서 그리기 (캔버스에 그릴 때 깜빡임 방지)
 		
 	backgroundImage.src = "resource/background/stage3_background_1.png";
 	let fireBackground = new Image();
 	fireBackground.src = "resource/background/stage3_background_fire.png";
 	let backgroundChangeInterval = Math.floor(remainingTime / 4); // 배경을 바꾸는 주기 (예: 180초를 버텨야 한다면 45초마다 배경 바꿈)
+	
+	// 하트 체력바
+	const heart = new Heart(villageHealthMax, maxWidth / 2 - 270, maxHeight - 40, 40, 40);
 	
 	// 타이머를 표시하는 div, 오른쪽 상단에 배치됨
 	const timeDiv = $("<div />").attr("id", "stage3_time");
@@ -489,7 +552,7 @@ function startGame(callBack) {
 		}
 		else {
 			volumeOn = true;
-			mainMusic.volume = 1.0;
+			mainMusic.volume = 0.8;
 			volumeDiv.find("img").attr("src", "resource/sprite/volume_on.png");
 		}
 	});
@@ -601,6 +664,9 @@ function startGame(callBack) {
 		// 시간에 따라 배경 바꾸기
 		backgroundImage.src = "resource/background/stage3_background_" + (Math.floor(addedTime / backgroundChangeInterval) + 1) + ".png";
 		
+		// 미리 배경화면 준비해놓기
+		hiddenImage.src = "resource/background/stage3_background_" + (Math.floor(addedTime % 5) + 1) + ".png";
+		
 		// 배경음악 루프
 		mainMusic.play();
 		
@@ -611,7 +677,8 @@ function startGame(callBack) {
 	// 시간 계산은 1초마다 실행됨
 	const timeCountdown = setInterval(updateTimer, 1000);
 	
-	// 마을 체력바를 그리는 함수
+	// 마을 체력바를 그리는 함수 - 하트 체력바로 대체됨
+	/*
 	function drawVillageHealthBar(context) {
 		let healthBarWidth = spawnLineWidthMax - spawnLineWidthMin;
 		context.fillStyle = "#565656"; // 체력바 배경
@@ -622,7 +689,7 @@ function startGame(callBack) {
 		
 		context.fillStyle = "#00c209"; // 실제 체력 2 (초록색)
 		context.fillRect(spawnLineWidthMin, deathLine - 15, healthBarWidth * (villageHealth / villageHealthMax), 15);
-	}
+	} */
 	
 	// 공과 각종 사각형들(패들, 몹)이 충돌하는지 검사하는 함수
 	function checkCollision(ball, rect, ballRad) {
@@ -726,6 +793,7 @@ function startGame(callBack) {
 				mob.sayAttack();
 				villageHitAudio.play();
 				villageHealth -= mob.damage;
+				heart.hit(mob.damage);
 				
 				activeMobs.splice(i, 1);
 			}
@@ -789,8 +857,8 @@ function startGame(callBack) {
 			ball.y = deathLine - 400;
 			
 			let villageHitAudio = villageHitAudios[Math.floor(Math.random() * villageHitAudios.length)];
-			villageHitAudio.play();
-			villageHealth -= 1;
+			villageHealth -= 4;
+			heart.hit(4);
 		}
 		
 		// 캔버스에 실제로 그리는 부분
@@ -826,14 +894,13 @@ function startGame(callBack) {
 		let winLoseResult = checkWinLose();
 		
 		// 마을 체력바 그리기
-		drawVillageHealthBar(context);
+		heart.draw(context);
 		
 		// 패배했을 때 처리
 		if(gameEnded && winLoseResult < 0)
 		{
 			let villageBreakAudio = villageBreakAudios[Math.floor(Math.random() * villageBreakAudios.length)];
 			villageBreakAudio.play();
-			drawVillageHealthBar(context);
 			
 			mainMusic.pause(); // 배경음악 멈추기
 			defeatMusic.play();
