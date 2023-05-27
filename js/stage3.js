@@ -385,14 +385,18 @@ function startGame(callBack) {
 		let aliveHearts = Math.ceil(this.health / 4);
 		let deadHearts = this.totalHearts - aliveHearts;
 		let drawX = this.x;
+		
+		// 죽은 하트 그리기
+		for(let i = 0; i < this.totalHearts; i++, drawX += this.width + 10) {
+			context.drawImage(Heart.heartBackgroundImg, drawX, this.y, this.width, this.height);
+		}
+		
 		// 아직 살아있는 하트 그리기
+		drawX = this.x;
 		for(let i = 0; i < aliveHearts; i++, drawX += this.width + 10) {
 			context.drawImage(Heart.heartImg, drawX, this.y, this.width, this.height);
 		}
-		// 죽은 하트 그리기
-		for(let i = 0; i < deadHearts; i++, drawX += this.width + 10) {
-			context.drawImage(Heart.heartBackgroundImg, drawX, this.y, this.width, this.height);
-		}
+		
 		// 깜빡깜빡 그리기
 		drawX = this.x;
 		if(addBlink) {
