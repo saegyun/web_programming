@@ -19,19 +19,19 @@ const checkResult = (context) => {
 
 const stage2Levels = {
 	"easy": {
-		brick_count: 40,
+		brick_count: 32,
 		bricks_in_row: 8,
 		ball_speed: 1,
 		barWidth: 250
 	},
 	"normal": {
-		brick_count: 40,
+		brick_count: 32,
 		bricks_in_row: 8,
 		ball_speed: 2,
 		barWidth: 200
 	},
 	"hard": {
-		brick_count: 40,
+		brick_count: 32,
 		bricks_in_row: 8,
 		ball_speed: 3,
 		barWidth: 150
