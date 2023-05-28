@@ -11,25 +11,33 @@ $(document).ready(() => {
 			preview: "resource/ui/blank.png",
 		},
 		{
-			name: "stage3",
+			name: "stage 3",
 			description: "몬스터가 찾아옵니다! 동이 틀 때까지 버티세요!",
 			preview: "resource/ui/heart.png",
 		},
 		{
-			name: "stage4",
+			name: "stage 4",
 			description: "블레이즈 스포너를 찾았습니다! 스포너를 부숴 그들을 막으세요!",
 			preview: "resource/background/preview/stage4.png",
 		},
 		{
-			name: "stage5",
+			name: "stage 5",
 			description: "평화를 깬 엔더드래곤! 복수의 시간입니다!",
 			preview: "resource/ui/blank.png",
 		}
 	]
 
+	$(".stages").ready(() => {
+		currentStage = stageInfo[0].name;
+		$("#stage-info > p").eq(0).text(stageInfo[0].name);
+		$("#stage-info > p").eq(1).text(stageInfo[0].description);
+		$("#stage-info > img").attr("src", stageInfo[0].preview);
+	});
+
 	for (let i = 0; i < 5; i++) {
 		$(".stages > button").eq(i).on("click", () => {
 			currentStage = stageInfo[i].name;
+			console.log("select stage", currentStage);
 			$("#stage-info > p").eq(0).text(stageInfo[i].name);
 			$("#stage-info > p").eq(1).text(stageInfo[i].description);
 			$("#stage-info > img").attr("src", stageInfo[i].preview);

@@ -1,0 +1,19 @@
+#setting > h1 {
+	color: white;
+	-webkit-text-stroke: 1px black;
+
+	font-size: 45px;
+	margin-top: 100px;
+	margin-bottom: 100px;
+}
+#settings {
+	margin: 30px auto;
+	width: 600px;
+	height: 400px;
+
+	display: grid;
+	grid-template-columns: 200px 200px 200px;
+}
+#settings > * {
+	margin: 20px;
+}

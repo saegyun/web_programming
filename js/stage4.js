@@ -33,7 +33,7 @@ $(document).ready(function() {
 	});
 
 	$(".level-btn").on("click", function() {
-		if (currentStage === "stage4") {
+		if (currentStage === "stage 4") {
 			moveNext(3);
 			$(window).on("mousemove", event => {
 				mousePos = [

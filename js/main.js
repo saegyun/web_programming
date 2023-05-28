@@ -1,4 +1,4 @@
-let currentStage = "";
+let currentStage = "stage 1";
 
 // canvas size
 const maxWidth = 800;
@@ -52,6 +52,11 @@ function initPage() {
 	const choiceBgImg = new Image();
 	choiceBgImg.src = "resource/background/choice.jpg";
 	
+	const settingBgImg = new Image();
+	settingBgImg.src = "resource/background/setting.jpg";
+
+	const stage4ResultBgImg = new Image();
+	stage4ResultBgImg.src = "resource/background/stage4_background.png";	
 
 	const intro = document.getElementById("intro");
 	const title = document.getElementById("title");
@@ -102,6 +107,24 @@ function initPage() {
 			value: setting,
 			next: [],
 			prev: "title",
+			onLoad: () => {
+
+				context.drawImage(
+					settingBgImg,
+					0,
+					0,
+					225,
+					225,
+					0,
+					0,
+					maxWidth,
+					maxHeight
+				);
+
+			},
+			onUnload: () => {
+				context.clearRect(0, 0, maxWidth, maxHeight);
+			}
 		},
 		"choice": {
 			value: choice,
@@ -171,6 +194,24 @@ function initPage() {
 			value: stage4_result,
 			next: [],
 			prev: "choice",
+			onLoad: () => {
+
+				context.drawImage(
+					stage4ResultBgImg,
+					0,
+					0,
+					720,
+					720,
+					0,
+					0,
+					maxWidth,
+					maxHeight
+				);
+
+			},
+			onUnload: () => {
+				context.clearRect(0, 0, maxWidth, maxHeight);
+			}
 		},
 		"stage5": {
 			value: stage5,

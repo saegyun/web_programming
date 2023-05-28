@@ -31,3 +31,14 @@
 	width: 400px;
 	margin-top: 40px;
 }
+#credit {
+	color: white;
+	text-shadow: 0px 0px black, 0px 2px rgb(171, 171, 171), 2px 0px rgb(73, 73, 73), 0px 0px black;
+
+	position: absolute;
+
+	left: 110px;
+	bottom: 10px;
+
+	text-align: left;
+}
