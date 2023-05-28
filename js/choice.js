@@ -7,8 +7,8 @@ $(document).ready(() => {
 		},
 		{
 			name: "stage 2",
-			description: "광물을 캐 경험치를 얻어보세요!",
-			preview: "resource/ui/blank.png",
+			description: "광물을 캐 새로운 광물을 사용해보세요!",
+			preview: "resource/background/preview/stage2.png",
 		},
 		{
 			name: "stage 3",

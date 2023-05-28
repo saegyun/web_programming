@@ -172,6 +172,7 @@ const Stage4 = {
 		// brick width, height and padding within one another
 		Stage4.brickAreaWidth = Math.round(maxWidth / levelInfo.bricks_in_row);
 		Stage4.brickAreaHeight = Stage4.brickAreaWidth;
+		
 		const padding = 40;
 
 		const backgroundImg = new Image();
