@@ -3,6 +3,9 @@ let mousePadding = 0;
 
 let gameInterval;
 let stageStatus = {isPlaying: false};
+let isSuccess = false;
+
+let pickaxeStatus;
 
 
 const gameEnd = (context) => {
@@ -13,10 +16,49 @@ const gameEnd = (context) => {
 	$(window).off("mousemove");
 };
 
-const checkResult = (context) => {
+// const checkResult = (context) => {
+// 	if (!isSuccess) {
+// 		$("#stage2-result").css({
+// 			backgroundColor: "rgba(255, 0, 0, 0.253)",
+// 		});
+// 		$("#stage2-result > h1").text("You died!");
+// 		$("#stage2-result > img").attr("src","resource/pickaxe/stone_pickaxe.png");
+// 	} 
+// 	else {
+// 		$("#stage2-result").css({
+// 			backgroundColor: "rgba(102, 255, 0, 0.253)",
+// 		});
+// 		$("#stage2-result > h1").text("You Successed!");
+// 		$("#stage2-result > img").attr("src","resource/pickaxe/stone_pickaxe.png");
+// 	}
+// 	$("#stage2-result > p").text("Achieved!");
+// 	gameEnd(context);
+// 	moveNext(0);
+// };
+
+
+const failResult =(context) => {
+	$("#stage2-result").css({
+		backgroundColor: "rgba(255, 0, 0, 0.253)",
+	});
+	$("#stage2-result > h1").text("You died!");
+	$("#stage2-result > img").attr("src","resource/pickaxe/stone_pickaxe.png");
+	$("#stage2-result > p").text("Achieved!");
 	gameEnd(context);
 	moveNext(0);
-};
+}
+
+const successResult =(context) => {
+	$("#stage2-result").css({
+		backgroundColor: "rgba(102, 255, 0, 0.253)",
+	});
+	$("#stage2-result > h1").text("You Successed!");
+	$("#stage2-result > img").attr("src","resource/pickaxe/stone_pickaxe.png");
+	console.log("else");
+	$("#stage2-result > p").text("Achieved!");
+	gameEnd(context);
+	moveNext(0);
+}
 
 const stage2Levels = {
 	"easy": {
@@ -28,13 +70,13 @@ const stage2Levels = {
 	"normal": {
 		brick_count: 40,
 		bricks_in_row: 8,
-		ball_speed: 2,
+		ball_speed: 1.5,
 		barWidth: 200
 	},
 	"hard": {
 		brick_count: 40,
 		bricks_in_row: 8,
-		ball_speed: 3,
+		ball_speed: 2.5,
 		barWidth: 150
 	},
 }
@@ -76,7 +118,7 @@ $(document).ready(function() {
 
 // brick breaking main logic
 function startGame(callBack) {
-	
+	isSuccess = false;
 	Ores = {
 		WOOD: {order: 0, oreType: "wood", imageSrc: "no", oreHealth: 1, weight: 0},
 		STONE: {order: 1, oreType: "stone", imageSrc: "resource/blocks/stone.png", oreHealth: 2, weight: 4}, 
@@ -129,8 +171,6 @@ function startGame(callBack) {
 
 	ballImage.src = `resource/pickaxe/wood_pickaxe.png`;
 
-	console.log(window.pickaxe);
-
 	const ball = { 
 		id: ballId,
 		color: "red", 
@@ -147,7 +187,12 @@ function startGame(callBack) {
 	draws.push(ball); 
 
 	// initial ball shooting radian
-	let ballRad = Math.PI * (Math.random() - 1) / 4; 
+	const poassibleRadians = [
+		-Math.PI * (1 / 6 + Math.random() / 6),
+		-Math.PI * (5 / 6 - Math.random() / 6),
+	 ];
+	 let ballRad = poassibleRadians[Math.floor(Math.random() * 2)];
+ 
 
 	if(!window.fixedDiamondX) 
 		window.fixedDiamondX = Math.floor(Math.random() * levelInfo.bricks_in_row); 
@@ -220,6 +265,7 @@ function startGame(callBack) {
 				ball.image.src = `resource/items/diamond_pickaxe.png`;
 				break;
 		}
+		
 
 		for (const object of draws) {
 			context.beginPath();
@@ -273,7 +319,9 @@ function startGame(callBack) {
 				} 
 
 				if (object.loc[1] > deathLine) { 
-					checkResult(context);
+					//checkResult(context);
+					pickaxeStatus = ball.image;
+					failResult();
 				}
 			}
 
@@ -334,14 +382,14 @@ function startGame(callBack) {
 		// calculating brick that the ball will collide with
 		let brickX = (
 			Number.parseInt(
-				(ballLoc[0] + Math.cos(ballRad) * (levelInfo.ball_speed)) / brickAreaWidth
+				(ballLoc[0] + Math.cos(ballRad) * (ball.width)) / brickAreaWidth
 			) % levelInfo.bricks_in_row
 		) * brickAreaWidth;
 		// limit brick's x position
 		brickX = Math.max(0, brickX);
 		brickX = Math.min(maxWidth - brickAreaWidth, brickX);
 
-		const brickY = Number.parseInt((ballLoc[1] + Math.sin(ballRad) * (ball.width)*2) / brickAreaHeight) * brickAreaHeight;
+		const brickY = Number.parseInt((ballLoc[1] + Math.sin(ballRad) * (ball.width)) / brickAreaHeight) * brickAreaHeight;
 
 		const collidePos = [brickX, brickY];
 	
@@ -374,8 +422,12 @@ function startGame(callBack) {
 					window.ores[collidePos].health = 0;
 					
 					//check if breaks diamond => end
-					if(brickPosInfo[collidePos].ore === Ores.DIAMOND) gameEnd(context);
-
+					if(brickPosInfo[collidePos].ore === Ores.DIAMOND) {
+						isSuccess = true;
+						//checkResult(context);
+						successResult();
+						gameEnd(context);
+					}
 					//change pickaxe material
 					if(brickPosInfo[collidePos].ore !== window.pickaxe.ore && 
 						brickPosInfo[collidePos].ore.order >= window.pickaxe.ore.order) {
