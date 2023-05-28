@@ -1,7 +1,3 @@
-let mousePos = [0, 0];
-let mousePadding = 0;
-let canvasPosition; // canvas의 위치를 저장하는 전역 변수, div를 absolute로 추가할 때 canvas에 대한 상대적 위치를 지정하기 위해 필요
-let gameOn = false; // 게임이 현재 진행 중인지 체크하기 위한 전역 변수, 스테이지가 시작하면 true로 바뀌고 스테이지를 나가면 false로 바뀜
 
 $(document).ready(function() {
 	let gameQuit = false;
@@ -25,7 +21,7 @@ $(document).ready(function() {
 		});
 		
 		gameOn = true; // 스테이지를 시작하면 게임이 진행 중인 것으로 취급
-		startGame(() => {
+		startStage3(() => {
 			$(window).off("mousemove");
 		});
 	});
@@ -40,7 +36,7 @@ $(document).ready(function() {
 
 
 // 스테이지3에 대한 총괄 함수
-function startGame(callBack) { 
+function startStage3(callBack) { 
 	// 클래스, 함수들 정의
 	// 공에 대한 클래스
 	class Ball {
