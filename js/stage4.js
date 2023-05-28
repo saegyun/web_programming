@@ -32,15 +32,18 @@ $(document).ready(function() {
 		reCalc();
 	});
 
-	$("#choice .next").eq(3).on("click", () => {
-		$(window).on("mousemove", event => {
-			mousePos = [
-				event.pageX,
-				event.pageY
-			];
-		});
-
-		startGame();
+	$(".level-btn").on("click", function() {
+		if (currentStage === "stage4") {
+			moveNext(3);
+			$(window).on("mousemove", event => {
+				mousePos = [
+					event.pageX,
+					event.pageY
+				];
+			});
+	
+			startGame($(this).val());
+		}
 	});
 
 	$("#stage4 .back").on("click", () => {
@@ -85,7 +88,7 @@ const stage4Levels = {
 }
 
 // brick breaking main logic
-function startGame() {
+function startGame(level) {
 		
 	class MobBlaze extends Mob {
 		constructor(x, y, maxHealth, damage, speed, width, height, exp) {
@@ -173,7 +176,7 @@ function startGame() {
 
 	const deathLine = maxHeight * 0.98;
 
-	const levelInfo = stage4Levels[currentLevel];
+	const levelInfo = stage4Levels[level];
 
 	// objects to draw 
 	// -> will be divided with property "type"

@@ -29,8 +29,6 @@ $(document).ready(function() {
 // brick breaking main logic
 function startGame(callBack) {
 	
-	const canvas = document.getElementById("myCanvas");
-	const context = canvas.getContext("2d");
 
 	const deathLine = maxHeight * 0.98;
 
