@@ -4,6 +4,7 @@ let mousePadding = 0;
 let gameInterval;
 let stageStatus = {isPlaying: false};
 
+
 const gameEnd = (context) => {
 	clearInterval(gameInterval);
 	setTimeout(() => {
@@ -25,13 +26,13 @@ const stage2Levels = {
 		barWidth: 250
 	},
 	"normal": {
-		brick_count: 32,
+		brick_count: 40,
 		bricks_in_row: 8,
 		ball_speed: 2,
 		barWidth: 200
 	},
 	"hard": {
-		brick_count: 32,
+		brick_count: 40,
 		bricks_in_row: 8,
 		ball_speed: 3,
 		barWidth: 150
@@ -105,7 +106,7 @@ function startGame(callBack) {
 	// brick width, height and padding within one another
 	const brickAreaWidth = (maxWidth / levelInfo.bricks_in_row);
 	const brickAreaHeight = brickAreaWidth;
-	const padding = 30;
+	const padding = 0;
 
 	// object that maps "position" to "id"
 	const brickPosInfo = {};
@@ -135,7 +136,7 @@ function startGame(callBack) {
 		color: "red", 
 		type: "circle", 
 		loc: [450, 600], 
-		width: 30, 
+		width: 25, 
 		image: ballImage, 
 		degree: 0
 	};
@@ -340,7 +341,7 @@ function startGame(callBack) {
 		brickX = Math.max(0, brickX);
 		brickX = Math.min(maxWidth - brickAreaWidth, brickX);
 
-		const brickY = Number.parseInt((ballLoc[1] + Math.sin(ballRad) * (levelInfo.ball_speed)) / brickAreaHeight) * brickAreaHeight;
+		const brickY = Number.parseInt((ballLoc[1] + Math.sin(ballRad) * (ball.width)*2) / brickAreaHeight) * brickAreaHeight;
 
 		const collidePos = [brickX, brickY];
 	
