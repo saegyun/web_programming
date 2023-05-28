@@ -1,0 +1,62 @@
+#choice > h1 {
+	color: white;
+	-webkit-text-stroke: 1px black;
+
+	font-size: 45px;
+	margin-top: 100px;
+	margin-bottom: 100px;
+}
+#choice > .stages {
+	float: left;
+
+	width: 200px;
+	height: 400px;
+
+	margin-left: 150px;
+
+	display: flex;
+	flex-direction: column;
+}
+#choice > .stages > button {
+	margin: 10px;
+}
+
+#choice > #stage-info {
+	float: left;
+
+	width: 500px;
+	height: 400px;
+
+	background-color: gray;
+
+	margin-left: 20px;
+
+	display: flex;
+	flex-direction: column;
+}
+#choice > #stage-info > img {
+	margin: 15px auto;
+
+	width: 200px;
+	height: 200px;
+}
+#choice > #stage-info > p:nth-of-type(1) {
+	font-size: 30px;
+}
+#choice > #stage-info > p:nth-of-type(2) {
+	font-size: 15px;
+
+	margin-bottom: 30px;
+}
+#choice > #stage-info > .level {
+	display: flex;
+	flex-direction: row;
+
+	margin: 0 auto;
+}
+.level > button {
+	margin-left: 10px;
+}
+.level > button:nth-of-type(1) {
+	margin-left: 0px;
+}

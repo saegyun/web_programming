@@ -12,6 +12,7 @@
 	<link href="https://fonts.cdnfonts.com/css/minecraft-4" rel="stylesheet">
 	<link rel="stylesheet" href="/css/main.css">
 	<link rel="stylesheet" href="/css/title.css">
+	<link rel="stylesheet" href="/css/choice.css">
 	<link rel="stylesheet" href="/css/stage4.css">
 	<title>Brick_Breaking</title>
 </head>
@@ -20,26 +21,42 @@
 		<div id="ui">
 			<div id="intro">
 				<h1>intro</h1>
-				<button class="next">Skip</button>
+				<button class="next minecraft">Skip</button>
 			</div>
 			<div id="title">
 				<p>Brick Breaking!!!</p>
-				<button class="next">Start</button>
+				<button class="next minecraft">Start</button>
 				<br>
-				<button class="next">Setting</button>
+				<button class="next minecraft">Setting</button>
 			</div>
 			<div id="setting">
 				<h1>setting</h1>
-				<button class="back">back</button>
+				<button class="back minecraft">back</button>
 			</div>
 			<div id="choice">
-				<h1>choice</h1>
-				<button class="next">stage1</button>
-				<button class="next">stage2</button>
-				<button class="next">stage3</button>
-				<button class="next">stage4</button>
-				<button class="next">stage5</button>
-				<button class="back">back</button>
+				<h1>Stages</h1>
+				<div class="stages">
+					<button class="minecraft">stage 1</button>
+					<button class="minecraft">stage 2</button>
+					<button class="minecraft">stage 3</button>
+					<button class="minecraft">stage 4</button>
+					<button class="minecraft">stage 5</button>
+					<button class="back minecraft">back</button>
+				</div>
+				<div id="stage-info" class="minecraft">
+					<p>
+						Stages
+					</p>
+					<img class="minecraft" src="resource/ui/blank.png" alt="">
+					<p class="description">
+						Please Select Stages
+					</p>
+					<div class="level">
+						<button class="minecraft"> Peaceful</button>
+						<button class="minecraft"> Easy</button>
+						<button class="minecraft"> Difficult</button>
+					</div>
+				</div>
 			</div>
 			<div id="stage1">
 				<button class="back">quit</button>

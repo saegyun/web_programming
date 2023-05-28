@@ -43,8 +43,14 @@ const moveBack = () => {
 
 function initPage() {
 
-	const bgImg = new Image();
-	bgImg.src = "resource/background/title.png";
+	const canvas = document.getElementById("myCanvas");
+	const context = canvas.getContext("2d");
+
+	const titleBgImg = new Image();
+	titleBgImg.src = "resource/background/title.png";
+	
+	const choiceBgImg = new Image();
+	choiceBgImg.src = "resource/background/choice.jpg";
 	
 
 	const intro = document.getElementById("intro");
@@ -75,11 +81,8 @@ function initPage() {
 			next: ["choice", "setting"],
 			prev: undefined,
 			onLoad: () => {
-				const canvas = document.getElementById("myCanvas");
-				const context = canvas.getContext("2d");
-
 				context.drawImage(
-					bgImg,
+					titleBgImg,
 					0,
 					0,
 					1084,
@@ -92,10 +95,6 @@ function initPage() {
 
 			},
 			onUnload: () => {
-				const canvas = document.getElementById("myCanvas");
-				const context = canvas.getContext("2d");
-				console.log("?");
-
 				context.clearRect(0, 0, maxWidth, maxHeight);
 			}
 		},
@@ -114,6 +113,24 @@ function initPage() {
 				"stage5",
 			],
 			prev: "title",
+			onLoad: () => {
+
+				context.drawImage(
+					choiceBgImg,
+					0,
+					0,
+					971,
+					971,
+					0,
+					0,
+					maxWidth,
+					maxHeight
+				);
+
+			},
+			onUnload: () => {
+				context.clearRect(0, 0, maxWidth, maxHeight);
+			}
 		},
 		"stage1": {
 			value: stage1,
