@@ -1,4 +1,8 @@
 let currentStage = "stage 1";
+let mousePos = [0, 0];
+let mousePadding = 0;
+
+let gameInterval;
 
 // canvas size
 const maxWidth = 800;
