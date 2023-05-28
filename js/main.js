@@ -1,36 +1,31 @@
-const debugObtions = {
-	showHitBox: false,
-};
-
-// level information
-const levels = {
-	"easy": {
-		brick_intenity: 1,
-		brick_count: 40,
-		bricks_in_row: 8,
-		ball_speed: 1,
-		plane_size: 4,
-	},
-	"normal": {
-		brick_intenity: 1,
-		brick_count: 40,
-		bricks_in_row: 10,
-		ball_speed: 1,
-		plane_size: 4,
-	},
-	"hard": {
-		brick_intenity: 1,
-		brick_count: 40,
-		bricks_in_row: 10,
-		ball_speed: 1,
-		plane_size: 4,
-	},
-}
-let currentLevel = "easy";
+let currentLevel = "normal";
 
 // canvas size
 const maxWidth = 800;
 const maxHeight = 800;
+
+let flow;
+
+
+let state = "intro";
+
+const moveNext = (idx) => {
+	// flow[state].value.hidden = true;
+	$(flow[state].value).fadeOut();
+	state = flow[state].next[idx];
+	setTimeout(() => {
+		$(flow[state].value).fadeIn();
+	}, 500);
+	// flow[state].value.hidden = false;
+};
+
+const moveBack = () => {
+	$(flow[state].value).fadeOut();
+	state = flow[state].prev;
+	setTimeout(() => {
+		$(flow[state].value).fadeIn();
+	}, 500);
+}
 
 function initPage() {
 	const intro = document.getElementById("intro");
@@ -50,7 +45,7 @@ function initPage() {
 	const stage4_result = document.getElementById("stage4-result");
 	const stage5_result = document.getElementById("stage5-result");
 
-	const flow = {
+	flow = {
 		"intro": {
 			value: intro,
 			next: ["title"],
@@ -129,20 +124,6 @@ function initPage() {
 		},
 	};
 
-	let state = "intro";
-
-	const moveNext = (idx) => {
-		flow[state].value.hidden = true;
-		state = flow[state].next[idx];
-		flow[state].value.hidden = false;
-	};
-
-	const moveBack = () => {
-		flow[state].value.hidden = true;
-		state = flow[state].prev;
-		flow[state].value.hidden = false;
-	}
-
 	Object.entries(flow).forEach((page) => {
 		if (page[0] != state) {
 			page[1].value.hidden = true;
@@ -152,6 +133,7 @@ function initPage() {
 	$(".back").on("click", moveBack);
 
 	$("#intro .next").on("click", () => moveNext(0));
+	
 	$("#title .next").eq(0).on("click", () => moveNext(0));
 	$("#title .next").eq(1).on("click", () => moveNext(1));
 

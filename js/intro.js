@@ -18,8 +18,7 @@ $(document).ready(() => {
     
     $introText.on('click', function() {
         if(page >= texts.length - 1) {
-            $('#intro').hide();
-            $('#title').show();
+            moveNext(0);
         }
         if($(this).is('.end')) return;
     
