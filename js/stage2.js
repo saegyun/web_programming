@@ -2,21 +2,18 @@ let stageStatus = {isPlaying: false};
 
 const levels = {
 	"easy": {
-		brick_intenity: 1,
 		brick_count: 40,
 		bricks_in_row: 8,
 		ball_speed: 1,
 		barWidth: 250
 	},
 	"normal": {
-		brick_intenity: 1,
 		brick_count: 40,
 		bricks_in_row: 8,
 		ball_speed: 2,
 		barWidth: 200
 	},
 	"hard": {
-		brick_intenity: 1,
 		brick_count: 40,
 		bricks_in_row: 8,
 		ball_speed: 3,
@@ -64,7 +61,7 @@ function startGame(callBack) {
 	const canvas = document.getElementById("myCanvas");
 	const context = canvas.getContext("2d");
 
-	const deathLine = maxHeight * 0.97;
+	const deathLine = maxHeight * 0.96;
 
 	const levelInfo = levels[currentLevel];
 
@@ -112,7 +109,7 @@ function startGame(callBack) {
 		color: "red", 
 		type: "circle", 
 		loc: [450, 600], 
-		width: 20, 
+		width: 30, 
 		image: ballImage, 
 		degree: 0
 	};
@@ -383,7 +380,7 @@ function startGame(callBack) {
 	const gameEnd = () => {
 		context.clearRect(0, 0, maxWidth, maxHeight); // clear canvas
 		// TODO save final ore status globally
-		context = undefined
+		//context = undefined
 		callBack();
 	};
 
