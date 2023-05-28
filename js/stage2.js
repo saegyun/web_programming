@@ -5,11 +5,14 @@ let gameInterval;
 let stageStatus = {isPlaying: false};
 //let isSuccess = false;
 
-
+//상태 저장
+let pickaxeStatus;
 
 const gameEnd = (context) => {
+	//초기화
 	window.fixedDiamondX = undefined;
 	window.pickaxe = undefined;
+	console.log(pickaxeStatus);
 	clearInterval(gameInterval);
 	setTimeout(() => {
 		context.clearRect(0, 0, maxWidth, maxHeight); // clear canvas			
@@ -43,7 +46,7 @@ const failResult =(context) => {
 		backgroundColor: "rgba(255, 0, 0, 0.253)",
 	});
 	$("#stage2-result > h1").text("You died!");
-	$("#stage2-result > img").attr("src","resource/pickaxe/stone_pickaxe.png");
+	$("#stage2-result > img").attr("src",`resource/pickaxe/${pickaxeStatus}_pickaxe.png`);
 	$("#stage2-result > p").text("Achieved!");
 	gameEnd(context);
 	moveNext(0);
@@ -54,7 +57,7 @@ const successResult =(context) => {
 		backgroundColor: "rgba(102, 255, 0, 0.253)",
 	});
 	$("#stage2-result > h1").text("You Successed!");
-	$("#stage2-result > img").attr("src","resource/pickaxe/stone_pickaxe.png");
+	$("#stage2-result > img").attr("src",`resource/pickaxe/${pickaxeStatus}_pickaxe.png`);
 	console.log("else");
 	$("#stage2-result > p").text("Achieved!");
 	gameEnd(context);
@@ -252,18 +255,23 @@ function startGame(callBack) {
 		switch(window.pickaxe.ore) {
 			case Ores.WOOD:
 				ball.image.src = `resource/items/wood_pickaxe.png`;
+				pickaxeStatus = "wood";
 				break;
 			case Ores.STONE:
 				ball.image.src = `resource/items/stone_pickaxe.png`;
+				pickaxeStatus = "stone";
 				break;
 			case Ores.IRON:
 				ball.image.src = `resource/items/iron_pickaxe.png`;
+				pickaxeStatus = "iron";
 				break;
 			case Ores.GOLD:
 				ball.image.src = `resource/items/gold_pickaxe.png`;
+				pickaxeStatus = "gold";
 				break;
 			case Ores.DIAMOND:
 				ball.image.src = `resource/items/diamond_pickaxe.png`;
+				pickaxeStatus = "diamond";
 				break;
 		}
 		
