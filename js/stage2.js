@@ -320,7 +320,6 @@ function startGame(callBack) {
 
 				if (object.loc[1] > deathLine) { 
 					//checkResult(context);
-					pickaxeStatus = ball.image;
 					failResult();
 				}
 			}
