@@ -75,6 +75,8 @@ function initPage() {
 	const stage4_result = document.getElementById("stage4-result");
 	const stage5_result = document.getElementById("stage5-result");
 
+	const enchant = document.getElementById("enchant-page");
+
 	flow = {
 		"intro": {
 			value: intro,
@@ -134,6 +136,7 @@ function initPage() {
 				"stage3",
 				"stage4",
 				"stage5",
+				"enchant",
 			],
 			prev: "title",
 			onLoad: () => {
@@ -154,6 +157,11 @@ function initPage() {
 			onUnload: () => {
 				context.clearRect(0, 0, maxWidth, maxHeight);
 			}
+		},
+		"enchant": {
+			value: enchant,
+			next: [],
+			prev: "choice",
 		},
 		"stage1": {
 			value: stage1,
@@ -227,6 +235,7 @@ function initPage() {
 
 	Object.entries(flow).forEach((page) => {
 		if (page[0] != state) {
+			console.log(page);
 			page[1].value.hidden = true;
 		}
 	});

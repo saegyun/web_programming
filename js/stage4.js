@@ -72,12 +72,12 @@ $(document).ready(function() {
 
 });
 
-const debugObtions = {
-	showHitBox: false,
-	addTrackBrick: (id) => {
-		trackIds.push(id);
-	}
-};
+// const debugOptions = {
+// 	showHitBox: false,
+// 	addTrackBrick: (id) => {
+// 		trackIds.push(id);
+// 	}
+// };
 
 // level information
 const stage4Levels = {
@@ -268,7 +268,11 @@ function startGame(level) {
 
 
 	// initial ball shooting radian
-	let ballRad = Math.PI * (3 / 2 + (Math.random() - 0.5) / 4);
+	const poassibleRadians = [
+		Math.PI * (3 / 2 + 1 / 4 + Math.random() / 4),
+		Math.PI * (3 / 2 - 1 / 4 - Math.random() / 4),
+	];
+	let ballRad = poassibleRadians[Math.floor(Math.random() * 2)];
 	// let ballRad = Math.PI * (Math.random() - 1) / 6;
 
 	// movement for eachBricks
@@ -548,7 +552,7 @@ function startGame(level) {
 
 		// check if brick really exists
 		if (targetId) {
-			// debugObtions.addTrackBrick(targetId);
+			// debugOptions.addTrackBrick(targetId);
 			// console.log(targetId);
 
 			let isBounced = false;
@@ -588,12 +592,12 @@ function startGame(level) {
 			}
 		}
 		// if it's true, show the target brick's hitbox
-		if (debugObtions.showHitBox) {
-			context.fillStyle = 'rgba(10, 60, 10, 0.5)';
+		// if (debugOptions.showHitBox) {
+		// 	context.fillStyle = 'rgba(10, 60, 10, 0.5)';
 
-			context.fillRect(brickX + padding / 2, brickY + padding / 2, brickAreaWidth - padding, brickAreaHeight - padding);
-			context.fillRect(brickX + padding / 2 - ball.radius, brickY + padding / 2 - ball.radius, brickAreaWidth - padding + ball.radius * 2, brickAreaHeight - padding + ball.radius * 2);	
-		}
+		// 	context.fillRect(brickX + padding / 2, brickY + padding / 2, brickAreaWidth - padding, brickAreaHeight - padding);
+		// 	context.fillRect(brickX + padding / 2 - ball.radius, brickY + padding / 2 - ball.radius, brickAreaWidth - padding + ball.radius * 2, brickAreaHeight - padding + ball.radius * 2);	
+		// }
 	}
 
 	gameInterval = setInterval(() => draw(gameInterval, checkResult));
