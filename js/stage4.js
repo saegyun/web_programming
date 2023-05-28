@@ -5,6 +5,9 @@ let mousePadding = 0;
 let trackIds = [];
 let gameInterval;
 
+let obtainedXp = 0; 
+let isSuccess = false;
+
 const damage = 5;
 
 const gameEnd = (context) => {
@@ -17,6 +20,20 @@ const gameEnd = (context) => {
 };
 
 const checkResult = (context) => {
+	if (!isSuccess) {
+		$("#stage4-result").css({
+			"background-color": "rgba(255, 0, 0, 0.253)",
+		});
+		$("#stage4-result > h1").text("You died!");
+		// $("#stage4-result > .result-buttons > button").eq(1).attr("disabled", true);
+	} else {
+		$("#stage4-result").css({
+			"background-color": "rgba(102, 255, 0, 0.253)",
+		});
+		$("#stage4-result > h1").text("You Successed!");
+		// $("#stage4-result > .result-buttons > button").eq(1).attr("disabled", false);
+	}
+	$("#stage4-result > p").text("Obtained Exp : " + obtainedXp);
 	gameEnd(context);
 	moveNext(0);
 };
@@ -89,7 +106,10 @@ const stage4Levels = {
 
 // brick breaking main logic
 function startGame(level) {
-		
+	obtainedXp = 0;
+
+	isSuccess = false;
+
 	class MobBlaze extends Mob {
 		constructor(x, y, maxHealth, damage, speed, width, height, exp) {
 			super(x, y, maxHealth, damage, speed, width, height, 8, 200, 192, exp); // Mob 클래스의 생성자 호출
@@ -248,7 +268,7 @@ function startGame(level) {
 
 
 	// initial ball shooting radian
-	let ballRad = Math.PI * (Math.random() - 2) / 6;
+	let ballRad = Math.PI * (3 / 2 + (Math.random() - 0.5) / 4);
 	// let ballRad = Math.PI * (Math.random() - 1) / 6;
 
 	// movement for eachBricks
@@ -332,6 +352,7 @@ function startGame(level) {
 			if (object.loc[1] < maxHeight * 0.5 && 
 				(object.loc[0] > maxWidth / 2 - brickAreaWidth / 2 && object.loc[0] < maxWidth / 2 + brickAreaWidth / 2)) {
 					spawner.hit(levelInfo.spawnerHitCnt, () => {
+						isSuccess = true;
 						checkResult(context);
 					});
 			}
@@ -394,7 +415,6 @@ function startGame(level) {
 	};
 	
 	let expLabels = [];
-	let obtainedXp = 0; 
 
 	// main drawing interval
 	const draw = (callBack) => {

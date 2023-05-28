@@ -44,6 +44,26 @@ img {
 	text-shadow: 0px 0px black, 0px 2px black, 2px 0px rgb(125, 125, 125), 0px 0px black;
 }
 
+.minecraft:hover {
+
+	background-color: rgb(110, 110, 110);
+	border-top: 4px solid rgb(129, 129, 129);
+	border-left: 4px solid rgb(129, 129, 129);
+
+	border-bottom: 4px solid rgb(40, 40, 40);
+	border-right: 4px solid rgb(40, 40, 40);
+}
+
+.minecraft:disabled {
+	
+	background-color: rgb(110, 110, 110);
+	border-top: 4px solid rgb(129, 129, 129);
+	border-left: 4px solid rgb(129, 129, 129);
+
+	border-bottom: 4px solid rgb(40, 40, 40);
+	border-right: 4px solid rgb(40, 40, 40);
+}
+
 #content-wrapper {
 	position: relative;
 	
@@ -72,20 +92,6 @@ img {
 	/* font-weight: bold; */
 }
 
-#ui button.minecraft:hover {
-	background-color: rgb(86, 86, 86);
-	border-top: 4px solid rgb(129, 129, 129);
-	border-left: 4px solid rgb(129, 129, 129);
-
-	border-bottom: 4px solid rgb(40, 40, 40);
-	border-right: 4px solid rgb(40, 40, 40);
-}
-
-#ui button.back {
-	color: white;
-	
-	background-color: var(--ui-back-btn-bg-color);
-}
 #stage1 > button {
 	position: absolute;
 	bottom: 0;
