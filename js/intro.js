@@ -17,12 +17,12 @@ $(document).ready(() => {
     $introText.text(texts[page]);
     
     $introText.on('click', function() {
-        if(page >= texts.length - 1) {
+        if (page >= texts.length - 1) {
             moveNext(0);
         }
-        if($(this).is('.end')) return;
+        if ($(this).is('.end')) return;
     
-        if(page === 5) {
+        if (page === 5) {
             $(".intro-image").css('background-image', 'url("/resource/bg/intro2.jpg")');
         }
         console.log(page);

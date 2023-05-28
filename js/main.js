@@ -86,6 +86,23 @@ function initPage() {
 			value: intro,
 			next: ["title"],
 			prev: undefined,
+			onLoad: () => {
+				context.drawImage(
+					settingBgImg,
+					0,
+					0,
+					225,
+					225,
+					0,
+					0,
+					maxWidth,
+					maxHeight
+				);
+
+			},
+			onUnload: () => {
+				context.clearRect(0, 0, maxWidth, maxHeight);
+			}
 		},
 		"title": {
 			value: title,
@@ -259,6 +276,10 @@ function initPage() {
 			page[1].value.hidden = true;
 		}
 	});
+
+	setTimeout(() => {
+		flow[state].onLoad();
+	}, 100);
 
 	$(".back").on("click", moveBack);
 

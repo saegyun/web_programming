@@ -369,7 +369,7 @@ const Stage4 = {
 			brickPosInfo[pos] = object.id;
 
 			// 몹이 마을에 도달했을 때 (아래 끝까지)
-			if(mob.y > deathLine - 60) {
+			if (mob.y > deathLine - 60) {
 				callBack();
 				delete draws[object.id];
 				delete brickPosInfo[pos];
@@ -487,9 +487,9 @@ const Stage4 = {
 			spawner.draw(context);
 			
 			// 경험치 라벨 그리기
-			for(var i in expLabels) {
+			for (let i in expLabels) {
 				let expLabel = expLabels[i];
-				if(expLabel.draw(context)) {
+				if (expLabel.draw(context)) {
 					expLabels.splice(i, 1);
 				}
 			}

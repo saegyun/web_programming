@@ -49,6 +49,9 @@ const Stage2 = {
 		const deathLine = maxHeight * 0.96;
 	
 		const levelInfo = stage2Levels[currentLevel];
+
+		const paddleImg = new Image();
+		paddleImg.src = "resource/sprite/paddle_slime.png";
 	
 		// objects to draw 
 		// -> will be divided with property "type"
@@ -73,14 +76,14 @@ const Stage2 = {
 		let bar = {
 			id: barId,
 			color: "brown",
-			type: "rect",
-			from: [100 + maxWidth / 2 - levelInfo.barWidth / 2, deathLine - 100],
+			type: "bar",
+			loc: [100 + maxWidth / 2 - levelInfo.barWidth / 2, deathLine - 100],
 			size: [levelInfo.barWidth, barHeight],
 		};
 	
 		draws.push(bar);
 	
-		if(!window.pickaxe) 
+		if (!window.pickaxe) 
 			window.pickaxe = {ore: Ores.WOOD, power: 1};
 	
 		let ballImage = new Image();
@@ -110,7 +113,7 @@ const Stage2 = {
 		 let ballRad = poassibleRadians[Math.floor(Math.random() * 2)];
 	 
 	
-		if(!window.fixedDiamondX) 
+		if (!window.fixedDiamondX) 
 			window.fixedDiamondX = Math.floor(Math.random() * levelInfo.bricks_in_row); 
 	
 		// add bricks to "draws" and initialize "brickPosInfo"
@@ -133,7 +136,7 @@ const Stage2 = {
 				size: [brickAreaWidth - padding, brickAreaHeight - padding]
 			}; 			
 				
-			if(!window.ores[pos]) {
+			if (!window.ores[pos]) {
 				let health = ore.oreHealth;
 				window.ores[pos] = {};
 				window.ores[pos].ore = ore;
@@ -195,7 +198,7 @@ const Stage2 = {
 	
 				// when the object is the bar
 				if (object.id === barId) {
-					object.from = [
+					object.loc = [
 						Math.max(
 							0,
 							Math.min(
@@ -203,7 +206,7 @@ const Stage2 = {
 								mousePos[0] - mousePadding - levelInfo.barWidth / 2
 							)
 						),
-						object.from[1],
+						object.loc[1],
 					];
 					bar = object;
 				}
@@ -229,13 +232,13 @@ const Stage2 = {
 					];
 	
 					// collide with bar
-					if ((object.loc[1] <= bar.from[1] && object.loc[1] >= bar.from[1] - object.width) &&
-						(object.loc[0] >= bar.from[0] && object.loc[0] <= bar.from[0] + levelInfo.barWidth)) {
+					if ((object.loc[1] <= bar.loc[1] && object.loc[1] >= bar.loc[1] - object.width) &&
+						(object.loc[0] >= bar.loc[0] && object.loc[0] <= bar.loc[0] + levelInfo.barWidth)) {
 						ballRad = (2 * Math.PI - ballRad);
 					}
-					if ((object.loc[1] >= bar.from[1] && object.loc[1] <= bar.from[1] + barHeight) &&
-						((object.loc[0] >= bar.from[0] - object.width && object.loc[0] <= bar.from[0]) || 
-						 (object.loc[0] <= bar.from[0] + levelInfo.barWidth + object.width && object.loc[0] >= bar.from[0] + levelInfo.barWidth))) {
+					if ((object.loc[1] >= bar.loc[1] && object.loc[1] <= bar.loc[1] + barHeight) &&
+						((object.loc[0] >= bar.loc[0] - object.width && object.loc[0] <= bar.loc[0]) || 
+						 (object.loc[0] <= bar.loc[0] + levelInfo.barWidth + object.width && object.loc[0] >= bar.loc[0] + levelInfo.barWidth))) {
 						ballRad = Math.PI - ballRad; 
 					} 
 	
@@ -265,12 +268,25 @@ const Stage2 = {
 						context.fillStyle = object.color || "black";
 						context.fillRect(object.from[0], object.from[1], object.size[0], object.size[1]);
 						break;
+					case "bar":
+						context.drawImage(
+							paddleImg,
+							0,
+							0,
+							132,
+							36,
+							object.loc[0], 
+							object.loc[1], 
+							object.size[0], 
+							object.size[1]
+						);
+						break;
 					case "ore":
 						//console.log(window.ores[object.pos]);
 							
 						const destroyStage = Math.floor(10 - (window.ores[object.pos].health / brickPosInfo[object.pos].ore.oreHealth) * 10);
 	
-						if(destroyStage > 0 && destroyStage < 10) {
+						if (destroyStage > 0 && destroyStage < 10) {
 							const destroyMaskImage = new Image();
 							let src = `resource/blocks/destroy/${window.ores[object.pos].ore.oreType}_destroy_stage_${destroyStage}.png`;
 							
@@ -338,11 +354,11 @@ const Stage2 = {
 					window.ores[collidePos].health -= window.pickaxe.power;
 	
 					//check destroys the ore
-					if(window.ores[collidePos].health <= 0) {
+					if (window.ores[collidePos].health <= 0) {
 						window.ores[collidePos].health = 0;
 	
 						//change pickaxe material
-						if(brickPosInfo[collidePos].ore !== window.pickaxe.ore && 
+						if (brickPosInfo[collidePos].ore !== window.pickaxe.ore && 
 							brickPosInfo[collidePos].ore.order >= window.pickaxe.ore.order) {
 	
 							window.pickaxe.ore = brickPosInfo[collidePos].ore;
@@ -352,7 +368,7 @@ const Stage2 = {
 						}
 						
 						//check if breaks diamond => end
-						if(brickPosInfo[collidePos].ore === Ores.DIAMOND) {
+						if (brickPosInfo[collidePos].ore === Ores.DIAMOND) {
 							//isSuccess = true;
 							//checkResult(context);
 							Stage2.successResult(context);
@@ -419,9 +435,7 @@ $(document).ready(function() {
 				];
 			});
 			Stage2.stageStatus.isPlaying = true;
-			Stage2.startGame($(this).val(), () => {
-				$(window).off("mousemove");
-			});
+			Stage2.startGame($(this).val());
 		}
 	});
 
@@ -436,7 +450,7 @@ $(document).ready(function() {
 });
 
 function getRandomOre(info, x, y) {
-	if(x == window.fixedDiamondX && y == 0) return Ores.DIAMOND;
+	if (x == window.fixedDiamondX && y == 0) return Ores.DIAMOND;
 
 	//console.log(x + ", " + y);
 
@@ -450,7 +464,7 @@ function getRandomOre(info, x, y) {
 		//console.log(ore);
 		
 		let proportion = Math.ceil(ore.weight / maxWeight * maxY);
-		if(proportion >= y)
+		if (proportion >= y)
 			Array(ore.weight).fill(0).forEach(() => weightenList.push(ore));
 	});
 
