@@ -12,22 +12,41 @@ let state = "intro";
 const moveNext = (idx) => {
 	// flow[state].value.hidden = true;
 	$(flow[state].value).fadeOut();
+	if (flow[state].onUnload) {
+		flow[state].onUnload();
+	}
 	state = flow[state].next[idx];
+	
 	setTimeout(() => {
 		$(flow[state].value).fadeIn();
+		if (flow[state].onLoad) {
+			flow[state].onLoad();
+		}
 	}, 500);
 	// flow[state].value.hidden = false;
 };
 
 const moveBack = () => {
 	$(flow[state].value).fadeOut();
+	if (flow[state].onUnload) {
+		flow[state].onUnload();
+	}
 	state = flow[state].prev;
+	
 	setTimeout(() => {
 		$(flow[state].value).fadeIn();
+		if (flow[state].onLoad) {
+			flow[state].onLoad();
+		}
 	}, 500);
 }
 
 function initPage() {
+
+	const bgImg = new Image();
+	bgImg.src = "resource/background/title.png";
+	
+
 	const intro = document.getElementById("intro");
 	const title = document.getElementById("title");
 	const setting = document.getElementById("setting");
@@ -55,6 +74,30 @@ function initPage() {
 			value: title,
 			next: ["choice", "setting"],
 			prev: undefined,
+			onLoad: () => {
+				const canvas = document.getElementById("myCanvas");
+				const context = canvas.getContext("2d");
+
+				context.drawImage(
+					bgImg,
+					0,
+					0,
+					1084,
+					1080,
+					0,
+					0,
+					maxWidth,
+					maxHeight
+				);
+
+			},
+			onUnload: () => {
+				const canvas = document.getElementById("myCanvas");
+				const context = canvas.getContext("2d");
+				console.log("?");
+
+				context.clearRect(0, 0, maxWidth, maxHeight);
+			}
 		},
 		"setting": {
 			value: setting,
