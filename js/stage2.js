@@ -431,10 +431,9 @@ function startGame(callBack) {
 					
 					//check if breaks diamond => end
 					if(brickPosInfo[collidePos].ore === Ores.DIAMOND) {
-						isSuccess = true;
+						//isSuccess = true;
 						//checkResult(context);
 						successResult(context);
-						gameEnd(context);
 					}
 					//change pickaxe material
 					if(brickPosInfo[collidePos].ore !== window.pickaxe.ore && 
