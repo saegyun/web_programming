@@ -1,5 +1,3 @@
-let mousePos = [0, 0];
-let mousePadding = 0;
 
 $(document).ready(function() {
 	const reCalc = () => {

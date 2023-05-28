@@ -106,3 +106,30 @@ img {
 #myCanvas {
 	background-color: var(--canvas-bg-color);
 }
+
+#intro {
+	align-items: center;
+	display: flex;
+	flex-direction: column;
+}
+
+.intro-text {
+	position: relative;
+	width: 690px;
+	height: 90px;
+	background-color: antiquewhite;
+	border-radius: 5%;
+	margin-bottom: 20px;
+	padding: 30px;
+}
+
+.intro-image {
+	position: relative;
+	width: 500px;
+	height: 500px;
+	background-image: url("/resource/bg/intro1.jpg");
+	border-radius: 1%;
+	padding: 0;
+	margin-top: 40px;
+	margin-bottom: 40px;
+}
