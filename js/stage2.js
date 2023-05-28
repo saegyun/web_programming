@@ -1,6 +1,23 @@
+let mousePos = [0, 0];
+let mousePadding = 0;
+
+let gameInterval;
 let stageStatus = {isPlaying: false};
 
-const levels = {
+const gameEnd = (context) => {
+	clearInterval(gameInterval);
+	setTimeout(() => {
+		context.clearRect(0, 0, maxWidth, maxHeight); // clear canvas			
+	}, 10);
+	$(window).off("mousemove");
+};
+
+const checkResult = (context) => {
+	gameEnd(context);
+	moveNext(0);
+};
+
+const stage2Levels = {
 	"easy": {
 		brick_count: 40,
 		bricks_in_row: 8,
@@ -51,19 +68,28 @@ $(document).ready(function() {
 		stageStatus.isPlaying = false; // 스테이지를 나가면 게임이 끝난 것으로 취급, 아래 코드에서 루프 종료
 		const canvas = document.getElementById("myCanvas");
 		const context = canvas.getContext("2d");
-		context.clearRect(0, 0, maxWidth, maxHeight);
+
+		gameEnd(context);
 	});
 });
 
 // brick breaking main logic
 function startGame(callBack) {
 	
+	Ores = {
+		WOOD: {order: 0, oreType: "wood", imageSrc: "no", oreHealth: 1, weight: 0},
+		STONE: {order: 1, oreType: "stone", imageSrc: "resource/blocks/stone.png", oreHealth: 2, weight: 4}, 
+		IRON: {order: 2, oreType: "iron", imageSrc: "resource/blocks/iron_ore.png", oreHealth: 3, weight: 3},
+		GOLD: {order: 2, oreType: "gold", imageSrc: "resource/blocks/gold_ore.png", oreHealth: 1, weight: 1},
+		DIAMOND: {order: 4, oreType: "diamond", imageSrc: "resource/blocks/diamond_ore.png", oreHealth: 10, weight: 0}
+	};
+	window.ores = {};
 	const canvas = document.getElementById("myCanvas");
 	const context = canvas.getContext("2d");
 
 	const deathLine = maxHeight * 0.96;
 
-	const levelInfo = levels[currentLevel];
+	const levelInfo = stage2Levels[currentLevel];
 
 	// objects to draw 
 	// -> will be divided with property "type"
@@ -143,10 +169,7 @@ function startGame(callBack) {
 			ore: ore,
 			from: [col + padding / 2, row + padding / 2],
 			size: [brickAreaWidth - padding, brickAreaHeight - padding]
-		}; 
-
-		if(!window.ores) 	
-			window.ores = {};
+		}; 			
 			
 		if(!window.ores[pos]) {
 			let health = ore.oreHealth;
@@ -249,8 +272,7 @@ function startGame(callBack) {
 				} 
 
 				if (object.loc[1] > deathLine) { 
-					clearInterval(interval); 
-					setTimeout(callBack, 1000); 
+					checkResult(context);
 				}
 			}
 
@@ -351,7 +373,7 @@ function startGame(callBack) {
 					window.ores[collidePos].health = 0;
 					
 					//check if breaks diamond => end
-					if(brickPosInfo[collidePos].ore === Ores.DIAMOND) gameEnd();
+					if(brickPosInfo[collidePos].ore === Ores.DIAMOND) gameEnd(context);
 
 					//change pickaxe material
 					if(brickPosInfo[collidePos].ore !== window.pickaxe.ore && 
@@ -377,14 +399,7 @@ function startGame(callBack) {
 		// }
 	}
 
-	const gameEnd = () => {
-		context.clearRect(0, 0, maxWidth, maxHeight); // clear canvas
-		// TODO save final ore status globally
-		//context = undefined
-		callBack();
-	};
-
-	const gameInterval = setInterval(() => draw(gameInterval, gameEnd));
+	gameInterval = setInterval(() => draw(gameInterval, gameEnd));
 }
 
 function getRandomOre(info, x, y) {
@@ -410,7 +425,7 @@ function getRandomOre(info, x, y) {
 	return weightenList[randIdx];
 }
 
-const Ores = {
+let Ores = {
 	WOOD: {order: 0, oreType: "wood", imageSrc: "no", oreHealth: 1, weight: 0},
 	STONE: {order: 1, oreType: "stone", imageSrc: "resource/blocks/stone.png", oreHealth: 2, weight: 4}, 
 	IRON: {order: 2, oreType: "iron", imageSrc: "resource/blocks/iron_ore.png", oreHealth: 3, weight: 3},
