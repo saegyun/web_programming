@@ -492,7 +492,6 @@ function startStage3(callBack) {
 		
 	backgroundImage.src = "resource/background/stage3_background_1.png";
 	let fireBackground = new Image();
-	fireBackground.src = "resource/background/stage3_background_fire.png";
 	let backgroundChangeInterval = Math.floor(remainingTime / 4); // 배경을 바꾸는 주기 (예: 180초를 버텨야 한다면 45초마다 배경 바꿈)
 	
 	// 하트 체력바
@@ -870,6 +869,14 @@ function startStage3(callBack) {
 			maxWidth, // Destination width
 			maxHeight // Destination height
 		);
+		
+		// 마을 불 배경
+		if(villageHealth < villageHealthMax) {
+			let percent = (villageHealth / villageHealthMax) * 100;
+			let fireIndex = 4 - Math.floor(percent / 25);
+			fireBackground.src = "resource/background/stage3_background_fire_" + fireIndex + ".png";
+			context.drawImage(fireBackground, 0, 0, maxWidth, maxHeight);
+		}
 		
 		// 공 그리기
 		ball.draw(context);

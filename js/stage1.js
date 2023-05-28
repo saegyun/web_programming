@@ -83,15 +83,46 @@ function startStage1(callBack) {
 			this.y = y;
 			this.width = width;
 			this.height = height;
+			this.status = "";
 			Bar.barImage.src = "resource/sprite/paddle_steve.png";
+			Bar.barHitImage.src = "resource/sprite/paddle_steve_hit.png";
+			Bar.barEatImage.src = "resource/sprite/paddle_steve_eat.png";
+			this.animationTime = 0;
 		}
 		static barImage = new Image();
+		static barHitImage = new Image();
+		static barEatImage = new Image();
 		static barCollideAudios = [new Audio("resource/sound/steve_paddle_1.ogg"), new Audio("resource/sound/steve_paddle_2.ogg"), new Audio("resource/sound/steve_paddle_3.ogg")];
 	}
 	
 	Bar.prototype.draw = function(context) {
+		let sprite;
+		switch(this.status) {
+			case "hit":
+				if(this.animationTime >= 0) {
+					this.animationTime -= 1;
+					sprite = Bar.barHitImage;
+				} else {
+					this.status = "";
+					sprite = Bar.barImage;
+				}
+				break;
+			case "eat":
+				if(this.animationTime >= 0) {
+					this.animationTime -= 1;
+					sprite = Bar.barEatImage;
+				} else {
+					this.status = "";
+					sprite = Bar.barImage;
+				}
+				break;
+			default:
+				sprite = Bar.barImage;
+				break;
+		}
+		
 		context.drawImage(
-			Bar.barImage, // Image
+			sprite, // Image
 			this.x, // Destination x
 			this.y, // Destination y
 			this.width, // Destination width
@@ -100,7 +131,14 @@ function startStage1(callBack) {
 	}
 	
 	Bar.prototype.collideSound = function() {
+		this.status = "hit";
+		this.animationTime = 30;
 		Bar.barCollideAudios[Math.floor(Math.random() * Bar.barCollideAudios.length)].play();
+	}
+	
+	Bar.prototype.eat = function() {
+		this.status = "eat";
+		this.animationTime = 30;
 	}
 	
 	// 블럭에 대한 부모 클래스
@@ -772,8 +810,8 @@ function startStage1(callBack) {
 	}
 	
 	// 패들 크기
-	const barWidth = 65;
-	const barHeight = 70;
+	const barWidth = 105;
+	const barHeight = 114;
 	
 	// 패들 객체
 	let bar = new Bar(100 + maxWidth / 2 - barWidth / 2, deathLine - 150, barWidth, barHeight);
@@ -936,6 +974,7 @@ function startStage1(callBack) {
 				currentHunger = Math.min(currentHunger + food.saturation, maxHunger);
 				hunger.modify(currentHunger);
 				food.eat();
+				bar.eat();
 				
 				activeFoods.splice(i, 1);
 			}

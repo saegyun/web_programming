@@ -1,5 +1,5 @@
 
-# 스테이지3 1차
+# 스테이지1 1차 
 <p>스테이지1에 대한 코드를 stage1.js에 작성했습니다. 제 branch의 모든 파일을 다운로드(클론)해야 게임이 정상적으로 동작합니다.</p>
 
 ![stage 1 preivew 1](images/stage1_preview_1.jpg)
