@@ -8,6 +8,8 @@ let stageStatus = {isPlaying: false};
 
 
 const gameEnd = (context) => {
+	window.fixedDiamondX = undefined;
+	window.pickaxe = undefined;
 	clearInterval(gameInterval);
 	setTimeout(() => {
 		context.clearRect(0, 0, maxWidth, maxHeight); // clear canvas			
