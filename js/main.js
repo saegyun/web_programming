@@ -162,6 +162,22 @@ function initPage() {
 			value: enchant,
 			next: [],
 			prev: "choice",
+			onLoad: () => {
+				context.drawImage(
+					choiceBgImg,
+					0,
+					0,
+					971,
+					971,
+					0,
+					0,
+					maxWidth,
+					maxHeight
+				);
+			},
+			onUnload: () => {
+				context.clearRect(0, 0, maxWidth, maxHeight);
+			}
 		},
 		"stage1": {
 			value: stage1,
@@ -235,7 +251,7 @@ function initPage() {
 
 	Object.entries(flow).forEach((page) => {
 		if (page[0] != state) {
-			console.log(page);
+			// console.log(page);
 			page[1].value.hidden = true;
 		}
 	});
