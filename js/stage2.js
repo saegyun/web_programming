@@ -10,8 +10,6 @@ let pickaxeStatus;
 
 const gameEnd = (context) => {
 	//초기화
-	window.fixedDiamondX = undefined;
-	window.pickaxe = undefined;
 	console.log(pickaxeStatus);
 	clearInterval(gameInterval);
 	setTimeout(() => {
@@ -53,12 +51,12 @@ const failResult =(context) => {
 }
 
 const successResult =(context) => {
+	pickaxeStatus = "diamond";
 	$("#stage2-result").css({
 		backgroundColor: "rgba(102, 255, 0, 0.253)",
 	});
 	$("#stage2-result > h1").text("You Successed!");
 	$("#stage2-result > img").attr("src",`resource/pickaxe/${pickaxeStatus}_pickaxe.png`);
-	console.log("else");
 	$("#stage2-result > p").text("Achieved!");
 	gameEnd(context);
 	moveNext(0);
@@ -122,7 +120,9 @@ $(document).ready(function() {
 
 // brick breaking main logic
 function startGame(callBack) {
-	isSuccess = false;
+	//isSuccess = false;
+	window.fixedDiamondX = undefined;
+	window.pickaxe = undefined;
 	Ores = {
 		WOOD: {order: 0, oreType: "wood", imageSrc: "no", oreHealth: 1, weight: 0},
 		STONE: {order: 1, oreType: "stone", imageSrc: "resource/blocks/stone.png", oreHealth: 2, weight: 4}, 
@@ -428,13 +428,7 @@ function startGame(callBack) {
 				//check destroys the ore
 				if(window.ores[collidePos].health <= 0) {
 					window.ores[collidePos].health = 0;
-					
-					//check if breaks diamond => end
-					if(brickPosInfo[collidePos].ore === Ores.DIAMOND) {
-						//isSuccess = true;
-						//checkResult(context);
-						successResult(context);
-					}
+
 					//change pickaxe material
 					if(brickPosInfo[collidePos].ore !== window.pickaxe.ore && 
 						brickPosInfo[collidePos].ore.order >= window.pickaxe.ore.order) {
@@ -444,6 +438,14 @@ function startGame(callBack) {
 						console.log(window.pickaxe.ore);
 						console.log(brickPosInfo[collidePos].ore);
 					}
+					
+					//check if breaks diamond => end
+					if(brickPosInfo[collidePos].ore === Ores.DIAMOND) {
+						//isSuccess = true;
+						//checkResult(context);
+						successResult(context);
+					}
+
 
 					draws.splice(draws.indexOf(target), 1);
 					delete brickPosInfo[collidePos];
