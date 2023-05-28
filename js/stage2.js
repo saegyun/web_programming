@@ -3,9 +3,8 @@ let mousePadding = 0;
 
 let gameInterval;
 let stageStatus = {isPlaying: false};
-let isSuccess = false;
+//let isSuccess = false;
 
-let pickaxeStatus;
 
 
 const gameEnd = (context) => {
@@ -320,7 +319,7 @@ function startGame(callBack) {
 
 				if (object.loc[1] > deathLine) { 
 					//checkResult(context);
-					failResult();
+					failResult(context);
 				}
 			}
 
@@ -424,7 +423,7 @@ function startGame(callBack) {
 					if(brickPosInfo[collidePos].ore === Ores.DIAMOND) {
 						isSuccess = true;
 						//checkResult(context);
-						successResult();
+						successResult(context);
 						gameEnd(context);
 					}
 					//change pickaxe material
