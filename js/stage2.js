@@ -1,5 +1,29 @@
 let stageStatus = {isPlaying: false};
 
+const levels = {
+	"easy": {
+		brick_intenity: 1,
+		brick_count: 40,
+		bricks_in_row: 8,
+		ball_speed: 1,
+		barWidth: 250
+	},
+	"normal": {
+		brick_intenity: 1,
+		brick_count: 40,
+		bricks_in_row: 8,
+		ball_speed: 2,
+		barWidth: 200
+	},
+	"hard": {
+		brick_intenity: 1,
+		brick_count: 40,
+		bricks_in_row: 8,
+		ball_speed: 3,
+		barWidth: 150
+	},
+}
+
 $(document).ready(function() {
 	const reCalc = () => {
 		mousePadding = ($(window).width() - $("#myCanvas").width()) / 2;
@@ -24,6 +48,8 @@ $(document).ready(function() {
 		});
 	});
 
+
+	//??
 	$("#stage2 .back").on("click", () => {
 		stageStatus.isPlaying = false; // 스테이지를 나가면 게임이 끝난 것으로 취급, 아래 코드에서 루프 종료
 		const canvas = document.getElementById("myCanvas");
@@ -38,9 +64,9 @@ function startGame(callBack) {
 	const canvas = document.getElementById("myCanvas");
 	const context = canvas.getContext("2d");
 
-	const deathLine = maxHeight * 0.98;
+	const deathLine = maxHeight * 0.97;
 
-	const levelInfo = levels[currentLevel];//easy 로 고정?
+	const levelInfo = levels[currentLevel];
 
 	// objects to draw 
 	// -> will be divided with property "type"
@@ -51,7 +77,6 @@ function startGame(callBack) {
 	const ballId = new Date().getMilliseconds();
 	// bar id
 	const barId = new Date().getMilliseconds() - 1;
-	const barWidth = 200;
 	const barHeight = 20;
 
 	// brick width, height and padding within one another
@@ -67,8 +92,8 @@ function startGame(callBack) {
 		id: barId,
 		color: "brown",
 		type: "rect",
-		from: [100 + maxWidth / 2 - barWidth / 2, deathLine - 100],
-		size: [barWidth, barHeight],
+		from: [100 + maxWidth / 2 - levelInfo.barWidth / 2, deathLine - 100],
+		size: [levelInfo.barWidth, barHeight],
 	};
 
 	draws.push(bar);
@@ -186,8 +211,8 @@ function startGame(callBack) {
 					Math.max(
 						0,
 						Math.min(
-							maxWidth - barWidth, 
-							mousePos[0] - mousePadding - barWidth / 2
+							maxWidth - levelInfo.barWidth, 
+							mousePos[0] - mousePadding - levelInfo.barWidth / 2
 						)
 					),
 					object.from[1],
@@ -217,12 +242,12 @@ function startGame(callBack) {
 
 				// collide with bar
 				if ((object.loc[1] <= bar.from[1] && object.loc[1] >= bar.from[1] - object.width) &&
-					(object.loc[0] >= bar.from[0] && object.loc[0] <= bar.from[0] + barWidth)) {
+					(object.loc[0] >= bar.from[0] && object.loc[0] <= bar.from[0] + levelInfo.barWidth)) {
 					ballRad = (2 * Math.PI - ballRad);
 				}
 				if ((object.loc[1] >= bar.from[1] && object.loc[1] <= bar.from[1] + barHeight) &&
 					((object.loc[0] >= bar.from[0] - object.width && object.loc[0] <= bar.from[0]) || 
-					 (object.loc[0] <= bar.from[0] + barWidth + object.width && object.loc[0] >= bar.from[0] + barWidth))) {
+					 (object.loc[0] <= bar.from[0] + levelInfo.barWidth + object.width && object.loc[0] >= bar.from[0] + levelInfo.barWidth))) {
 					ballRad = Math.PI - ballRad; 
 				} 
 
@@ -235,9 +260,9 @@ function startGame(callBack) {
 			// draw the object according to the its type
 			switch(object.type) {
 				case "circle":
-					//context.fillStyle = object.color || "black";
-					//context.arc(object.loc[0], object.loc[1], object.width, 0, 2 * Math.PI);
-					//context.fill();
+					// context.fillStyle = object.color || "black";
+					// context.arc(object.loc[0], object.loc[1], object.width, 0, 2 * Math.PI);
+					// context.fill();
 					
 					context.drawImage( 
 						ball.image, 
@@ -347,12 +372,12 @@ function startGame(callBack) {
 			}
 		}
 		// if it's true, show the target brick's hitbox
-		if (debugObtions.showHitBox) {
-			context.fillStyle = 'rgba(10, 60, 10, 0.5)';
+		// if (debugObtions.showHitBox) {
+		// 	context.fillStyle = 'rgba(10, 60, 10, 0.5)';
 
-			context.fillRect(brickX + padding / 2, brickY + padding / 2, brickAreaWidth - padding, brickAreaHeight - padding);
-			context.fillRect(brickX + padding / 2 - ball.width, brickY + padding / 2 - ball.width, brickAreaWidth - padding + ball.width * 2, brickAreaHeight - padding + ball.width * 2);	
-		}
+		// 	context.fillRect(brickX + padding / 2, brickY + padding / 2, brickAreaWidth - padding, brickAreaHeight - padding);
+		// 	context.fillRect(brickX + padding / 2 - ball.width, brickY + padding / 2 - ball.width, brickAreaWidth - padding + ball.width * 2, brickAreaHeight - padding + ball.width * 2);	
+		// }
 	}
 
 	const gameEnd = () => {
