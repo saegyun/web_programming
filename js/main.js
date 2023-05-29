@@ -1,14 +1,9 @@
 let currentStage = "stage 1";
 let mousePos = [0, 0];
 let mousePadding = 0;
+let monsterVolume = 1;
 
-let gameInterval;
-
-// canvas size
-const maxWidth = 800;
-const maxHeight = 800;
-
-const PlayStatus = {
+const PlayStatus = JSON.parse(localStorage.getItem("record")) || {
 	stat: {
 		exp: 0,
 		sharpness: 0,
@@ -17,14 +12,17 @@ const PlayStatus = {
 		result: undefined,
 	},
 };
+let gameInterval;
+
+// canvas size
+const maxWidth = 800;
+const maxHeight = 800;
 
 const getPlayerDamage = () => {
 	return PlayStatus.stat.sharpness * 1.5 + 3;
 };
 
 let flow;
-
-
 let state = "intro";
 
 const moveNext = (idx) => {
@@ -145,6 +143,19 @@ function initPage() {
 			next: [],
 			prev: "title",
 			onLoad: () => {
+
+				$("#current-record").html(`
+					<h2>
+						Current Record
+					</h2>
+					<br>
+					EXP : ${PlayStatus.stat.exp}
+					<br>
+					SHARPNESS : ${PlayStatus.stat.sharpness}
+					<br>
+					ORE : ${PlayStatus.stage2.result || "nothing"}
+				`);
+				$("#setting > p").eq(2).text(`Monster Sound (${Math.round(monsterVolume * 100)} %)`);
 
 				context.drawImage(
 					settingBgImg,
@@ -306,6 +317,9 @@ function initPage() {
 		flow[state].onLoad();
 	}, 100);
 
+	$("button").click(() => {
+		new Audio("resource/sound/experience.ogg").play();
+	});
 	$(".back").on("click", moveBack);
 
 	$("#intro .next").on("click", () => moveNext(0));

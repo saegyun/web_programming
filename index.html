@@ -9,6 +9,7 @@
 	<script src="js/intro.js"></script>
 	<script src="js/player_health.js"></script>
 	<script src="js/monster.js"></script>
+	<script src="js/setting.js"></script>
 	<script src="js/stage1.js"></script>
 	<script src="js/stage2.js"></script>
 	<script src="js/stage3.js"></script>
@@ -33,7 +34,7 @@
 			<div id="intro">
 				<!-- <h1>intro</h1> -->
 				<div class="intro-image"></div>
-				<div class="intro-text"></div>
+				<div class="intro-text">여기를 클릭하세요</div>
 
 				<button class="next minecraft">Skip</button>
 			</div>
@@ -56,16 +57,34 @@
 			</div>
 			<div id="setting">
 				<h1>setting</h1>
-
-				<div id="settings">
-					<button class="minecraft">test</button>
-					<button class="minecraft">test</button>
-					<button class="minecraft">test</button>
-					<button class="minecraft">test</button>
-					<button class="minecraft">test</button>
-					<button class="minecraft">test</button>
+				<p>Background Color</p>
+				<div class="settings" id="setting-bg">
+					<button class="minecraft">black</button>
+					<button class="minecraft">white</button>
+					<button class="minecraft">gray</button>
 				</div>
-
+				<p>Save Records</p>
+				<div id="current-record">
+					<h2>
+						Current Record
+					</h2>
+					<br>
+					EXP : 
+					<br>
+					SHARPNESS :
+					<br>
+					ORE : 
+				</div>
+				<div class="settings" id="setting-record">
+					<button class="minecraft">Save</button>
+					<button class="minecraft">Remove</button>
+				</div>
+				<p>Monster Sound</p>
+				<div class="settings" id="setting-audio">
+					<button class="minecraft">0 %</button>
+					<button class="minecraft">50 %</button>
+					<button class="minecraft">100 %</button>
+				</div>
 				<button class="back minecraft">back</button>
 			</div>
 			<div id="choice">
