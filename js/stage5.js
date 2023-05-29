@@ -32,7 +32,7 @@ $(document).ready(function() {
 				stage5_startGame($(this).val(), () => {
 					$(window).off("mousemove");
 				});
-			} ,16000);
+			} ,1000);
 		}
 	});
 
@@ -47,7 +47,7 @@ const stage5Levels = {
 		brick_intenity: 1,
 		brick_count: 40,
 		bricks_in_row: 8,
-		ball_speed: 5,
+		ball_speed: 3,
 		plane_size: 4,
 		barLife: 5,
 		bossLife: 10,
@@ -57,7 +57,7 @@ const stage5Levels = {
 		brick_intenity: 1,
 		brick_count: 40,
 		bricks_in_row: 10,
-		ball_speed: 5,
+		ball_speed: 3,
 		plane_size: 4,
 		barLife: 5,
 		bossLife: 15,
@@ -82,7 +82,7 @@ function stage5_startGame(currentLevel, callBack){
 	const deathLine = maxHeight * 0.98;
 	const levelInfo = stage5Levels[currentLevel];
 
-	const barWidth = 200;
+	const barWidth = 180;
 	const barHeight = 20;
 
 	const bossWidth = 200;
@@ -115,6 +115,7 @@ function stage5_startGame(currentLevel, callBack){
 	const crystalLife = levelInfo.crystalLife;
 
 	let gameON = true;
+	let gameWin = false;
 
 	let boss = {
 		id: bossId,
@@ -165,7 +166,7 @@ function stage5_startGame(currentLevel, callBack){
 		color: "red",
 		type: "circle",
 		loc: [450, 600],
-		radius: 5,
+		radius: 7,
 	};
 
 	// a list that keep tracks the ball's location
@@ -213,7 +214,7 @@ function stage5_startGame(currentLevel, callBack){
     	 boss.from[1] + bossHeight + firePadding]
 
     	img.onload = function fbdraw(){
-    		if(fireLoc[1] < (deathLine - fireSize)){
+    		if(gameON && (fireLoc[1] < (deathLine - fireSize))){
     			context.drawImage(img, fireLoc[0], fireLoc[1], fireSize, fireSize);
     			fireLoc[1]++;
 
@@ -232,7 +233,6 @@ function stage5_startGame(currentLevel, callBack){
     	if(gameON){
     		fireballItv = setTimeout(fireball, 2000);
     	}
-    	
     }
     fireballItv = setTimeout(fireball, 2000);
     
@@ -364,9 +364,11 @@ function stage5_startGame(currentLevel, callBack){
 
     //bar의 체력이 닳으면 현재 체력 update
 	function drawBarLife(){
-		let NowHeartNum = bar.life;
-		for(let i = NowHeartNum; i < barLife; i++)
-			barHeartImg[i].src ="img/heart_none.png";
+		if(bar.life > 0){
+			let NowHeartNum = bar.life;
+			for(let i = NowHeartNum; i < barLife; i++)
+				barHeartImg[i].src ="img/heart_none.png";
+		}
 	}
 
 
@@ -383,9 +385,12 @@ function stage5_startGame(currentLevel, callBack){
 
     //boss의 체력이 닳으면 현재 체력 update
 	function drawBossLife(){
-		let NowHeartNum = boss.life;
-		for(let i = NowHeartNum; i < bossLife; i++)
-			bossHeartImg[i].src ="img/heart_none.png";
+		if (boss.life > 0) {
+			let NowHeartNum = boss.life;
+			for(let i = NowHeartNum; i < bossLife; i++)
+				bossHeartImg[i].src ="img/heart_none.png";
+		}
+		
 	}
 
 
@@ -512,10 +517,12 @@ function stage5_startGame(currentLevel, callBack){
 			}
 		}
 		if(boss.life == 0){
+			gameWin = true;
 			clearInterval(interval);
 			setTimeout(callBack, 100);
 		}
 		else if(bar.life == 0){
+			gameWin = false;
 			clearInterval(interval);
 			setTimeout(callBack, 100);
 		}
@@ -529,20 +536,32 @@ function stage5_startGame(currentLevel, callBack){
 		for(let i = 0; i < objList.length; i++)
 			objList[i].remove();
 
-		for(let i = 0; i < skills.length; i++){
+		for(let i = 0; i < skills.length; i++)
 			clearTimeout(skills[i]);
-		}
-		for(let i = 0; i < fbintervalList.length; i++){
+		
+		for(let i = 0; i < fbintervalList.length; i++)
 			cancelAnimationFrame(fbintervalList[i]);
-		}
+		
 		context.clearRect(0, 0, maxWidth, maxHeight);
 
 		callBack();
+
+		moveNext(0);
+		if(gameWin){ //게임 클리어
+			let gameOver = document.createElement("p");
+			gameOver.value = "GAME CLEAR";
+			document.getElementById('stage5-result').appendChild(gameOver);
+		}else{ //stage5 게임 오버
+			let gameOver = document.createElement("p");
+			gameOver.value = "GAME OVER";
+			document.getElementById('stage5-result').appendChild(gameOver);
+		}
+		
 	}
 
 	$("#stage5 .back").on("click", () => {
 		clearInterval(gameInterval);
-		setTimeout(gameEnd, 100);
+		setTimeout(gameEnd);
 	});
 
 	const gameInterval = setInterval(() => draw(gameInterval, gameEnd));
