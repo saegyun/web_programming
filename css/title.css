@@ -24,7 +24,7 @@
 }
 
 #title > button:nth-of-type(1) {
-	margin-top: 400px;
+	margin-top: 250px;
 }
 
 #title > button {
@@ -52,4 +52,8 @@
 	bottom: 10px;
 
 	text-align: left;
+}
+
+#title #main-title{
+	margin-top: 100px;
 }
