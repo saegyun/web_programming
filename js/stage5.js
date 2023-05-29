@@ -1,6 +1,4 @@
 $(document).ready(function() {
-	let video;
-
 	const reCalc = () => {
 		mousePadding = ($(window).width() - $("#myCanvas").width()) / 2;
 	};
@@ -13,32 +11,33 @@ $(document).ready(function() {
 	$(".level-btn").on("click", function() {
 		if (currentStage === "stage 5") {
 			moveNext(4);
-			
-			video = document.createElement("VIDEO");
-			video.id = "stage5-vid";
+			$(window).on("mousemove", event => {
+				mousePos = [
+					event.pageX,
+					event.pageY
+				];
+			});
+
+			let video = document.createElement("VIDEO");
 			video.src = "img/Stage5.mp4";
+			video.style.width = maxHeight + "px"
+			video.style.height = maxHeight + "px";
+			video.style.backgroundColor = "black";
+
 			document.getElementById('stage5').appendChild(video);
 			video.play();
-			setTimeout(() => {
-				video.remove();
 
-				$(window).on("mousemove", event => {
-					mousePos = [
-						event.pageX,
-						event.pageY
-					];
-				});
-	
-		
+			setTimeout(()=>{
+				$('#stage5 video').remove();
 				stage5_startGame($(this).val(), () => {
 					$(window).off("mousemove");
 				});
-			}, 9000)
+			} ,16000);
 		}
 	});
 
 	$("#stage5 .back").on("click", () => {
-		video.remove();
+		console.log("back button for stage5 pressed");
 	});
 });
 
@@ -58,7 +57,7 @@ const stage5Levels = {
 		brick_intenity: 1,
 		brick_count: 40,
 		bricks_in_row: 10,
-		ball_speed: 1,
+		ball_speed: 5,
 		plane_size: 4,
 		barLife: 5,
 		bossLife: 15,
@@ -68,7 +67,7 @@ const stage5Levels = {
 		brick_intenity: 1,
 		brick_count: 40,
 		bricks_in_row: 10,
-		ball_speed: 1,
+		ball_speed: 5,
 		plane_size: 4,
 		barLife: 3,
 		bossLife: 15,
@@ -100,9 +99,9 @@ function stage5_startGame(currentLevel, callBack){
 	const skills = [];
 	const draws = [];
 	const monsters = [];
+
 	const stage5_maxWidth = 1000;
-	console.log(maxWidth);
-	console.log(maxHeight);
+
 	// ball id
 	const ballId = new Date().getMilliseconds();
 	// bar id
@@ -203,7 +202,6 @@ function stage5_startGame(currentLevel, callBack){
 	//fire ball skill
 	let fbintervalList = [];
 	let fbinterval;
-
 	function fireball() {
 		let img = new Image();
     	img.src ="img/fire_3.gif";
@@ -211,7 +209,7 @@ function stage5_startGame(currentLevel, callBack){
     	//랜덤한 x좌표
     	let fireSize = 50;
     	let firePadding = 10;
-    	let fireLoc = [Math.floor(Math.random() * (maxWidth - fireSize - (firePadding * 2))),
+    	let fireLoc = [Math.floor(Math.random() * (stage5_maxWidth - fireSize - (firePadding * 2))),
     	 boss.from[1] + bossHeight + firePadding]
 
     	img.onload = function fbdraw(){
@@ -266,7 +264,7 @@ function stage5_startGame(currentLevel, callBack){
 
     function drawFlame(){
     	for(let i = 0; i < 3; i++){
-    		flameX[i] = Math.floor(Math.random() * (maxWidth - flameSize[0] - (flamePadding * 2)));
+    		flameX[i] = Math.floor(Math.random() * (maxWidth - flameSize[0]) + 100);
     		flameImg[i].style.left = flameX[i] + "px";
     		flameImg[i].src ="img/warning.png";
     	}
@@ -298,7 +296,7 @@ function stage5_startGame(currentLevel, callBack){
 
     		let styles = {
 				"position" : "absolute",
-				"width" : maxWidth + "px",
+				"width" : stage5_maxWidth + "px",
 				"height" : maxHeight + "px",
 				"left" : "0px",
 				"top" :"0px",
@@ -358,14 +356,14 @@ function stage5_startGame(currentLevel, callBack){
 		barHeartImg[i] = document.createElement('img');
 		barHeartImg[i].src ="img/heart.png";
 		barHeartImg[i].style.top = (maxHeight-30)+"px";
-		barHeartImg[i].style.left = (maxWidth/2 - barLife*heartSize/2 + i*30)+ "px";
+		barHeartImg[i].style.left = (stage5_maxWidth/2 - barLife*heartSize/2 + i*30)+ "px";
 
     	Object.assign(barHeartImg[i].style, heartStyles); 
     	document.getElementById('stage5').appendChild(barHeartImg[i]);
     }
 
     //bar의 체력이 닳으면 현재 체력 update
-	function drawBarLife() {
+	function drawBarLife(){
 		let NowHeartNum = bar.life;
 		for(let i = NowHeartNum; i < barLife; i++)
 			barHeartImg[i].src ="img/heart_none.png";
@@ -377,7 +375,7 @@ function stage5_startGame(currentLevel, callBack){
 		bossHeartImg[i] = document.createElement('img');
 		bossHeartImg[i].src ="img/heart.png";
 		bossHeartImg[i].style.top = "20px";
-		bossHeartImg[i].style.left = (maxWidth/2 - bossLife*heartSize/2 + i*30)+ "px";
+		bossHeartImg[i].style.left = (stage5_maxWidth/2 - bossLife*heartSize/2 + i*30)+ "px";
 
     	Object.assign(bossHeartImg[i].style, heartStyles); 
     	document.getElementById('stage5').appendChild(bossHeartImg[i]);
