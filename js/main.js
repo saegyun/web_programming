@@ -8,7 +8,7 @@ const levels = {
 		brick_intenity: 1,
 		brick_count: 40,
 		bricks_in_row: 8,
-		ball_speed: 13,
+		ball_speed: 5,
 		plane_size: 4,
 	},
 	"normal": {
@@ -163,8 +163,6 @@ function initPage() {
 	for (let i = 0; i < flow["choice"].next.length; i++) {
 		$("#choice .next").eq(i).on("click", () => moveNext(i));
 	}
-
-	
 }
 
 $(document).ready(() => {	
