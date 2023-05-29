@@ -101,7 +101,7 @@ img {
 #screen {	
 	position: absolute;
 
-	left: 100px;
+	left: 60px;
 }
 #myCanvas {
 	background-color: var(--canvas-bg-color);
