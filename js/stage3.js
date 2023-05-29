@@ -49,7 +49,7 @@ const Stage3 = {
 		}, 10);
 		$(window).off("mousemove");
 	},
-	startGame: function startStage3(currentLevel, callBack) {
+	startGame: function (currentLevel, callBack) {
 		// 클래스, 함수들 정의
 		// 공에 대한 클래스
 		class Ball {
@@ -754,6 +754,7 @@ const Stage3 = {
 		function checkWinLose() {
 			if(remainingTime <= 0) {
 				gameEnded = true;
+
 				return 1;
 			}
 			if(villageHealth <= 0) {
@@ -905,67 +906,69 @@ const Stage3 = {
 			heart.draw(context);
 			
 			// 패배했을 때 처리
-			if(gameEnded && winLoseResult < 0)
-			{
-				let villageBreakAudio = villageBreakAudios[Math.floor(Math.random() * villageBreakAudios.length)];
-				villageBreakAudio.play();
-				
-				mainMusic.pause(); // 배경음악 멈추기
-				defeatMusic.play();
-				$("#screen #stage3_time").remove();
-				$("#screen #stage3_exp").remove();
-				$("#screen #stage3_volume").remove();
-				
-				// 마을 불 배경
-				context.drawImage(fireBackground, 0, 0, maxWidth, maxHeight);
-				
-				// 패배 배경
-				context.fillStyle = 'rgba(255, 0, 0, 0.253)';
-				context.fillRect(0, 0, maxWidth, maxHeight);
-				
-				// 패배 제목
-				let font = "bold 80px Arial";
-				let textColor = "white";
-				context.font = font;
-				context.fillStyle = textColor;
-				context.fillText("Defeat!", maxWidth / 2 - 140, maxHeight * 0.15);
-				
-				// 경험치
-				font = "bold 28px Arial";
-				textColor = "#7bf318";
-				context.font = font;
-				context.fillStyle = textColor;
-				context.fillText("Total XP: " + obtainedXp, maxWidth / 2 - 90, maxHeight * 0.35);
-				
-			}
-			// 승리했을 때 처리
-			else if(gameEnded && winLoseResult > 0)
-			{
-				mainMusic.pause(); // 배경음악 멈추기
-				victoryMusic.play();
-				$("#screen #stage3_time").remove();
-				$("#screen #stage3_exp").remove();
-				$("#screen #stage3_volume").remove();
-				
-				// 승리 배경
-				context.fillStyle = 'rgba(102, 255, 0, 0.253)';
-				context.fillRect(0, 0, maxWidth, maxHeight);
-				
-				// 승리 제목
-				let font = "bold 80px Arial";
-				let textColor = "white";
-				context.font = font;
-				context.fillStyle = textColor;
-				context.fillText("Victory!", maxWidth / 2 - 140, maxHeight * 0.15);
-				
-				// 경험치와 보너스 경험치
-				font = "bold 28px Arial";
-				textColor = "#7bf318";
-				context.font = font;
-				context.fillStyle = textColor;
-				context.fillText("Total XP: " + obtainedXp, maxWidth / 2 - 90, maxHeight * 0.35);
-				
-				context.fillText("Bonus XP: " + bonusEXP, maxWidth / 2 - 90, maxHeight * 0.4);
+			if (gameEnded) {
+				PlayStatus.stat.exp += obtainedXp;
+
+				if (winLoseResult < 0) {
+					let villageBreakAudio = villageBreakAudios[Math.floor(Math.random() * villageBreakAudios.length)];
+					villageBreakAudio.play();
+					
+					mainMusic.pause(); // 배경음악 멈추기
+					defeatMusic.play();
+					$("#screen #stage3_time").remove();
+					$("#screen #stage3_exp").remove();
+					$("#screen #stage3_volume").remove();
+					
+					// 마을 불 배경
+					context.drawImage(fireBackground, 0, 0, maxWidth, maxHeight);
+					
+					// 패배 배경
+					context.fillStyle = 'rgba(255, 0, 0, 0.253)';
+					context.fillRect(0, 0, maxWidth, maxHeight);
+					
+					// 패배 제목
+					let font = "bold 80px Arial";
+					let textColor = "white";
+					context.font = font;
+					context.fillStyle = textColor;
+					context.fillText("Defeat!", maxWidth / 2 - 140, maxHeight * 0.15);
+					
+					// 경험치
+					font = "bold 28px Arial";
+					textColor = "#7bf318";
+					context.font = font;
+					context.fillStyle = textColor;
+					context.fillText("Total XP: " + obtainedXp, maxWidth / 2 - 90, maxHeight * 0.35);
+					
+				}
+				// 승리했을 때 처리
+				else if (winLoseResult > 0) {
+					mainMusic.pause(); // 배경음악 멈추기
+					victoryMusic.play();
+					$("#screen #stage3_time").remove();
+					$("#screen #stage3_exp").remove();
+					$("#screen #stage3_volume").remove();
+					
+					// 승리 배경
+					context.fillStyle = 'rgba(102, 255, 0, 0.253)';
+					context.fillRect(0, 0, maxWidth, maxHeight);
+					
+					// 승리 제목
+					let font = "bold 80px Arial";
+					let textColor = "white";
+					context.font = font;
+					context.fillStyle = textColor;
+					context.fillText("Victory!", maxWidth / 2 - 140, maxHeight * 0.15);
+					
+					// 경험치와 보너스 경험치
+					font = "bold 28px Arial";
+					textColor = "#7bf318";
+					context.font = font;
+					context.fillStyle = textColor;
+					context.fillText("Total XP: " + obtainedXp, maxWidth / 2 - 90, maxHeight * 0.35);
+					
+					context.fillText("Bonus XP: " + bonusEXP, maxWidth / 2 - 90, maxHeight * 0.4);
+				}
 			}
 		}
 		// requestAnimationFrame is much better than setInterval for animation and games because of optimization and synchronized with browser rendering loop

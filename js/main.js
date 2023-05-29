@@ -8,10 +8,21 @@ let gameInterval;
 const maxWidth = 800;
 const maxHeight = 800;
 
+const PlayStatus = {
+	stat: {
+		exp: 0,
+		sharpness: 0,
+		damage: 1,
+	},
+	stage2: {
+		result: undefined,
+	},
+};
+
 let flow;
 
 
-let state = "intro";
+let state = "enchant";
 
 const moveNext = (idx) => {
 	// flow[state].value.hidden = true;
@@ -184,6 +195,17 @@ function initPage() {
 			next: [],
 			prev: "choice",
 			onLoad: () => {
+				if (PlayStatus.stage2.result !== undefined) {
+					$("#enchant-ore > img").show();
+					$("#enchant-ore > p").hide();
+					$("#enchant-ore > img").attr("src",`resource/pickaxe/${PlayStatus.stage2.result}_pickaxe.png`);
+				} else {
+					$("#enchant-ore > p").show();
+					$("#enchant-ore > img").hide();
+				}
+				$("#show-exp").text(`Current Exp : ${PlayStatus.stat.exp}`);
+				$("#enchant-result").text("??");
+
 				context.drawImage(
 					choiceBgImg,
 					0,

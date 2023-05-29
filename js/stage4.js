@@ -97,6 +97,8 @@ const Stage4 = {
 		$(window).off("mousemove");
 	},
 	checkResult: (context) => {
+		PlayStatus.stat.exp += Stage4.obtainedXp;
+
 		if (!Stage4.isSuccess) {
 			$("#stage4-result").css({
 				"background-color": "rgba(255, 0, 0, 0.253)",

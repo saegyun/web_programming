@@ -1,10 +1,9 @@
 const Stage2 = {
 	sound: [new Audio("/resource/sound/player_hurt.mp3")],
 	stageStatus: { isPlaying: false },
-	pickaxeStatus: undefined,
 	gameEnd: (context) => {
 		//초기화
-		//console.log(Stage2.pickaxeStatus);
+		//console.log(PlayStatus.stage2.result);
 		clearInterval(gameInterval);
 		setTimeout(() => {
 			//context.clearRect(0, 0, maxWidth, maxHeight); // clear canvas			
@@ -16,18 +15,18 @@ const Stage2 = {
 			backgroundColor: "rgba(255, 0, 0, 0.253)",
 		});
 		$("#stage2-result > h1").text("You died!");
-		$("#stage2-result > img").attr("src",`resource/pickaxe/${Stage2.pickaxeStatus}_pickaxe.png`);
+		$("#stage2-result > img").attr("src",`resource/pickaxe/${PlayStatus.stage2.result}_pickaxe.png`);
 		$("#stage2-result > p").text("Achieved!");
 		Stage2.gameEnd(context);
 		moveNext(0);
 	},
 	successResult: (context) => {
-		Stage2.pickaxeStatus = "diamond";
+		PlayStatus.stage2.result = "diamond";
 		$("#stage2-result").css({
 			backgroundColor: "rgba(102, 255, 0, 0.253)",
 		});
 		$("#stage2-result > h1").text("You Successed!");
-		$("#stage2-result > img").attr("src",`resource/pickaxe/${Stage2.pickaxeStatus}_pickaxe.png`);
+		$("#stage2-result > img").attr("src",`resource/pickaxe/${PlayStatus.stage2.result}_pickaxe.png`);
 		$("#stage2-result > p").text("Achieved!");
 		Stage2.gameEnd(context);
 		moveNext(0);
@@ -173,23 +172,23 @@ const Stage2 = {
 			switch(window.pickaxe.ore) {
 				case Ores.WOOD:
 					ball.image.src = `resource/items/wood_pickaxe.png`;
-					Stage2.pickaxeStatus = "wood";
+					PlayStatus.stage2.result = "wood";
 					break;
 				case Ores.STONE:
 					ball.image.src = `resource/items/stone_pickaxe.png`;
-					Stage2.pickaxeStatus = "stone";
+					PlayStatus.stage2.result = "stone";
 					break;
 				case Ores.IRON:
 					ball.image.src = `resource/items/iron_pickaxe.png`;
-					Stage2.pickaxeStatus = "iron";
+					PlayStatus.stage2.result = "iron";
 					break;
 				case Ores.GOLD:
 					ball.image.src = `resource/items/gold_pickaxe.png`;
-					Stage2.pickaxeStatus = "gold";
+					PlayStatus.stage2.result = "gold";
 					break;
 				case Ores.DIAMOND:
 					ball.image.src = `resource/items/diamond_pickaxe.png`;
-					Stage2.pickaxeStatus = "diamond";
+					PlayStatus.stage2.result = "diamond";
 					break;
 			}
 			

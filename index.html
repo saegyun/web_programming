@@ -6,7 +6,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script src="js/main.js"></script>
-	<script src="js/intro.js"></script>
+	<!-- <script src="js/intro.js"></script> -->
 	<script src="js/player_health.js"></script>
 	<script src="js/monster.js"></script>
 	<script src="js/stage1.js"></script>
@@ -14,6 +14,7 @@
 	<script src="js/stage3.js"></script>
 	<script src="js/stage4.js"></script>
 	<script src="js/choice.js"></script>
+	<script src="js/enchant.js"></script>
 	<link href="https://fonts.cdnfonts.com/css/minecraft-4" rel="stylesheet">
 	<link rel="stylesheet" href="/css/main.css">
 	<link rel="stylesheet" href="/css/title.css">
@@ -31,10 +32,10 @@
 		<div id="ui">
 			<div id="intro">
 				<!-- <h1>intro</h1> -->
-				<div class="intro-image"></div>
+				<!-- <div class="intro-image"></div>
 				<div class="intro-text"></div>
 
-				<button class="next minecraft">Skip</button>
+				<button class="next minecraft">Skip</button> -->
 			</div>
 			<div id="title">
 				<p>Brick Breaking!!!</p>
@@ -97,6 +98,27 @@
 			</div>
 			<div id="enchant-page">
 				<h1>enchant</h1>
+				<div id="enchant-book">
+					<div id="enchant-tip">
+						<span>Tip</span>
+						<br>
+						인첸트는 가장 최근에 플레이한 Stage2에서 얻은 광물에 따라 최대치를 올릴 수 있다..!
+					</div>
+					<div id="enchant-ore">
+						<span>Current Ore</span>
+						<br>
+						<img src="resource/ui/blank.png" alt="">
+						<p>아직 플레이한 적이 없습니다!</p>
+					</div>
+					<div id="enchant-role">
+						<div id="enchant-result">
+							??
+						</div>
+						<button class="minecraft" id="role">Enchant</button>
+						<p>도전 시 exp가 <span>500</span>차감됩니다</p>
+						<p id="show-exp"></p>
+					</div>
+				</div>
 				<button class="minecraft back">back</button>
 			</div>
 			<div id="stage1">
