@@ -19,7 +19,7 @@ $(document).ready(function() {
 			});
 
 			let video = document.createElement("VIDEO");
-			video.src = "video/Stage5.mp4";
+			video.src = "img/Stage5.mp4";
 			document.getElementById('stage5').appendChild(video);
 			video.play();
 	
