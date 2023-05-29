@@ -48,7 +48,6 @@ function stage5_startGame(callBack){
 	const crystalHeight = 100;
 
 	const gifLength = 100;
-
 	
 	const skills = [];
 	const draws = [];
@@ -131,11 +130,10 @@ function stage5_startGame(callBack){
 	// initial ball shooting radian
 	let ballRad = Math.PI * (Math.random() - 1) / 4;
 
-
 	let fireballItv;
 	let bossUpItv;
 	let flameItv;
-
+	let breathItv;
 
 	//보스 체력회복 스킬
 	function bossUp(){
@@ -237,9 +235,49 @@ function stage5_startGame(callBack){
     }
     flameItv = setTimeout(drawFlame);
 
+	//breath 스킬 반드시 생명 하나 깎임
+    function breath(){
+    	if(bar.life > 0 && boss.life > 0){
+    		let breathImg = document.createElement("img");
+    		breathImg.src = "img/explosion.gif";
+
+    		let styles = {
+				"position" : "absolute",
+				"width" : maxWidth + "px",
+				"height" : maxHeight + "px",
+				"left" : "0px",
+				"top" :"0px",
+				"z-index" : "2"
+			};
+
+			Object.assign(breathImg.style, styles); 
+			document.getElementById('stage5').appendChild(breathImg);
+			setTimeout(()=>{
+				breathImg.remove();
+				bar.life--;
+				drawBarLife();
+				breathItv = setTimeout(breath, 10000);
+			}, 1000);
+			
+    	}
+    }
+    breathItv = setTimeout(breath, 10000);
+
+
+    function bossUp(){
+		if(boss.life < bossLife)
+			boss.life++;
+		if(crystal_1.life == 0 && crystal_2.life == 0)
+			clearInterval(bossUpItv);
+		else
+			bossUpItv = setTimeout(bossUp, 5000);
+	}
+	bossUpItv = setTimeout(bossUp, 5000);
+
 	skills.push(fireballItv);
 	skills.push(bossUpItv);
 	skills.push(flameItv);
+	skills.push(breathItv);
 
 	function drawMonsterImg(object){
 		const monsterImg = document.createElement('img');
@@ -428,7 +466,6 @@ function stage5_startGame(callBack){
 			clearInterval(interval);
 			setTimeout(callBack, 100);
 		}
-
 	}
 
 	const gameEnd = () => {
