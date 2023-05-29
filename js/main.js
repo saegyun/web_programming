@@ -2,6 +2,9 @@ const debugObtions = {
 	showHitBox: false,
 };
 
+let mousePos = [0, 0];
+let mousePadding = 0;
+
 // level information
 const levels = {
 	"easy": {
