@@ -8,51 +8,57 @@ $(document).ready(function() {
 		reCalc();
 	});
 
-	//title 화면
-	$("#intro .next").on("click", () => {
-		$("#ui").css({
-				"background-image":"url(img/background.jpg)",
-				"background-position":"center"
+	$(".level-btn").on("click", function() {
+		if (currentStage === "stage 5") {
+			moveNext(4);
+			$(window).on("mousemove", event => {
+				mousePos = [
+					event.pageX,
+					event.pageY
+				];
 			});
-	});
-	$("#setting .back").on("click", () => {
-		$("#ui").css({
-				"background-image":"url(img/background.jpg)",
-				"background-position":"center"
+	
+			stage5_startGame($(this).val(), () => {
+				$(window).off("mousemove");
 			});
-	});
-	$("#choice .back").on("click", () => {
-		$("#ui").css({
-				"background-image":"url(img/background.jpg)",
-				"background-position":"center"
-			});
+		}
 	});
 
-	$("#choice .next").eq(4).on("click", () => {
-		$("#screen").css({
-				"background-image":"url(img/stage5_background.jpg)",
-				"background-position":"center"
-			});
-		$(window).on("mousemove", event => {
-			mousePos = [
-				event.pageX,
-				event.pageY
-			];
-		});
-
-		stage5_startGame(() => {
-			$(window).off("mousemove");
-		});
+	$("#stage5 .back").on("click", () => {
+		console.log("back button for stage5 pressed");
 	});
 });
+// level information
+const stage5Levels = {
+	"easy": {
+		brick_intenity: 1,
+		brick_count: 40,
+		bricks_in_row: 8,
+		ball_speed: 5,
+		plane_size: 4,
+	},
+	"normal": {
+		brick_intenity: 1,
+		brick_count: 40,
+		bricks_in_row: 10,
+		ball_speed: 1,
+		plane_size: 4,
+	},
+	"hard": {
+		brick_intenity: 1,
+		brick_count: 40,
+		bricks_in_row: 10,
+		ball_speed: 1,
+		plane_size: 4,
+	},
+}
 
-
-function stage5_startGame(callBack){
+function stage5_startGame(currentLevel, callBack){
 	const canvas = document.getElementById("myCanvas");
 	const context = canvas.getContext("2d");
 
 	const deathLine = maxHeight * 0.98;
-	const levelInfo = levels[currentLevel];
+	const levelInfo = stage5Levels[currentLevel];
 
 	const barWidth = 200;
 	const barHeight = 20;
@@ -65,7 +71,9 @@ function stage5_startGame(callBack){
 
 	const gifLength = 100;
 
-	
+	const backgroundImg = new Image();
+	backgroundImg.src = "img/stage5_background.jpg";
+
 	const skills = [];
 	const draws = [];
 	const monsters = [];
@@ -317,7 +325,18 @@ function stage5_startGame(callBack){
 
 	const draw = (interval, callBack) =>{
 		context.clearRect(0, 0, maxWidth, maxHeight);
-		
+		context.drawImage(
+			backgroundImg,
+			200,
+			0,
+			580 + 200,
+			580,
+			0,
+			0,
+			maxWidth,
+			maxHeight
+		);
+
 		// main drawing interval
 		for (const object of draws) {
 			context.beginPath();
@@ -450,11 +469,7 @@ function stage5_startGame(callBack){
 		for(let i = 0; i < fbintervalList.length; i++){
 			cancelAnimationFrame(fbintervalList[i]);
 		}
-		context.clearRect(0, 0, maxWidth, maxHeight); // clear canvas
-		$("#ui").css({
-				"background-image":"url(img/background.jpg)",
-				"background-position":"center"
-			});
+		context.clearRect(0, 0, maxWidth, maxHeight);
 
 		callBack();
 	}

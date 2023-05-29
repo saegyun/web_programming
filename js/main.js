@@ -23,7 +23,7 @@ const getPlayerDamage = () => {
 };
 
 let flow;
-let state = "intro";
+let state = "choice";
 
 const moveNext = (idx) => {
 	// flow[state].value.hidden = true;
@@ -63,7 +63,8 @@ function initPage() {
 	const context = canvas.getContext("2d");
 
 	const titleBgImg = new Image();
-	titleBgImg.src = "resource/background/title.png";
+	// titleBgImg.src = "resource/background/title.png";
+	titleBgImg.src = "img/background.jpg";
 	
 	const choiceBgImg = new Image();
 	choiceBgImg.src = "resource/background/choice.jpg";
@@ -123,9 +124,9 @@ function initPage() {
 			onLoad: () => {
 				context.drawImage(
 					titleBgImg,
+					200,
 					0,
-					0,
-					1084,
+					1080 + 200,
 					1080,
 					0,
 					0,
