@@ -1,12 +1,13 @@
 const Stage2 = {
+	sound: [new Audio("/resource/sound/player_hurt.mp3")],
 	stageStatus: { isPlaying: false },
 	pickaxeStatus: undefined,
 	gameEnd: (context) => {
 		//초기화
-		console.log(Stage2.pickaxeStatus);
+		//console.log(Stage2.pickaxeStatus);
 		clearInterval(gameInterval);
 		setTimeout(() => {
-			context.clearRect(0, 0, maxWidth, maxHeight); // clear canvas			
+			//context.clearRect(0, 0, maxWidth, maxHeight); // clear canvas			
 		}, 10);
 		$(window).off("mousemove");
 	},
@@ -79,6 +80,7 @@ const Stage2 = {
 			type: "bar",
 			loc: [100 + maxWidth / 2 - levelInfo.barWidth / 2, deathLine - 100],
 			size: [levelInfo.barWidth, barHeight],
+			sound: [new Audio("resource/sound/slime_paddle_1.ogg"), new Audio("resource/sound/slime_paddle_2.ogg"), new Audio("resource/sound/slime_paddle_3.ogg"), new Audio("resource/sound/slime_paddle_4.ogg")],
 		};
 	
 		draws.push(bar);
@@ -97,7 +99,8 @@ const Stage2 = {
 			loc: [450, 600], 
 			width: 25, 
 			image: ballImage, 
-			degree: 0
+			degree: 0,
+			sound: [new Audio("resource/sound/brick_break1.mp3"), new Audio("resource/sound/brick_break2.mp3"), new Audio("resource/sound/brick_break3.mp3"), new Audio("resource/sound/brick_break4.mp3")],
 		};
 	
 		// a list that keep tracks the ball's location
@@ -235,15 +238,18 @@ const Stage2 = {
 					if ((object.loc[1] <= bar.loc[1] && object.loc[1] >= bar.loc[1] - object.width) &&
 						(object.loc[0] >= bar.loc[0] && object.loc[0] <= bar.loc[0] + levelInfo.barWidth)) {
 						ballRad = (2 * Math.PI - ballRad);
+						bar.sound[Math.floor(Math.random() * bar.sound.length)].play();
 					}
 					if ((object.loc[1] >= bar.loc[1] && object.loc[1] <= bar.loc[1] + barHeight) &&
 						((object.loc[0] >= bar.loc[0] - object.width && object.loc[0] <= bar.loc[0]) || 
 						 (object.loc[0] <= bar.loc[0] + levelInfo.barWidth + object.width && object.loc[0] >= bar.loc[0] + levelInfo.barWidth))) {
 						ballRad = Math.PI - ballRad; 
+						bar.sound[Math.floor(Math.random() * bar.sound.length)].play();
 					} 
 	
 					if (object.loc[1] > deathLine) { 
 						//checkResult(context);
+						Stage2.sound[0].play();
 						Stage2.failResult(context);
 					}
 				}
@@ -349,14 +355,13 @@ const Stage2 = {
 				}
 	
 				if (isBounced) {
-	
+					ball.sound[Math.floor(Math.random() * ball.sound.length)].play();
 					// HP calculation
 					window.ores[collidePos].health -= window.pickaxe.power;
 	
 					//check destroys the ore
 					if (window.ores[collidePos].health <= 0) {
 						window.ores[collidePos].health = 0;
-	
 						//change pickaxe material
 						if (brickPosInfo[collidePos].ore !== window.pickaxe.ore && 
 							brickPosInfo[collidePos].ore.order >= window.pickaxe.ore.order) {
