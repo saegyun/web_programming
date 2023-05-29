@@ -74,7 +74,7 @@ $(document).ready(() => {
 			for (i = 0; i <= max; i++) {
 				sum += enchants[i].value / total;
 				console.log(sum, random);
-				if (random > sum) {
+				if (random < sum) {
 					$("#enchant-result").text(enchants[i].text);
 					if (i === 0) {
 						new Audio("resource/sound/item_break.ogg").play();
