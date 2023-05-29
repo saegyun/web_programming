@@ -17,6 +17,11 @@ $(document).ready(function() {
 					event.pageY
 				];
 			});
+
+			let video = document.createElement("VIDEO");
+			video.src = "video/Stage5.mp4";
+			document.getElementById('stage5').appendChild(video);
+			video.play();
 	
 			stage5_startGame($(this).val(), () => {
 				$(window).off("mousemove");
@@ -28,6 +33,7 @@ $(document).ready(function() {
 		console.log("back button for stage5 pressed");
 	});
 });
+
 // level information
 const stage5Levels = {
 	"easy": {
@@ -36,6 +42,9 @@ const stage5Levels = {
 		bricks_in_row: 8,
 		ball_speed: 5,
 		plane_size: 4,
+		barLife: 5,
+		bossLife: 10,
+		crystalLife: 5
 	},
 	"normal": {
 		brick_intenity: 1,
@@ -43,6 +52,9 @@ const stage5Levels = {
 		bricks_in_row: 10,
 		ball_speed: 1,
 		plane_size: 4,
+		barLife: 5,
+		bossLife: 15,
+		crystalLife: 7
 	},
 	"hard": {
 		brick_intenity: 1,
@@ -50,6 +62,9 @@ const stage5Levels = {
 		bricks_in_row: 10,
 		ball_speed: 1,
 		plane_size: 4,
+		barLife: 3,
+		bossLife: 15,
+		crystalLife: 7
 	},
 }
 
@@ -77,7 +92,9 @@ function stage5_startGame(currentLevel, callBack){
 	const skills = [];
 	const draws = [];
 	const monsters = [];
-
+	const stage5_maxWidth = 1000;
+	console.log(maxWidth);
+	console.log(maxHeight);
 	// ball id
 	const ballId = new Date().getMilliseconds();
 	// bar id
@@ -86,17 +103,18 @@ function stage5_startGame(currentLevel, callBack){
 	const crystal_1_Id = new Date().getMilliseconds() - 3;
 	const crystal_2_Id = new Date().getMilliseconds() - 4;
 
-	const barLife = 5;
-	const bossLife = 10;
+	const barLife = levelInfo.barLife;
+	const bossLife = levelInfo.bossLife;
+	const crystalLife = levelInfo.crystalLife;
 
 	let gameON = true;
 
 	let boss = {
 		id: bossId,
 		type: "img",
-		from: [maxWidth / 2 - bossWidth / 2, 30],
+		from: [stage5_maxWidth / 2 - bossWidth / 2, 30],
 		size: [bossWidth, bossHeight],
-		life: 10,
+		life: bossLife,
 		src: "img/ender_dragon_1.gif"
 	};
 
@@ -107,7 +125,7 @@ function stage5_startGame(currentLevel, callBack){
 		type: "img",
 		from: [100, deathLine - 500],
 		size: [crystalWidth, crystalHeight],
-		life: 3,
+		life: crystalLife,
 		src: "img/end_crystal.gif"
 	};
 	monsters.push(crystal_1);
@@ -115,9 +133,9 @@ function stage5_startGame(currentLevel, callBack){
 	let crystal_2 = {
 		id: crystal_2_Id,
 		type: "img",
-		from: [maxWidth-crystalWidth-100, deathLine - 500],
+		from: [stage5_maxWidth-crystalWidth-100, deathLine - 500],
 		size: [crystalWidth, crystalHeight],
-		life: 3,
+		life: crystalLife,
 		src: "img/end_crystal.gif"
 	};
 	monsters.push(crystal_2);
@@ -129,7 +147,7 @@ function stage5_startGame(currentLevel, callBack){
 		type: "rect",
 		from: [100 + maxWidth / 2 - barWidth / 2, deathLine - 100],
 		size: [barWidth, barHeight],
-		life: 5
+		life: barLife
 	};
 
 	draws.push(bar);
@@ -159,6 +177,7 @@ function stage5_startGame(currentLevel, callBack){
 	let fireballItv;
 	let bossUpItv;
 	let flameItv;
+	let breathItv;
 
 
 	//보스 체력회복 스킬
@@ -215,23 +234,23 @@ function stage5_startGame(currentLevel, callBack){
     const flameSize = [barWidth/2, barWidth/4];
     const flamePadding = 10;
     let isAttacked = false;
+
     let flameX = [];
     const flameY = bar.from[1] - flameSize[1] + 30;
+
     let flameImg = [];
     
 
+    let styles = {
+		"position" : "absolute",
+		"width" : flameSize[0] + "px",
+		"height" : flameSize[1] + "px",
+		"top" : flameY + "px",
+		"z-index" : "2"
+	};
+
     for(let i = 0; i < 3; i++){
-    	flameImg[i] = document.createElement('img');
-    	flameImg[i].src ="img/fire_5.gif";
-    	flameX[i] = Math.floor(Math.random() * (maxWidth - flameSize[0] - (flamePadding * 2)));
-    	let styles = {
-			"position" : "absolute",
-			"width" : flameSize[0] + "px",
-			"height" : flameSize[1] + "px",
-			"top" : flameY + "px",
-			"left" : flameX[i] + "px",
-			"z-index" : "2"
-		};
+    	flameImg[i] = document.createElement("img");
 		Object.assign(flameImg[i].style, styles); 
 		document.getElementById('stage5').appendChild(flameImg[i]);
     }
@@ -240,20 +259,60 @@ function stage5_startGame(currentLevel, callBack){
     	for(let i = 0; i < 3; i++){
     		flameX[i] = Math.floor(Math.random() * (maxWidth - flameSize[0] - (flamePadding * 2)));
     		flameImg[i].style.left = flameX[i] + "px";
+    		flameImg[i].src ="img/warning.png";
     	}
-    	flameItv = setTimeout(drawFlame, 5000);
+    	setTimeout(()=>{
+    		isAttacked = false;
+    		for(let i = 0; i < 3; i++){
+    			flameImg[i].src ="img/fire_5.gif";
+    			if((flameX[i] >= bar.from[0] - flameSize[0]/2)
+    				&& (flameX[i] <= bar.from[0] + barWidth - flameSize[0]/2))
+    				{
+    					isAttacked = true;
+    				}
+    		}
+    		if(isAttacked){
+    			bar.life--;
+    			drawBarLife();
+    		}
+    	}, 3000);
+    	
+    	flameItv = setTimeout(drawFlame, 6000);
     }
-    flameItv = setTimeout(drawFlame, 5000);
+    flameItv = setTimeout(drawFlame);
 
-	/*
-	if((breathX[i] >= bar.from[0] - flameSize[i]/2) && (flameX[i] <= bar.from[0] + barWidth - flameSize[i]/2)){
-    		isAttacked = true;
+    //breath 스킬 반드시 생명 하나 깎임
+    function breath(){
+    	if(bar.life > 0 && boss.life > 0){
+    		let breathImg = document.createElement("img");
+    		breathImg.src = "img/explosion.gif";
+
+    		let styles = {
+				"position" : "absolute",
+				"width" : maxWidth + "px",
+				"height" : maxHeight + "px",
+				"left" : "0px",
+				"top" :"0px",
+				"z-index" : "2"
+			};
+
+			Object.assign(breathImg.style, styles); 
+			document.getElementById('stage5').appendChild(breathImg);
+			setTimeout(()=>{
+				breathImg.remove();
+				bar.life--;
+				drawBarLife();
+				breathItv = setTimeout(breath, 10000);
+			}, 1000);
+			
     	}
-	*/
+    }
+    breathItv = setTimeout(breath, 10000);
 
 	skills.push(fireballItv);
 	skills.push(bossUpItv);
 	skills.push(flameItv);
+	skills.push(breathItv);
 
 	function drawMonsterImg(object){
 		const monsterImg = document.createElement('img');
