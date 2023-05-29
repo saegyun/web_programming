@@ -78,7 +78,8 @@ function stage5_startGame(callBack){
 	// bar id
 	const barId = new Date().getMilliseconds() - 1;
 	const bossId = new Date().getMilliseconds() - 2;
-	const crystalId = new Date().getMilliseconds() - 3;
+	const crystal_1_Id = new Date().getMilliseconds() - 3;
+	const crystal_2_Id = new Date().getMilliseconds() - 4;
 
 	const barLife = 5;
 	const bossLife = 10;
@@ -97,7 +98,7 @@ function stage5_startGame(callBack){
 	monsters.push(boss);
 
 	let crystal_1 = {
-		id: crystalId,
+		id: crystal_1_Id,
 		type: "img",
 		from: [100, deathLine - 500],
 		size: [crystalWidth, crystalHeight],
@@ -107,7 +108,7 @@ function stage5_startGame(callBack){
 	monsters.push(crystal_1);
 
 	let crystal_2 = {
-		id: crystalId,
+		id: crystal_2_Id,
 		type: "img",
 		from: [maxWidth-crystalWidth-100, deathLine - 500],
 		size: [crystalWidth, crystalHeight],
@@ -215,9 +216,25 @@ function stage5_startGame(callBack){
 	skills.push(bossUpItv);
 	//skills.push(breathInterval);
 
+	function drawMonsterImg(object){
+		const monsterImg = document.createElement('img');
+		monsterImg.src = object.src;
+		monsterImg.setAttribute('id', object.id);
+		let styles = {
+			"position" : "absolute",
+			"width" : object.size[0]+"px",
+			"height" : object.size[1]+"px",
+			"top" : object.from[1]+"px",
+			"left" : object.from[0]+"px",
+			"z-index" : "2"
+		};
+		Object.assign(monsterImg.style, styles); 
+		document.getElementById('stage5').appendChild(monsterImg);
+	}
 	function drawImg(object){
 		const monsterImg = document.createElement('img');
 		monsterImg.src = object.src;
+		monsterImg.setAttribute('id', object.id);
 		let styles = {
 			"position" : "absolute",
 			"width" : object.size[0]+"px",
@@ -231,7 +248,7 @@ function stage5_startGame(callBack){
 	}
 
 	for (let i = 0; i < monsters.length; i++){
-		drawImg(monsters[i]);
+		drawMonsterImg(monsters[i]);
 	}
 
 	const draw = (interval, callBack) =>{
@@ -370,6 +387,11 @@ function stage5_startGame(callBack){
 					//drawImg();
 				}
 			}
+			else{
+				let id = object.id;
+				let obj = document.getElementById(id);
+				obj.remove();
+			}
 		}
 
 		
@@ -403,6 +425,10 @@ function stage5_startGame(callBack){
 	}
 
 	const gameEnd = () => {
+		let obj = $('#stage5 img');
+		for(let i = 0; i < obj.length; i++)
+			obj[i].remove();
+
 		gameON = false;
 		for(let i = 0; i < skills.length; i++){
 			clearTimeout(skills[i]);
