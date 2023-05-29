@@ -11,7 +11,31 @@ $(document).ready(function() {
 		reCalc();
 	});
 
-	$("#choice .next").eq(0).on("click", () => {
+	//title 화면
+	$("#intro .next").on("click", () => {
+		$("#ui").css({
+				"background-image":"url(img/background.jpg)",
+				"background-position":"center"
+			});
+	});
+	$("#setting .back").on("click", () => {
+		$("#ui").css({
+				"background-image":"url(img/background.jpg)",
+				"background-position":"center"
+			});
+	});
+	$("#choice .back").on("click", () => {
+		$("#ui").css({
+				"background-image":"url(img/background.jpg)",
+				"background-position":"center"
+			});
+	});
+
+	$("#choice .next").eq(4).on("click", () => {
+		$("#screen").css({
+				"background-image":"url(img/stage5_background.jpg)",
+				"background-position":"center"
+			});
 
 		$(window).on("mousemove", event => {
 			mousePos = [
@@ -20,41 +44,90 @@ $(document).ready(function() {
 			];
 		});
 
-		startGame(() => {
+		stage5_startGame(() => {
 			$(window).off("mousemove");
 		});
 	});
 });
 
-// brick breaking main logic
-function startGame(callBack) {
-	
+
+function stage5_startGame(callBack){
 	const canvas = document.getElementById("myCanvas");
 	const context = canvas.getContext("2d");
 
 	const deathLine = maxHeight * 0.98;
-
 	const levelInfo = levels[currentLevel];
 
-	// objects to draw 
-	// -> will be divided with property "type"
-	// -> and identified with property "id"
+	const barWidth = 200;
+	const barHeight = 20;
+
+	const bossWidth = 200;
+	const bossHeight = 200;
+
+	const crystalWidth = 100;
+	const crystalHeight = 100;
+
+	const gifLength = 100;
+
+	const ender_dragon_gif = [];
+	for (let i = 0; i <= gifLength; i++) {
+    	ender_dragon_gif[i] = 'img/ender_dragon/'+i+'.png';
+	}
+	const end_crystal_gif = [];
+	for (let i = 0; i <= gifLength; i++) {
+    	end_crystal_gif[i] = 'img/end_crystal/'+i+'.png';
+	}
+
+	
+	const skills = [];
 	const draws = [];
+	const monsters = [];
 
 	// ball id
 	const ballId = new Date().getMilliseconds();
 	// bar id
 	const barId = new Date().getMilliseconds() - 1;
-	const barWidth = 200;
-	const barHeight = 20;
+	const bossId = new Date().getMilliseconds() - 2;
+	const crystalId = new Date().getMilliseconds() - 3;
 
-	// brick width, height and padding within one another
-	const brickAreaWidth = (maxWidth / levelInfo.bricks_in_row);
-	const brickAreaHeight = brickAreaWidth;
-	const padding = 30;
+	const barLife = 5;
+	const bossLife = 10;
 
-	// object that maps "position" to "id"
-	const brickPosInfo = {};
+	let gameON = true;
+
+	let boss = {
+		id: bossId,
+		type: "gif",
+		from: [maxWidth / 2 - bossWidth / 2, 30],
+		size: [bossWidth, bossHeight],
+		life: 10,
+		url: ender_dragon_gif,
+		gifNum : 0
+	};
+
+	monsters.push(boss);
+
+	let crystal_1 = {
+		id: crystalId,
+		type: "gif",
+		from: [100, deathLine - 500],
+		size: [crystalWidth, crystalHeight],
+		life: 3,
+		url: end_crystal_gif,
+		gifNum : 0
+	};
+	monsters.push(crystal_1);
+
+	let crystal_2 = {
+		id: crystalId,
+		type: "gif",
+		from: [maxWidth-crystalWidth-100, deathLine - 500],
+		size: [crystalWidth, crystalHeight],
+		life: 3,
+		url: end_crystal_gif,
+		gifNum : 0
+	};
+	monsters.push(crystal_2);
 
 	// bar object
 	let bar = {
@@ -63,6 +136,7 @@ function startGame(callBack) {
 		type: "rect",
 		from: [100 + maxWidth / 2 - barWidth / 2, deathLine - 100],
 		size: [barWidth, barHeight],
+		life: 5
 	};
 
 	draws.push(bar);
@@ -81,36 +155,120 @@ function startGame(callBack) {
 
 	draws.push(ball);
 
+	draws.push(monsters[0]);
+	draws.push(monsters[1]);
+	draws.push(monsters[2]);
+
 	// initial ball shooting radian
 	let ballRad = Math.PI * (Math.random() - 1) / 4;
 
-	// add bricks to "draws" and initialize "brickPosInfo"
-	for (let i = 0; i < levelInfo.brick_count; i++) {
 
-		const row = Number.parseInt(i / levelInfo.bricks_in_row) * brickAreaHeight;
-		const col = (i % levelInfo.bricks_in_row) * brickAreaWidth;
-		
-		const pos = [col, row];
+	let fireballItv;
+	let bossUpItv;
+	let breathItv;
 
-		brickPosInfo[pos] = new Date().getMilliseconds() + i + 1;
 
-		draws.push({
-			id: brickPosInfo[pos],
-			color: "rgba(60, 10, 10, 0.5)",
-			type: "rect",
-			from: [col + padding / 2, row + padding / 2],
-			size: [brickAreaWidth - padding, brickAreaHeight - padding],
-		});
+	function bossUp(){
+		boss.life++;
+		if(crystal_1.life == 0 && crystal_2.life == 0)
+			clearInterval(bossUpItv);
+		else
+			bossUpItv = setTimeout(bossUp, 5000);
 	}
+	bossUpItv = setTimeout(bossUp, 5000);
 
-	// main drawing interval
-	const draw = (interval, callBack) => {
+	let fbintervalList = [];
+	let fbinterval;
+	function fireball() {
+		let img = new Image();
+    	img.src ="img/fire_3.gif";
+
+    	//랜덤한 x좌표
+    	let fireSize = 50;
+    	let firePadding = 10;
+    	let fireLoc = [Math.floor(Math.random() * (maxWidth - fireSize - (firePadding * 2))),
+    	 boss.from[1] + bossHeight + firePadding]
+
+    	img.onload = function fbdraw(){
+    		if(fireLoc[1] < (deathLine - fireSize)){
+    			context.drawImage(img, fireLoc[0], fireLoc[1], fireSize, fireSize);
+    			fireLoc[1]++;
+
+    			fbinterval = requestAnimationFrame(fbdraw);
+    			fbintervalList.push(fbinterval);
+
+    			if((fireLoc[0] >= bar.from[0] - fireSize/2 && fireLoc[0] <= bar.from[0] + barWidth + fireSize/2)
+    				&&(fireLoc[1] + fireSize >= bar.from[1] && fireLoc[1] + fireSize <= bar.from[1] + barHeight)){
+    				bar.life--;
+    			cancelAnimationFrame(fbinterval);
+    			}
+    		}
+    	}
+    	if(gameON){
+    		fireballItv = setTimeout(fireball, 2000);
+    	}
+    	
+    }
+    fireballItv = setTimeout(fireball, 2000);
+    
+
+    let breathInterval;
+
+    const breathSize = [barWidth/2, barWidth/4];
+    const breathPadding = 10;
+    let isAttacked = false;
+    let breathX = [];
+    for(let i = 0; i < 3; i++){
+    	breathX[i] = Math.floor(Math.random() * (maxWidth - breathSize[0] - (breathPadding * 2)));
+    }
+
+    const breathY = bar.from[1] - breathSize[1] + 30;
+
+	skills.push(fireballItv);
+	skills.push(bossUpItv);
+	//skills.push(breathInterval);
+
+	const draw = (interval, callBack) =>{
 		context.clearRect(0, 0, maxWidth, maxHeight);
-
+		
+		// main drawing interval
 		for (const object of draws) {
 			context.beginPath();
 			context.strokeStyle = 'black';		
 			context.fillStyle = 'black';
+    		
+    		let heartImg = new Image();
+    		heartImg.src ="img/heart.png";
+    		let heartSize = 20;
+
+    		heartImg.onload = function(){
+
+    			if(object.id == barId){
+    				let NowHeartNum = object.life;
+    				let heartNum = barLife;
+    				for(let i = 0; i < NowHeartNum; i++)
+    					context.drawImage(heartImg, maxWidth/2 - NowHeartNum*heartSize/2 + i*30 , maxHeight-30, heartSize, heartSize);
+
+    				heartImg.src = "img/heart_none.png";
+    				heartImg.onload = function(){
+    					for(let i = NowHeartNum; i < heartNum; i++)
+    						context.drawImage(heartImg, maxWidth/2 - NowHeartNum*heartSize/2 + i*30, maxHeight-30, heartSize, heartSize);
+    				}
+    				
+    			}
+    			else if(object.id == bossId){
+    				let NowHeartNum = object.life;
+    				let heartNum = bossLife;
+    				for(let i = 0; i < NowHeartNum; i++)
+    					context.drawImage(heartImg, maxWidth/2 - NowHeartNum*heartSize/2 + i*30, 20, heartSize, heartSize);
+
+    				heartImg.src = "img/heart_none.png";
+    				heartImg.onload = function(){
+    					for(let i = NowHeartNum; i < heartNum; i++)
+    						context.drawImage(heartImg, maxWidth/2 - NowHeartNum*heartSize/2 + i*30, 20, heartSize, heartSize);
+    				}
+    			}
+    		}
 
 			// when the object is the bar
 			if (object.id === barId) {
@@ -130,23 +288,16 @@ function startGame(callBack) {
 			// when the object is the ball
 			if (object.id == ballId) {
 				ballLoc = object.loc; // location track
-				
+					
 				// collide with vertical wall
 				if (object.loc[0] < object.radius || object.loc[0] > maxWidth - object.radius) {
 					ballRad = Math.PI - ballRad;  
 				}
 
 				// collide with horizontal wall
-				if (object.loc[1] < object.radius || object.loc[1] > maxHeight - object.radius) {
+				if (object.loc[1] < object.radius) {
 					ballRad = (2 * Math.PI - ballRad);
 				}
-				
-				// refreshing ball's location
-				object.loc = [
-					object.loc[0] + Math.cos(ballRad) * levelInfo.ball_speed,
-					object.loc[1] + Math.sin(ballRad) * levelInfo.ball_speed,
-				];
-
 				// collide with bar
 				if ((object.loc[1] <= bar.from[1] && object.loc[1] >= bar.from[1] - object.radius) &&
 					(object.loc[0] >= bar.from[0] && object.loc[0] <= bar.from[0] + barWidth)) {
@@ -154,16 +305,27 @@ function startGame(callBack) {
 				}
 				if ((object.loc[1] >= bar.from[1] && object.loc[1] <= bar.from[1] + barHeight) &&
 					((object.loc[0] >= bar.from[0] - object.radius && object.loc[0] <= bar.from[0]) || 
-					 (object.loc[0] <= bar.from[0] + barWidth + object.radius && object.loc[0] >= bar.from[0] + barWidth))) {
+				 	(object.loc[0] <= bar.from[0] + barWidth + object.radius && object.loc[0] >= bar.from[0] + barWidth))) {
 					ballRad = Math.PI - ballRad;  
 				}
 
 				if (object.loc[1] > deathLine) {
-					clearInterval(interval);
-					setTimeout(callBack, 1000);
+					bar.life--;
+					if(bar.life == 0){
+						clearInterval(interval);
+						setTimeout(callBack, 100);
+					}else{
+						ballRad = Math.PI * (Math.random() - 1) / 4;
+						object.loc = [450, 600];
+					}
 				}
-			}
 
+				// refreshing ball's location
+				object.loc = [
+					object.loc[0] + Math.cos(ballRad) * levelInfo.ball_speed,
+					object.loc[1] + Math.sin(ballRad) * levelInfo.ball_speed,
+				];
+			}
 			// draw the object according to the its type
 			switch(object.type) {
 				case "circle":
@@ -175,6 +337,18 @@ function startGame(callBack) {
 					context.fillStyle = object.color || "black";
 					context.fillRect(object.from[0], object.from[1], object.size[0], object.size[1]);
 					break;
+				
+				case "gif":
+					if(object.life > 0){
+						let imgIndex = (object.gifNum++) % gifLength;
+						let img = new Image();
+						img.src = object.url[imgIndex];
+						img.onload = function(){
+							context.drawImage(img, object.from[0], object.from[1], object.size[0], object.size[1]);
+						}
+					}
+					break;
+
 				default:
 					break;
 			}
@@ -182,56 +356,91 @@ function startGame(callBack) {
 			context.closePath();
 		}
 
-		// calculating brick that the ball will collide with
-		let brickX = (
-			Number.parseInt(
-				(ballLoc[0] + Math.cos(ballRad) * (levelInfo.ball_speed)) / brickAreaWidth
-			) % levelInfo.bricks_in_row
-		) * brickAreaWidth;
-		// limit brick's x position
-		brickX = Math.max(0, brickX);
-		brickX = Math.min(maxWidth - brickAreaWidth, brickX);
-
-		const brickY = Number.parseInt((ballLoc[1] + Math.sin(ballRad) * (levelInfo.ball_speed)) / brickAreaHeight) * brickAreaHeight;
-
-		// check if brick really exists
-		if (brickPosInfo[[brickX, brickY]]) {
-			let isBounced = false;
-
-			// find the real brick object according to its id
-			const target = draws.find(v => v.id === brickPosInfo[[brickX, brickY]]);
-
-			if (((ballLoc[0] >= brickX + padding / 2 - ball.radius && ballLoc[0] <= brickX + padding / 2) || (ballLoc[0] <= brickX - padding / 2 + brickAreaWidth + ball.radius && ballLoc[0] >= brickX - padding / 2 + brickAreaWidth)) && 
-				(ballLoc[1] >= brickY + padding / 2 && ballLoc[1] <= brickY + brickAreaHeight - padding / 2)) {
-				ballRad = Math.PI - ballRad;
-				isBounced = true;
-			}
-
-			if ((ballLoc[0] >= brickX + padding / 2 && ballLoc[0] <= brickX + brickAreaWidth - padding / 2) && 
-				((ballLoc[1] >= brickY + padding / 2 - ball.radius && ballLoc[1] <= brickY + padding / 2) || (ballLoc[1] <= brickY - padding / 2 + brickAreaHeight + ball.radius && ballLoc[1] >= brickY - padding / 2 + brickAreaHeight))) {
-				ballRad = (2 * Math.PI - ballRad);
-				isBounced = true;
-			}
-
-			if (isBounced) {
-				draws.splice(draws.indexOf(target), 1);
-	
-				delete brickPosInfo[[brickX, brickY]];
+		for (const object of monsters){
+			if((object.life > 0) && gameON){
+				let isBounced = false;
+				
+				if ((ball.loc[1] <= object.from[1] && ball.loc[1] >= object.from[1] - ball.radius) &&
+					(ball.loc[0] >= object.from[0] && ball.loc[0] <= object.from[0] + object.size[0])) {
+					ballRad = (2 * Math.PI - ballRad);
+					isBounced = true;
+				}
+				if ((ball.loc[1] >= object.from[1] && ball.loc[1] <= object.from[1] + object.size[1]) &&
+					((ball.loc[0] >= object.from[0] - ball.radius && ball.loc[0] <= object.from[0]) || 
+					(ball.loc[0] <= object.from[0] + object.size[0] + ball.radius && ball.loc[0] >= object.from[0] + object.size[0]))) {
+					ballRad = Math.PI - ballRad;  
+					isBounced = true;
+				}
+				if(isBounced)
+					object.life--;
 			}
 		}
-		// if it's true, show the target brick's hitbox
-		if (debugObtions.showHitBox) {
-			context.fillStyle = 'rgba(10, 60, 10, 0.5)';
 
-			context.fillRect(brickX + padding / 2, brickY + padding / 2, brickAreaWidth - padding, brickAreaHeight - padding);
-			context.fillRect(brickX + padding / 2 - ball.radius, brickY + padding / 2 - ball.radius, brickAreaWidth - padding + ball.radius * 2, brickAreaHeight - padding + ball.radius * 2);	
+		
+			
+		let flameImg = new Image();
+    	flameImg.src ="img/fire_5.png";
+
+    	flameImg.onload = function (){
+    		context.beginPath();
+    		for(let i = 0; i < 3; i++){
+    			context.drawImage(flameImg, breathX[i], breathY, breathSize[0], breathSize[1]);
+    			if((breathX[i] >= bar.from[0] - breathSize[i]/2) && (breathX[i] <= bar.from[0] + barWidth - breathSize[i]/2))
+    			{
+    				isAttacked = true;
+    			}
+    		}
+    		context.stroke();
+			context.closePath();
+    			
+    	}
+
+		if(boss.life == 0){
+			clearInterval(interval);
+			setTimeout(callBack, 100);
 		}
+		else if(bar.life == 0){
+			clearInterval(interval);
+			setTimeout(callBack, 100);
+		}
+
 	}
 
 	const gameEnd = () => {
+		gameON = false;
+		for(let i = 0; i < skills.length; i++){
+			clearTimeout(skills[i]);
+		}
+		for(let i = 0; i < fbintervalList.length; i++){
+			cancelAnimationFrame(fbintervalList[i]);
+		}
 		context.clearRect(0, 0, maxWidth, maxHeight); // clear canvas
+		$("#ui").css({
+				"background-image":"url(img/background.jpg)",
+				"background-position":"center"
+			});
+
 		callBack();
-	};
+	}
+
+
+	setInterval(()=>{
+		if(isAttacked)
+			bar.life--;
+		isAttacked = false;
+		for(let i = 0; i < 3; i++){
+			breathX[i] = Math.floor(Math.random() * (maxWidth - breathSize[0] - (breathPadding * 2)));
+		}
+	}, 5000);
+
+
+
+	$("#stage5 .back").on("click", () => {
+		clearInterval(gameInterval);
+		setTimeout(gameEnd, 100);
+		
+	});
 
 	const gameInterval = setInterval(() => draw(gameInterval, gameEnd));
+	
 }
