@@ -12,17 +12,20 @@ const PlayStatus = {
 	stat: {
 		exp: 0,
 		sharpness: 0,
-		damage: 1,
 	},
 	stage2: {
 		result: undefined,
 	},
 };
 
+const getPlayerDamage = () => {
+	return PlayStatus.stat.sharpness * 1.5 + 3;
+};
+
 let flow;
 
 
-let state = "enchant";
+let state = "intro";
 
 const moveNext = (idx) => {
 	// flow[state].value.hidden = true;

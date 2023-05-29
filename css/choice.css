@@ -63,7 +63,8 @@
 #choice > #stage-info > .description {
 	overflow-y: auto;
 
-	height: 50px;
+	width: 90%;
+	height: 70px;
 }
 #enchant {
 	position: absolute;

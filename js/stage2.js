@@ -1,16 +1,22 @@
 const Stage2 = {
-	sound: [new Audio("/resource/sound/player_hurt.mp3")],
+	sound: [new Audio("resource/sound/player_hurt.mp3")],
+	mainMusic: new Audio("resource/sound/stage2_music.ogg"), // 배경 음악
+	failMusic: new Audio("resource/sound/stage3_defeat.ogg"), // 패배 음악
+	victoryMusic: new Audio("resource/sound/stage2_victory.ogg"), // 승리 음악
 	stageStatus: { isPlaying: false },
 	gameEnd: (context) => {
 		//초기화
 		//console.log(PlayStatus.stage2.result);
 		clearInterval(gameInterval);
+		$("#screen #stage2_volume").remove(); // 볼륨 버튼 없애기
 		setTimeout(() => {
 			//context.clearRect(0, 0, maxWidth, maxHeight); // clear canvas			
 		}, 10);
 		$(window).off("mousemove");
+		Stage2.mainMusic.pause();
 	},
 	failResult: (context) => {
+		Stage2.failMusic.play(); // 패배 음악
 		$("#stage2-result").css({
 			backgroundColor: "rgba(255, 0, 0, 0.253)",
 		});
@@ -45,6 +51,7 @@ const Stage2 = {
 		window.ores = {};
 		const canvas = document.getElementById("myCanvas");
 		const context = canvas.getContext("2d");
+		const canvasPosition = $(canvas).position();
 	
 		const deathLine = maxHeight * 0.96;
 	
@@ -52,6 +59,36 @@ const Stage2 = {
 
 		const paddleImg = new Image();
 		paddleImg.src = "resource/sprite/paddle_slime.png";
+		
+		// 배경 음악
+		Stage2.mainMusic.volume = 1.0; // 음악 볼륨
+		Stage2.mainMusic.play();
+		
+		// 볼륨 버튼
+		const volumeDiv = $("<div />").attr("id", "stage2_volume");
+		let volumeOn = true;
+		volumeDiv.append($("<img />").attr("src", "resource/sprite/volume_on.png").attr("width", "60px").attr("height", "60px"));
+		$(volumeDiv).css({
+			"position": "absolute",
+			"z-index": "1",
+			"height": "60px",
+			"left": (canvasPosition.left + 700) + "px",
+			"top": (canvasPosition.top + 710) + "px",
+			"line-height": "80px",
+		});
+		volumeDiv.on("click", function() {
+			if(volumeOn) {
+				volumeOn = false;
+				Stage2.mainMusic.volume = 0.0;
+				volumeDiv.find("img").attr("src", "resource/sprite/volume_off.png");
+			}
+			else {
+				volumeOn = true;
+				Stage2.mainMusic.volume = 1.0;
+				volumeDiv.find("img").attr("src", "resource/sprite/volume_on.png");
+			}
+		});
+		$(canvas).parent().append(volumeDiv);
 	
 		// objects to draw 
 		// -> will be divided with property "type"

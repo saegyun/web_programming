@@ -81,16 +81,20 @@ class Spawner {
 }
 
 const Stage4 = {
+	mainMusic: new Audio("resource/sound/stage4_music.ogg"), // 배경 음악
+	failMusic: new Audio("resource/sound/stage3_defeat.ogg"), // 패배 음악
+	victoryMusic: new Audio("resource/sound/stage3_victory.ogg"), // 승리 음악
 	brickAreaWidth: undefined,
 	brickAreaHeight: undefined,
 	canvasPosition: undefined,
 	obtainedXp: 0,
 	isSuccess: false,
 	trackIds: [],
-	damage: 5,
 	gameEnd: (context) => {
+		Stage4.mainMusic.pause();
 		clearInterval(gameInterval);
 		$("#stage4_exp").remove();
+		$("#screen #stage4_volume").remove(); // 볼륨 버튼 없애기
 		setTimeout(() => {
 			context.clearRect(0, 0, maxWidth, maxHeight); // clear canvas			
 		}, 10);
@@ -100,12 +104,14 @@ const Stage4 = {
 		PlayStatus.stat.exp += Stage4.obtainedXp;
 
 		if (!Stage4.isSuccess) {
+			Stage4.failMusic.play();
 			$("#stage4-result").css({
 				"background-color": "rgba(255, 0, 0, 0.253)",
 			});
 			$("#stage4-result > h1").text("You died!");
 			// $("#stage4-result > .result-buttons > button").eq(1).attr("disabled", true);
 		} else {
+			Stage4.victoryMusic.play();
 			$("#stage4-result").css({
 				"background-color": "rgba(102, 255, 0, 0.253)",
 			});
@@ -231,8 +237,8 @@ const Stage4 = {
 
 		// initial ball shooting radian
 		const poassibleRadians = [
-			Math.PI * (3 / 2 + 1 / 4 + Math.random() / 4),
-			Math.PI * (3 / 2 - 1 / 4 - Math.random() / 4),
+			-Math.PI * (1 / 6 + Math.random() / 6),
+			-Math.PI * (5 / 6 - Math.random() / 6),
 		];
 		let ballRad = poassibleRadians[Math.floor(Math.random() * 2)];
 		// let ballRad = Math.PI * (Math.random() - 1) / 6;
@@ -259,6 +265,36 @@ const Stage4 = {
 		});
 		expDiv.text("XP: 0");
 		$(canvas).parent().append(expDiv);
+		
+		// 배경 음악
+		Stage4.mainMusic.volume = 0.8; // 음악 볼륨
+		Stage4.mainMusic.play();
+		
+		// 볼륨 버튼
+		const volumeDiv = $("<div />").attr("id", "stage4_volume");
+		let volumeOn = true;
+		volumeDiv.append($("<img />").attr("src", "resource/sprite/volume_on.png").attr("width", "60px").attr("height", "60px"));
+		$(volumeDiv).css({
+			"position": "absolute",
+			"z-index": "1",
+			"height": "60px",
+			"left": (Stage4.canvasPosition.left + 700) + "px",
+			"top": (Stage4.canvasPosition.top + 710) + "px",
+			"line-height": "80px",
+		});
+		volumeDiv.on("click", function() {
+			if(volumeOn) {
+				volumeOn = false;
+				Stage4.mainMusic.volume = 0.0;
+				volumeDiv.find("img").attr("src", "resource/sprite/volume_off.png");
+			}
+			else {
+				volumeOn = true;
+				Stage4.mainMusic.volume = 0.8;
+				volumeDiv.find("img").attr("src", "resource/sprite/volume_on.png");
+			}
+		});
+		$(canvas).parent().append(volumeDiv);
 
 		// add bricks to "draws" and initialize "brickPosInfo"
 		const spawnBricks = () => {
@@ -538,7 +574,7 @@ const Stage4 = {
 				
 				if (isBounced) {
 					if (target.class.status === "") {
-						if (target.class.hit(Stage4.damage)) {
+						if (target.class.hit(getPlayerDamage())) {
 							let expLabel = new ExperienceLabel(target.class.x, target.class.y, target.class.exp);
 							expLabel.ding();
 							expLabels.push(expLabel);

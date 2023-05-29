@@ -40,6 +40,7 @@ $(document).ready(() => {
 		}
 
 		PlayStatus.stat.exp -= 500;
+		$("#show-exp").text(`Current Exp : ${PlayStatus.stat.exp}`);
 
 		let max = 1;
 		
@@ -71,8 +72,8 @@ $(document).ready(() => {
 			console.log("current rand : ", random);
 
 			for (i = 0; i <= max; i++) {
-				console.log(sum, random);
 				sum += enchants[i].value / total;
+				console.log(sum, random);
 				if (random > sum) {
 					$("#enchant-result").text(enchants[i].text);
 					if (i === 0) {
@@ -80,11 +81,13 @@ $(document).ready(() => {
 						return;
 					}
 					isDecided = true;
+					PlayStatus.stat.sharpness = enchants[i].sharpness;
 					break;
 				}
 			}
 			if (!isDecided) {
 				$("#enchant-result").text(enchants[max].text);
+				PlayStatus.stat.sharpness = enchants[max].sharpness;
 			}
 			new Audio("resource/sound/experience.ogg").play();
 		}
