@@ -91,17 +91,10 @@ img {
 	font-size: 20px;
 	/* font-weight: bold; */
 }
-
-#stage1 > button {
-	position: absolute;
-	bottom: 0;
-	left: calc(var(--main-width) - 50px);
-}
-
 #screen {	
 	position: absolute;
 
-	left: 60px;
+	left: 100px;
 }
 #myCanvas {
 	background-color: var(--canvas-bg-color);

@@ -3,7 +3,7 @@ $(document).ready(() => {
 		{
 			name: "stage 1",
 			description: "나무를 캐 기본 조작을 익혀보세요!",
-			preview: "resource/ui/blank.png",
+			preview: "resource/background/preview/stage1.png",
 		},
 		{
 			name: "stage 2",
@@ -13,7 +13,7 @@ $(document).ready(() => {
 		{
 			name: "stage 3",
 			description: "몬스터가 찾아옵니다! 동이 틀 때까지 버티세요!",
-			preview: "resource/ui/heart.png",
+			preview: "resource/background/preview/stage3.png",
 		},
 		{
 			name: "stage 4",

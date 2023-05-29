@@ -1,0 +1,6 @@
+
+#stage1 > button {
+	position: absolute;
+	bottom: 0;
+	left: calc(var(--main-width) - 50px);
+}
