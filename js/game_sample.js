@@ -153,9 +153,10 @@ function stage5_startGame(callBack){
 
 	let fireballItv;
 	let bossUpItv;
-	let breathItv;
+	let flameItv;
 
 
+	//보스 체력회복 스킬
 	function bossUp(){
 		boss.life++;
 		if(crystal_1.life == 0 && crystal_2.life == 0)
@@ -165,6 +166,8 @@ function stage5_startGame(callBack){
 	}
 	bossUpItv = setTimeout(bossUp, 5000);
 
+
+	//fire ball skill
 	let fbintervalList = [];
 	let fbinterval;
 	function fireball() {
@@ -200,21 +203,49 @@ function stage5_startGame(callBack){
     fireballItv = setTimeout(fireball, 2000);
     
 
-    let breathInterval;
-
-    const breathSize = [barWidth/2, barWidth/4];
-    const breathPadding = 10;
+    //flame 스킬
+    const flameSize = [barWidth/2, barWidth/4];
+    const flamePadding = 10;
     let isAttacked = false;
-    let breathX = [];
+    let flameX = [];
+    const flameY = bar.from[1] - flameSize[1] + 30;
+    let flameImg = [];
+    
+
     for(let i = 0; i < 3; i++){
-    	breathX[i] = Math.floor(Math.random() * (maxWidth - breathSize[0] - (breathPadding * 2)));
+    	flameImg[i] = document.createElement('img');
+    	flameImg[i].src ="img/fire_5.png";
+    	flameX[i] = Math.floor(Math.random() * (maxWidth - flameSize[0] - (flamePadding * 2)));
+    	let styles = {
+			"position" : "absolute",
+			"width" : flameSize[0] + "px",
+			"height" : flameSize[1] + "px",
+			"top" : flameY + "px",
+			"left" : flameX[i] + "px",
+			"z-index" : "2"
+		};
+		Object.assign(flameImg[i].style, styles); 
+		document.getElementById('stage5').appendChild(flameImg[i]);
     }
 
-    const breathY = bar.from[1] - breathSize[1] + 30;
+    function drawFlame(){
+    	for(let i = 0; i < 3; i++){
+    		flameX[i] = Math.floor(Math.random() * (maxWidth - flameSize[0] - (flamePadding * 2)));
+    		flameImg[i].style.left = flameX[i] + "px";
+    	}
+    	flameItv = setTimeout(drawFlame, 5000);
+    }
+    flameItv = setTimeout(drawFlame, 5000);
+
+	/*
+	if((breathX[i] >= bar.from[0] - flameSize[i]/2) && (flameX[i] <= bar.from[0] + barWidth - flameSize[i]/2)){
+    		isAttacked = true;
+    	}
+	*/
 
 	skills.push(fireballItv);
 	skills.push(bossUpItv);
-	//skills.push(breathInterval);
+	skills.push(flameItv);
 
 	function drawMonsterImg(object){
 		const monsterImg = document.createElement('img');
@@ -222,25 +253,10 @@ function stage5_startGame(callBack){
 		monsterImg.setAttribute('id', object.id);
 		let styles = {
 			"position" : "absolute",
-			"width" : object.size[0]+"px",
-			"height" : object.size[1]+"px",
-			"top" : object.from[1]+"px",
-			"left" : object.from[0]+"px",
-			"z-index" : "2"
-		};
-		Object.assign(monsterImg.style, styles); 
-		document.getElementById('stage5').appendChild(monsterImg);
-	}
-	function drawImg(object){
-		const monsterImg = document.createElement('img');
-		monsterImg.src = object.src;
-		monsterImg.setAttribute('id', object.id);
-		let styles = {
-			"position" : "absolute",
-			"width" : object.size[0]+"px",
-			"height" : object.size[1]+"px",
-			"top" : object.from[1]+"px",
-			"left" : object.from[0]+"px",
+			"width" : object.size[0] + "px",
+			"height" : object.size[1] + "px",
+			"top" : object.from[1] + "px",
+			"left" : object.from[0] + "px",
 			"z-index" : "2"
 		};
 		Object.assign(monsterImg.style, styles); 
@@ -251,6 +267,81 @@ function stage5_startGame(callBack){
 		drawMonsterImg(monsters[i]);
 	}
 
+	/*
+	let heartImg = document.createElement('img');
+    heartImg.src ="img/heart.png";
+    let heartSize = 20;
+
+    let Heartlist = $('#BarHeart');
+	for(let i = 0; i < Heartlist.length; i++){
+		Heartlist[i].remove();
+	}
+	heartImg.setAttribute('id', "BarHeart");
+    let NowHeartNum = object.life;
+    let heartNum = barLife;
+
+    for(let i = 0; i < NowHeartNum; i++){
+    	let styles = {
+    		"position" : "absolute",
+    		"width" : heartSize+"px",
+    		"height" : heartSize+"px",
+    		"top" : (maxHeight-30)+"px",
+    		"left" : (maxWidth/2 - NowHeartNum*heartSize/2 + i*30) + 100+"px",
+    		"z-index" : "2"
+    	};
+    	Object.assign(heartImg.style, styles); 
+    	document.getElementById('stage5').appendChild(heartImg);
+    }
+    heartImg.src = "img/heart_none.png";
+    for(let i = NowHeartNum; i < heartNum; i++){
+    	let styles = {
+			"position" : "absolute",
+			"width" : heartSize + "px",
+			"height" : heartSize+"px",
+			"top" : (maxHeight-30)+"px",
+			"left" : (maxWidth/2 - NowHeartNum*heartSize/2 + i*30)+ 100 +"px",
+			"z-index" : "2"
+		};
+		Object.assign(heartImg.style, styles); 
+		document.getElementById('stage5').appendChild(heartImg);
+	}
+	let obj = $('#BossHeart');
+	for(let i = 0; i < obj.length; i++)
+		obj[i].remove();
+
+	heartImg.setAttribute('id', "BossHeart");
+
+	let NowHeartNum = object.life;
+	let heartNum = barLife;
+
+	for(let i = 0; i < NowHeartNum; i++){
+		let styles = {
+			"position" : "absolute",
+			"width" : heartSize+"px",
+			"height" : heartSize+"px",
+			"top" : "20px",
+			"left" : "120px",
+			"z-index" : "2"
+		};
+		Object.assign(heartImg.style, styles); 
+		document.getElementById('stage5').appendChild(heartImg);
+	}
+	heartImg.src = "img/heart_none.png";
+	for(let i = NowHeartNum; i < heartNum; i++){
+		let styles = {
+			"position" : "absolute",
+			"width" : heartSize+"px",
+			"height" : heartSize+"px",
+			"top" : "20px",
+			"left" : "120px",
+			"z-index" : "2"
+		};
+		Object.assign(heartImg.style, styles); 
+		document.getElementById('stage5').appendChild(heartImg);
+    }
+	*/
+	
+
 	const draw = (interval, callBack) =>{
 		context.clearRect(0, 0, maxWidth, maxHeight);
 		
@@ -260,38 +351,6 @@ function stage5_startGame(callBack){
 			context.strokeStyle = 'black';		
 			context.fillStyle = 'black';
     		
-    		let heartImg = new Image();
-    		heartImg.src ="img/heart.png";
-    		let heartSize = 20;
-
-    		heartImg.onload = function(){
-
-    			if(object.id == barId){
-    				let NowHeartNum = object.life;
-    				let heartNum = barLife;
-    				for(let i = 0; i < NowHeartNum; i++)
-    					context.drawImage(heartImg, maxWidth/2 - NowHeartNum*heartSize/2 + i*30 , maxHeight-30, heartSize, heartSize);
-
-    				heartImg.src = "img/heart_none.png";
-    				heartImg.onload = function(){
-    					for(let i = NowHeartNum; i < heartNum; i++)
-    						context.drawImage(heartImg, maxWidth/2 - NowHeartNum*heartSize/2 + i*30, maxHeight-30, heartSize, heartSize);
-    				}
-    				
-    			}
-    			else if(object.id == bossId){
-    				let NowHeartNum = object.life;
-    				let heartNum = bossLife;
-    				for(let i = 0; i < NowHeartNum; i++)
-    					context.drawImage(heartImg, maxWidth/2 - NowHeartNum*heartSize/2 + i*30, 20, heartSize, heartSize);
-
-    				heartImg.src = "img/heart_none.png";
-    				heartImg.onload = function(){
-    					for(let i = NowHeartNum; i < heartNum; i++)
-    						context.drawImage(heartImg, maxWidth/2 - NowHeartNum*heartSize/2 + i*30, 20, heartSize, heartSize);
-    				}
-    			}
-    		}
 
 			// when the object is the bar
 			if (object.id === barId) {
@@ -384,35 +443,13 @@ function stage5_startGame(callBack){
 				}
 				if(isBounced){
 					object.life--;
-					//drawImg();
 				}
 			}
 			else{
-				let id = object.id;
-				let obj = document.getElementById(id);
-				obj.remove();
+				if(document.getElementById(object.id)!=null)
+					document.getElementById(object.id).remove();
 			}
 		}
-
-		
-			
-		let flameImg = new Image();
-    	flameImg.src ="img/fire_5.png";
-
-    	flameImg.onload = function (){
-    		context.beginPath();
-    		for(let i = 0; i < 3; i++){
-    			context.drawImage(flameImg, breathX[i], breathY, breathSize[0], breathSize[1]);
-    			if((breathX[i] >= bar.from[0] - breathSize[i]/2) && (breathX[i] <= bar.from[0] + barWidth - breathSize[i]/2))
-    			{
-    				isAttacked = true;
-    			}
-    		}
-    		context.stroke();
-			context.closePath();
-    			
-    	}
-
 		if(boss.life == 0){
 			clearInterval(interval);
 			setTimeout(callBack, 100);
@@ -425,11 +462,12 @@ function stage5_startGame(callBack){
 	}
 
 	const gameEnd = () => {
-		let obj = $('#stage5 img');
-		for(let i = 0; i < obj.length; i++)
-			obj[i].remove();
-
 		gameON = false;
+
+		let objList = $('#stage5 img');
+		for(let i = 0; i < objList.length; i++)
+			objList[i].remove();
+
 		for(let i = 0; i < skills.length; i++){
 			clearTimeout(skills[i]);
 		}
@@ -445,21 +483,11 @@ function stage5_startGame(callBack){
 		callBack();
 	}
 
-
-	setInterval(()=>{
-		if(isAttacked)
-			bar.life--;
-		isAttacked = false;
-		for(let i = 0; i < 3; i++){
-			breathX[i] = Math.floor(Math.random() * (maxWidth - breathSize[0] - (breathPadding * 2)));
-		}
-	}, 5000);
-
 	$("#stage5 .back").on("click", () => {
 		clearInterval(gameInterval);
 		setTimeout(gameEnd, 100);
 	});
 
-	const gameInterval = setInterval(() => draw(gameInterval, gameEnd), 30);
+	const gameInterval = setInterval(() => draw(gameInterval, gameEnd));
 	
 }
