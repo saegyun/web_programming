@@ -273,22 +273,22 @@ const Stage3 = {
 			let drawX = this.x;
 			
 			// 죽은 하트 그리기
-			for(let i = 0; i < this.totalHearts; i++, drawX += this.width + 10) {
+			for (let i = 0; i < this.totalHearts; i++, drawX += this.width + 10) {
 				context.drawImage(Heart.heartBackgroundImg, drawX, this.y, this.width, this.height);
 			}
 			
 			// 아직 살아있는 하트 그리기
 			drawX = this.x;
-			for(let i = 0; i < aliveHearts; i++, drawX += this.width + 10) {
+			for (let i = 0; i < aliveHearts; i++, drawX += this.width + 10) {
 				context.drawImage(Heart.heartImg, drawX, this.y, this.width, this.height);
 			}
 			
 			// 깜빡깜빡 그리기
 			drawX = this.x;
-			if(addBlink) {
+			if (addBlink) {
 				context.fillStyle = 'rgba(255, 56, 56, 0.4)';
 				context.fillRect(0, 0, maxWidth, maxHeight);
-				for(let i = 0; i < this.totalHearts; i++, drawX += this.width + 10) {
+				for (let i = 0; i < this.totalHearts; i++, drawX += this.width + 10) {
 					context.drawImage(Heart.heartBlinkImg, drawX, this.y, this.width, this.height);
 				}
 			}
@@ -306,8 +306,8 @@ const Stage3 = {
 		
 		// 초를 '분분:초초' 문자열로 바꿔서 반환하는 함수 (180초는 03:00)
 		function formatTime(secs) {
-		  var minutes = Math.floor(secs / 60);
-		  var seconds = secs % 60;
+		  let minutes = Math.floor(secs / 60);
+		  let seconds = secs % 60;
 		  return (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
 		}
 		
@@ -421,7 +421,7 @@ const Stage3 = {
 			"line-height": "80px",
 		});
 		volumeDiv.on("click", function() {
-			if(volumeOn) {
+			if (volumeOn) {
 				volumeOn = false;
 				mainMusic.volume = 0.0;
 				volumeDiv.find("img").attr("src", "resource/sprite/volume_off.png");
@@ -444,11 +444,11 @@ const Stage3 = {
 		let mobSpawnWeights = [];
 		let mobIndex = 0;
 		[MobZombie, MobSpider, MobCreeper, MobVindicator].forEach((mob) => {
-			if(mob === MobVindicator && !doSpawnIllager) {
+			if (mob === MobVindicator && !doSpawnIllager) {
 				// 우민이 생성되지 않을 것이면 비중에 추가할 필요가 없음
 			}
 			else {
-				for(var i = 0; i < mob.spawnWeight; i++)
+				for (let i = 0; i < mob.spawnWeight; i++)
 					mobSpawnWeights.push(mobIndex);
 				mobIndex += 1;
 			}
@@ -456,11 +456,11 @@ const Stage3 = {
 		// 몹을 생성하는 함수
 		function spawnMob() {
 			// 현재 화면에 존재하는 몹 개수가 최대 개수보다 많으면 리턴
-			if(activeMobs.length >= maxSpawns)
+			if (activeMobs.length >= maxSpawns)
 				return;
 			
 			let randomInt = Math.floor(Math.random() * 100);
-			if(randomInt <= mobSpawnChance) // 몹이 몹 생성 확률 안에 있으면 실제로 생성
+			if (randomInt <= mobSpawnChance) // 몹이 몹 생성 확률 안에 있으면 실제로 생성
 			{
 				// 몹이 생성되는 x 좌표
 				const randomSpawnX = Math.floor(Math.random() * (spawnLineWidthMax - spawnLineWidthMin + 1)) + spawnLineWidthMin;
@@ -519,7 +519,7 @@ const Stage3 = {
 						);
 						break;
 				}
-				if(newMob != undefined)
+				if (newMob != undefined)
 				{
 					newMob.sayIdle(); // 소리 내기
 					activeMobs.push(newMob); // 화면에 존재하는 몹 배열에 추가
@@ -546,7 +546,7 @@ const Stage3 = {
 			// 배경음악 루프
 			mainMusic.play();
 			
-			if(gameEnded) // 게임 승패가 났으면 배경음악 멈추기
+			if (gameEnded) // 게임 승패가 났으면 배경음악 멈추기
 				mainMusic.pause();
 		}
 		
@@ -629,12 +629,12 @@ const Stage3 = {
 		
 		// 승리(주어진 시간 끝까지 버팀)한지 또는 패배(마을이 체력을 모두 잃어서 파괴됬는지) 검사
 		function checkWinLose() {
-			if(remainingTime <= 0) {
+			if (remainingTime <= 0) {
 				gameEnded = true;
 
 				return 1;
 			}
-			if(villageHealth <= 0) {
+			if (villageHealth <= 0) {
 				villageHealth = 0;
 				
 				gameEnded = true;
@@ -644,7 +644,7 @@ const Stage3 = {
 		
 		// 실제 게임 진행 루프가 이루어지는 함수
 		function loop() {
-			if(!self.gameOn) { // 스테이지를 중간에 나갔을 때 수행
+			if (!self.gameOn) { // 스테이지를 중간에 나갔을 때 수행
 				clearInterval(spawnInterval);
 				clearInterval(timeCountdown);
 				mainMusic.pause();
@@ -652,7 +652,7 @@ const Stage3 = {
 				return;
 			}
 			
-			if(!gameEnded)
+			if (!gameEnded)
 				requestAnimationFrame(loop);
 			else { // 게임이 끝났을 때 (승패가 갈림)
 				clearInterval(spawnInterval);
@@ -662,11 +662,11 @@ const Stage3 = {
 			context.clearRect(0, 0, maxWidth, maxHeight);
 			
 			// 몹이 아래쪽으로 움직임
-			for(var i in activeMobs) {
+			for (let i in activeMobs) {
 				let mob = activeMobs[i];
 				mob.y += mob.speed;
 				// 몹이 마을에 도달했을 때 (아래 끝까지)
-				if(mob.y > deathLine - 60) {
+				if (mob.y > deathLine - 60) {
 					let villageHitAudio = villageHitAudios[Math.floor(Math.random() * villageHitAudios.length)];
 					mob.sayAttack();
 					villageHitAudio.play();
@@ -699,19 +699,19 @@ const Stage3 = {
 			
 			// 패들과 충돌
 			let collideWithBar = checkCollision(ball, bar, ballRad);
-			if(collideWithBar != 999) { // 충돌했다면 999가 아닌 수를 반환
+			if (collideWithBar != 999) { // 충돌했다면 999가 아닌 수를 반환
 				bar.collideSound();
 				ballRad = collideWithBar;
 			}
 			
 			// 몹과 충돌
-			for(var i in activeMobs) {
+			for (let i in activeMobs) {
 				let mob = activeMobs[i];
 				let collideWithMob = checkCollision(ball, mob, ballRad);
 				
-				if(collideWithMob != 999) { // 충돌했다면 999가 아닌 수를 반환
+				if (collideWithMob != 999) { // 충돌했다면 999가 아닌 수를 반환
 					ballRad = collideWithMob;
-					if(mob.hit(ball.damage)) { // 공에 맞은 몹이 죽은 경우, 경험치 라벨을 표시하고 죽은 몹을 화면에 있는 몹 배열에서 지우기
+					if (mob.hit(ball.damage)) { // 공에 맞은 몹이 죽은 경우, 경험치 라벨을 표시하고 죽은 몹을 화면에 있는 몹 배열에서 지우기
 						let expLabel = new ExperienceLabel(mob.x, mob.y, mob.exp);
 						expLabel.ding();
 						expLabels.push(expLabel);
@@ -728,7 +728,7 @@ const Stage3 = {
 			ball.y = ball.y + Math.sin(ballRad) * ball.speed;
 			
 			// 공이 아래로 내려가서 마을을 때렸을 때 중앙으로 텔레포트
-			if(ball.y > deathLine) {
+			if (ball.y > deathLine) {
 				// 공 라디안 재설정
 				ballRad = Math.PI * (Math.random() * (-45 + 135) - 135) / 180;
 				ball.x = maxWidth * 0.5;
@@ -750,7 +750,7 @@ const Stage3 = {
 			);
 			
 			// 마을 불 배경
-			if(villageHealth < villageHealthMax) {
+			if (villageHealth < villageHealthMax) {
 				let percent = (villageHealth / villageHealthMax) * 100;
 				let fireIndex = 4 - Math.floor(percent / 25);
 				fireBackground.src = "resource/background/stage3_background_fire_" + fireIndex + ".png";
@@ -764,14 +764,14 @@ const Stage3 = {
 			bar.draw(context);
 			
 			// 경험치 라벨 그리기
-			for(var i in expLabels) {
+			for (let i in expLabels) {
 				let expLabel = expLabels[i];
-				if(expLabel.draw(context)) // 경험치 라벨의 시간이 끝났으면 더 이상 그 라벨은 그리지 않기
+				if (expLabel.draw(context)) // 경험치 라벨의 시간이 끝났으면 더 이상 그 라벨은 그리지 않기
 					expLabels.splice(i, 1);
 			}
 			
 			// 몹 그리기
-			for(var i in activeMobs) {
+			for (let i in activeMobs) {
 				let mob = activeMobs[i];
 				mob.draw(context);
 			}

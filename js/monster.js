@@ -25,7 +25,7 @@ Mob.prototype.draw = function(context, idleSprite, hurtSprite) {
 	let sprite;
 	switch(this.status) { // 몹의 상태에 따라 다른 sprite 적용
 		case "hurt":
-			if(this.hitTimer > 0) { // 빨간색 오버레이(hurtSprite) 유지 시간
+			if (this.hitTimer > 0) { // 빨간색 오버레이(hurtSprite) 유지 시간
 				this.hitTimer -= 1;
 				sprite = hurtSprite;
 			}
@@ -50,7 +50,7 @@ Mob.prototype.draw = function(context, idleSprite, hurtSprite) {
 		this.width, // Destination width
 		this.height // Destination height
 	);
-	if(this.animationTime >= 10) { // sprite animation이 너무 빠르게 진행되지 않도록 함
+	if (this.animationTime >= 10) { // sprite animation이 너무 빠르게 진행되지 않도록 함
 		this.animationTime = 0;
 		this.currentFrame = (this.currentFrame + 1) % this.maxFrame;
 	}
@@ -78,7 +78,7 @@ Mob.prototype.say = function(idleAudios) {
 Mob.prototype.hit = function(damage, hurtAudios, deathAudios) {
 	this.health -= damage;
 	
-	if(this.health <= 0) // 몹이 체력을 다 잃고 죽었을 때 - true반환
+	if (this.health <= 0) // 몹이 체력을 다 잃고 죽었을 때 - true반환
 	{
 		this.status = "death"; // 몹 상태를 "death"로 변경
 		let deathAudio = deathAudios[Math.floor(Math.random() * deathAudios.length)];
@@ -114,7 +114,7 @@ class ExperienceLabel {
 ExperienceLabel.prototype.ding = function() {ExperienceLabel.expAudio.play() }
 // 경험치 라벨 그리기
 ExperienceLabel.prototype.draw = function(context) {
-	if(this.expTimer > 0)
+	if (this.expTimer > 0)
 	{
 		context.font = ExperienceLabel.font;
 		context.fillStyle = ExperienceLabel.textColor;

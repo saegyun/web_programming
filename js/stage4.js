@@ -283,7 +283,7 @@ const Stage4 = {
 			"line-height": "80px",
 		});
 		volumeDiv.on("click", function() {
-			if(volumeOn) {
+			if (volumeOn) {
 				volumeOn = false;
 				Stage4.mainMusic.volume = 0.0;
 				volumeDiv.find("img").attr("src", "resource/sprite/volume_off.png");

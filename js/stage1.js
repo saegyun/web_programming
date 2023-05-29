@@ -109,7 +109,7 @@ const Stage1 = {
 			let sprite;
 			switch(this.status) {
 				case "hit":
-					if(this.animationTime >= 0) {
+					if (this.animationTime >= 0) {
 						this.animationTime -= 1;
 						sprite = Bar.barHitImage;
 					} else {
@@ -118,7 +118,7 @@ const Stage1 = {
 					}
 					break;
 				case "eat":
-					if(this.animationTime >= 0) {
+					if (this.animationTime >= 0) {
 						this.animationTime -= 1;
 						sprite = Bar.barEatImage;
 					} else {
@@ -180,7 +180,7 @@ const Stage1 = {
 			);
 			// 블럭 위에 Break Sprite 그리기
 			
-			if(this.health < this.maxHealth) {
+			if (this.health < this.maxHealth) {
 				let breakPercent = (this.health / this.maxHealth) * 100;
 				let spriteNum = 9 - Math.floor(breakPercent / 10);
 				
@@ -201,7 +201,7 @@ const Stage1 = {
 		Block.prototype.hit = function(damage, hitAudios, deathAudios) {
 			this.health -= damage;
 			
-			if(this.health <= 0) {
+			if (this.health <= 0) {
 				let deathAudio = deathAudios[Math.floor(Math.random() * deathAudios.length)];
 				deathAudio.play();
 				
@@ -228,7 +228,7 @@ const Stage1 = {
 			static deathAudios = [new Audio("resource/sound/village_break.ogg")];
 			
 			draw(context) { // 캔버스에 그리기, Block 클래스의 draw() 호출
-				if(this.side) // 옆 또는 위쪽 나무 모양인지에 따라 달라짐
+				if (this.side) // 옆 또는 위쪽 나무 모양인지에 따라 달라짐
 					super.draw(context, BlockLog.blockSpriteSide);
 				else
 					super.draw(context, BlockLog.blockSprite);
@@ -284,7 +284,7 @@ const Stage1 = {
 			let sprite;
 			switch(this.status) { // 몹의 상태에 따라 다른 sprite 적용
 				case "hurt":
-					if(this.hitTimer > 0) { // 빨간색 오버레이(hurtSprite) 유지 시간
+					if (this.hitTimer > 0) { // 빨간색 오버레이(hurtSprite) 유지 시간
 						this.hitTimer -= 1;
 						sprite = hurtSprite;
 					}
@@ -298,7 +298,7 @@ const Stage1 = {
 			}
 			//context.fillRect(this.x, this.y, this.width, this.height); // Hitbox 체크를 위한 디버그 함수
 			let sourceY = 0; // 동물이 오른쪽 방향이면 0(위쪽 sprite), 왼쪽 방향이면 1(아래쪽 sprite)
-			if(this.speed < 0)
+			if (this.speed < 0)
 				sourceY = this.frameHeight;
 				
 			// 캔버스에 몹 sprite 그리기
@@ -313,7 +313,7 @@ const Stage1 = {
 				this.width, // Destination width
 				this.height // Destination height
 			);
-			if(this.animationTime >= 10) { // sprite animation이 너무 빠르게 진행되지 않도록 함
+			if (this.animationTime >= 10) { // sprite animation이 너무 빠르게 진행되지 않도록 함
 				this.animationTime = 0;
 				this.currentFrame = (this.currentFrame + 1) % this.maxFrame;
 			}
@@ -340,7 +340,7 @@ const Stage1 = {
 		Animal.prototype.hit = function(damage, hurtAudios, deathAudios) {
 			this.health -= damage;
 			
-			if(this.health <= 0) // 동물이 체력을 다 잃고 죽었을 때 - true반환
+			if (this.health <= 0) // 동물이 체력을 다 잃고 죽었을 때 - true반환
 			{
 				this.status = "death"; // 상태를 "death"로 변경
 				let deathAudio = deathAudios[Math.floor(Math.random() * deathAudios.length)];
@@ -524,20 +524,20 @@ const Stage1 = {
 			let drawX = this.x;
 			
 			// 죽은 허기 그리기
-			for(let i = 0; i < this.totalHungerIcons; i++, drawX += this.width + 10) {
+			for (let i = 0; i < this.totalHungerIcons; i++, drawX += this.width + 10) {
 				context.drawImage(Hunger.hungerBackgroundImg, drawX, this.y, this.width, this.height);
 			}
 			
 			// 아직 살아있는 허기 그리기
 			drawX = this.x;
-			for(let i = 0; i < aliveHungers; i++, drawX += this.width + 10) {
+			for (let i = 0; i < aliveHungers; i++, drawX += this.width + 10) {
 				context.drawImage(Hunger.hungerImg, drawX, this.y, this.width, this.height);
 			}
 			
 			// 깜빡깜빡 그리기
 			drawX = this.x;
-			if(addBlink) {
-				for(let i = 0; i < this.totalHungerIcons; i++, drawX += this.width + 10) {
+			if (addBlink) {
+				for (let i = 0; i < this.totalHungerIcons; i++, drawX += this.width + 10) {
 					context.drawImage(Hunger.hungerBlinkImg, drawX, this.y, this.width, this.height);
 				}
 			}
@@ -552,8 +552,8 @@ const Stage1 = {
 		
 		// 초를 '분분:초초' 문자열로 바꿔서 반환하는 함수 (180초는 03:00)
 		function formatTime(secs) {
-		  var minutes = Math.floor(secs / 60);
-		  var seconds = secs % 60;
+		  let minutes = Math.floor(secs / 60);
+		  let seconds = secs % 60;
 		  return (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
 		}
 		
@@ -639,7 +639,7 @@ const Stage1 = {
 			"line-height": "80px",
 		});
 		volumeDiv.on("click", function() {
-			if(volumeOn) {
+			if (volumeOn) {
 				volumeOn = false;
 				mainMusic.volume = 0.0;
 				volumeDiv.find("img").attr("src", "resource/sprite/volume_off.png");
@@ -664,9 +664,9 @@ const Stage1 = {
 		// 블럭을 배열에 추가
 		let tempX = 0;
 		let tempY = 0;
-		for(var i = 0; i < map.length; i++) {
+		for (let i = 0; i < map.length; i++) {
 			tempX = 0;
-			for(var j = 0; j < map[i].length; j++) {
+			for (let j = 0; j < map[i].length; j++) {
 				switch(map[i][j]) {
 					case "w":
 						activeBlocks.push(new BlockLog(tempX, tempY, 11, 2, 80, 80, false));
@@ -690,7 +690,7 @@ const Stage1 = {
 		let animalSpawnWeights = [];
 		let animalIndex = 0;
 		[AnimalPig, AnimalCow].forEach((animal) => {
-			for(var i = 0; i < animal.spawnWeight; i++)
+			for (let i = 0; i < animal.spawnWeight; i++)
 				animalSpawnWeights.push(animalIndex);
 			animalIndex += 1;
 		});
@@ -698,11 +698,11 @@ const Stage1 = {
 		// 동물을 생성하는 함수
 		function spawnAnimal() {
 			// 현재 화면에 존재하는 동물 개수가 최대 개수보다 많으면 리턴
-			if(activeAnimals.length >= maxSpawns)
+			if (activeAnimals.length >= maxSpawns)
 				return;
 			
 			let randomInt = Math.floor(Math.random() * 100);
-			if(randomInt <= animalSpawnChance) // 동물이 동물 생성 확률 안에 있으면 실제로 생성
+			if (randomInt <= animalSpawnChance) // 동물이 동물 생성 확률 안에 있으면 실제로 생성
 			{
 				// 동물이 생성되는 x 좌표
 				const randomSpawnX = Math.floor(Math.random() * (spawnLineWidthMax - spawnLineWidthMin + 1)) + spawnLineWidthMin;
@@ -737,7 +737,7 @@ const Stage1 = {
 						);
 						break;
 				}
-				if(newAnimal != undefined)
+				if (newAnimal != undefined)
 				{
 					newAnimal.sayIdle(); // 소리 내기
 					activeAnimals.push(newAnimal); // 화면에 존재하는 동물 배열에 추가
@@ -756,7 +756,7 @@ const Stage1 = {
 			// 배경음악 루프
 			mainMusic.play();
 			
-			if(gameEnded) // 게임 승패가 났으면 배경음악 멈추기
+			if (gameEnded) // 게임 승패가 났으면 배경음악 멈추기
 				mainMusic.pause();
 		}
 		
@@ -836,11 +836,11 @@ const Stage1 = {
 		
 		// 승리(나무를 모두 캠)한지 또는 패배(허기가 0) 검사
 		function checkWinLose() {
-			if(remainingWoods <= 0) {
+			if (remainingWoods <= 0) {
 				gameEnded = true;
 				return 1;
 			}
-			if(currentHunger <= 0) {
+			if (currentHunger <= 0) {
 				currentHunger = 0;
 				
 				gameEnded = true;
@@ -850,7 +850,7 @@ const Stage1 = {
 		
 		// 실제 게임 진행 루프가 이루어지는 함수
 		function loop() {
-			if(!self.gameOn) { // 스테이지를 중간에 나갔을 때 수행
+			if (!self.gameOn) { // 스테이지를 중간에 나갔을 때 수행
 				clearInterval(spawnInterval);
 				clearInterval(timeCountdown);
 				mainMusic.pause();
@@ -858,7 +858,7 @@ const Stage1 = {
 				return;
 			}
 			
-			if(!gameEnded)
+			if (!gameEnded)
 				requestAnimationFrame(loop);
 			else { // 게임이 끝났을 때 (승패가 갈림)
 				clearInterval(spawnInterval);
@@ -868,22 +868,22 @@ const Stage1 = {
 			context.clearRect(0, 0, maxWidth, maxHeight);
 			
 			// 동물이 왼쪽, 오른쪽 움직임
-			for(var i in activeAnimals) {
+			for (let i in activeAnimals) {
 				let animal = activeAnimals[i];
 				animal.x += animal.speed;
 				
-				if(animal.x + animal.width >= maxWidth || animal.x <= 0) {
+				if (animal.x + animal.width >= maxWidth || animal.x <= 0) {
 					animal.sayIdle();
 					animal.speed *= -1;
 				}
 			}
 			
 			// 음식이 아래로 떨어짐
-			for(var i in activeFoods) {
+			for (let i in activeFoods) {
 				let food = activeFoods[i];
 				food.y += 0.68; // food.y + speed
 				// 음식이 먹히지 않고 땅으로 떨어짐
-				if(food.y + food.height >= maxHeight) {
+				if (food.y + food.height >= maxHeight) {
 					popAudio.play();
 					activeFoods.splice(i, 1);
 				}
@@ -911,24 +911,24 @@ const Stage1 = {
 			
 			// 패들과 충돌
 			let collideWithBar = checkCollision(ball, bar, ballRad);
-			if(collideWithBar != 999) { // 충돌했다면 999가 아닌 수를 반환
+			if (collideWithBar != 999) { // 충돌했다면 999가 아닌 수를 반환
 				bar.collideSound();
 				ballRad = collideWithBar;
 			}
 			
 			// 블럭과 충돌
-			for(var i in activeBlocks) {
+			for (let i in activeBlocks) {
 				let block = activeBlocks[i];
 				let collideWithBlock = checkCollision(ball, block, ballRad);
 				
-				if(collideWithBlock != 999) { // 충돌했다면 999가 아닌 수를 반환
+				if (collideWithBlock != 999) { // 충돌했다면 999가 아닌 수를 반환
 					ballRad = collideWithBlock;
 					
 					currentHunger = Math.max(currentHunger - block.hungerDamage, 0);
 					hunger.modify(currentHunger);
 					
-					if(block.hit(ball.damage)) { // 공에 맞은 블럭이 부숴진 경우, 음식 드롭
-						if(block.drop != "") {
+					if (block.hit(ball.damage)) { // 공에 맞은 블럭이 부숴진 경우, 음식 드롭
+						if (block.drop != "") {
 							let newFood;
 							switch(block.drop) {
 								case "apple":
@@ -938,7 +938,7 @@ const Stage1 = {
 							popAudio.play();
 							activeFoods.push(newFood);
 						}
-						if(block instanceof BlockLog) {
+						if (block instanceof BlockLog) {
 							remainingWoods -= 1;
 							remainingWoodDiv.text("Wood Remaining: " + remainingWoods);
 							
@@ -949,17 +949,17 @@ const Stage1 = {
 			}
 			
 			// 동물과 충돌
-			for(var i in activeAnimals) {
+			for (let i in activeAnimals) {
 				let animal = activeAnimals[i];
 				let collideWithAnimal = checkCollision(ball, animal, ballRad);
 				
-				if(collideWithAnimal != 999) { // 충돌했다면 999가 아닌 수를 반환
+				if (collideWithAnimal != 999) { // 충돌했다면 999가 아닌 수를 반환
 					ballRad = collideWithAnimal;
 					
 					currentHunger = Math.max(currentHunger - animal.hungerDamage, 0);
 					hunger.modify(currentHunger);
 					
-					if(animal.hit(ball.damage)) { // 공에 맞은 동물이 죽은 경우, 음식 드롭
+					if (animal.hit(ball.damage)) { // 공에 맞은 동물이 죽은 경우, 음식 드롭
 						let newFood;
 						switch(animal.drop) {
 							case "porkchop":
@@ -978,11 +978,11 @@ const Stage1 = {
 			}
 			
 			// 패들과 음식이 충돌
-			for(var i in activeFoods) {
+			for (let i in activeFoods) {
 				let food = activeFoods[i];
 				let collideWithFood = checkRectCollision(bar, food);
 				
-				if(collideWithFood) { // 충돌했다면 true
+				if (collideWithFood) { // 충돌했다면 true
 					currentHunger = Math.min(currentHunger + food.saturation, maxHunger);
 					hunger.modify(currentHunger);
 					food.eat();
@@ -997,7 +997,7 @@ const Stage1 = {
 			ball.y = ball.y + Math.sin(ballRad) * ball.speed;
 			
 			// 공이 아래로 내려갔을 때 중앙으로 텔레포트
-			if(ball.y > deathLine) {
+			if (ball.y > deathLine) {
 				// 공 라디안 재설정
 				ballRad = Math.PI * (Math.random() * (-45 + 135) - 135) / 180;
 				ball.x = maxWidth * 0.5;
@@ -1025,19 +1025,19 @@ const Stage1 = {
 			bar.draw(context);
 			
 			// 블럭 그리기
-			for(var i in activeBlocks) {
+			for (let i in activeBlocks) {
 				let block = activeBlocks[i];
 				block.draw(context);
 			}
 			
 			// 동물 그리기
-			for(var i in activeAnimals) {
+			for (let i in activeAnimals) {
 				let animal = activeAnimals[i];
 				animal.draw(context);
 			}
 			
 			// 음식 그리기
-			for(var i in activeFoods) {
+			for (let i in activeFoods) {
 				let food = activeFoods[i];
 				food.draw(context);
 			}
@@ -1049,7 +1049,7 @@ const Stage1 = {
 			hunger.draw(context);
 			
 			// 패배했을 때 처리
-			if(gameEnded && winLoseResult < 0)
+			if (gameEnded && winLoseResult < 0)
 			{
 				steveDeathAudio.play();
 				
@@ -1076,7 +1076,7 @@ const Stage1 = {
 				
 			}
 			// 승리했을 때 처리
-			else if(gameEnded && winLoseResult > 0)
+			else if (gameEnded && winLoseResult > 0)
 			{
 				mainMusic.pause(); // 배경음악 멈추기
 				victoryMusic.play();
