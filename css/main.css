@@ -97,7 +97,7 @@ img {
 	left: 100px;
 }
 #myCanvas {
-	background-color: var(--canvas-bg-color);
+	/* background-color: var(--canvas-bg-color); */
 }
 
 #intro {

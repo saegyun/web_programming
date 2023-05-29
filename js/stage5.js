@@ -1,4 +1,6 @@
 $(document).ready(function() {
+	let video;
+
 	const reCalc = () => {
 		mousePadding = ($(window).width() - $("#myCanvas").width()) / 2;
 	};
@@ -11,26 +13,32 @@ $(document).ready(function() {
 	$(".level-btn").on("click", function() {
 		if (currentStage === "stage 5") {
 			moveNext(4);
-			$(window).on("mousemove", event => {
-				mousePos = [
-					event.pageX,
-					event.pageY
-				];
-			});
-
-			let video = document.createElement("VIDEO");
+			
+			video = document.createElement("VIDEO");
+			video.id = "stage5-vid";
 			video.src = "img/Stage5.mp4";
 			document.getElementById('stage5').appendChild(video);
 			video.play();
+			setTimeout(() => {
+				video.remove();
+
+				$(window).on("mousemove", event => {
+					mousePos = [
+						event.pageX,
+						event.pageY
+					];
+				});
 	
-			stage5_startGame($(this).val(), () => {
-				$(window).off("mousemove");
-			});
+		
+				stage5_startGame($(this).val(), () => {
+					$(window).off("mousemove");
+				});
+			}, 9000)
 		}
 	});
 
 	$("#stage5 .back").on("click", () => {
-		console.log("back button for stage5 pressed");
+		video.remove();
 	});
 });
 
@@ -195,6 +203,7 @@ function stage5_startGame(currentLevel, callBack){
 	//fire ball skill
 	let fbintervalList = [];
 	let fbinterval;
+
 	function fireball() {
 		let img = new Image();
     	img.src ="img/fire_3.gif";
@@ -356,7 +365,7 @@ function stage5_startGame(currentLevel, callBack){
     }
 
     //bar의 체력이 닳으면 현재 체력 update
-	function drawBarLife(){
+	function drawBarLife() {
 		let NowHeartNum = bar.life;
 		for(let i = NowHeartNum; i < barLife; i++)
 			barHeartImg[i].src ="img/heart_none.png";

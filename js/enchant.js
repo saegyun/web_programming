@@ -2,7 +2,7 @@ $(document).ready(() => {
 	const enchants = [
 		{
 			value: 4,
-			sharpness: 1,
+			sharpness: 0,
 			text: "꽝",
 		},
 		{
@@ -23,7 +23,7 @@ $(document).ready(() => {
 		{
 			value: 2,
 			sharpness: 4,
-			text: "날카로움 IIII",
+			text: "날카로움 IV",
 		},
 		{
 			value: 1,
@@ -45,6 +45,9 @@ $(document).ready(() => {
 		let max = 1;
 		
 		switch(PlayStatus.stage2.result) {
+			case "wood":
+				max = 1;
+				break;
 			case "stone":
 				max = 2;
 				break;

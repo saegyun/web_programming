@@ -3,3 +3,9 @@
 	bottom: 0;
 	left: calc(var(--main-width) - 50px);
 }
+#stage5-vid {
+	margin: 0 auto;
+
+	width: var(--main-width);
+	height: var(--main-height);
+}
