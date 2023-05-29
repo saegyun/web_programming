@@ -36,7 +36,6 @@ $(document).ready(function() {
 				"background-image":"url(img/stage5_background.jpg)",
 				"background-position":"center"
 			});
-
 		$(window).on("mousemove", event => {
 			mousePos = [
 				event.pageX,
@@ -69,15 +68,6 @@ function stage5_startGame(callBack){
 
 	const gifLength = 100;
 
-	const ender_dragon_gif = [];
-	for (let i = 0; i <= gifLength; i++) {
-    	ender_dragon_gif[i] = 'img/ender_dragon/'+i+'.png';
-	}
-	const end_crystal_gif = [];
-	for (let i = 0; i <= gifLength; i++) {
-    	end_crystal_gif[i] = 'img/end_crystal/'+i+'.png';
-	}
-
 	
 	const skills = [];
 	const draws = [];
@@ -97,35 +87,32 @@ function stage5_startGame(callBack){
 
 	let boss = {
 		id: bossId,
-		type: "gif",
+		type: "img",
 		from: [maxWidth / 2 - bossWidth / 2, 30],
 		size: [bossWidth, bossHeight],
 		life: 10,
-		url: ender_dragon_gif,
-		gifNum : 0
+		src: "img/ender_dragon_1.gif"
 	};
 
 	monsters.push(boss);
 
 	let crystal_1 = {
 		id: crystalId,
-		type: "gif",
+		type: "img",
 		from: [100, deathLine - 500],
 		size: [crystalWidth, crystalHeight],
 		life: 3,
-		url: end_crystal_gif,
-		gifNum : 0
+		src: "img/end_crystal.gif"
 	};
 	monsters.push(crystal_1);
 
 	let crystal_2 = {
 		id: crystalId,
-		type: "gif",
+		type: "img",
 		from: [maxWidth-crystalWidth-100, deathLine - 500],
 		size: [crystalWidth, crystalHeight],
 		life: 3,
-		url: end_crystal_gif,
-		gifNum : 0
+		src: "img/end_crystal.gif"
 	};
 	monsters.push(crystal_2);
 
@@ -227,6 +214,25 @@ function stage5_startGame(callBack){
 	skills.push(fireballItv);
 	skills.push(bossUpItv);
 	//skills.push(breathInterval);
+
+	function drawImg(object){
+		const monsterImg = document.createElement('img');
+		monsterImg.src = object.src;
+		let styles = {
+			"position" : "absolute",
+			"width" : object.size[0]+"px",
+			"height" : object.size[1]+"px",
+			"top" : object.from[1]+"px",
+			"left" : object.from[0]+"px",
+			"z-index" : "2"
+		};
+		Object.assign(monsterImg.style, styles); 
+		document.getElementById('stage5').appendChild(monsterImg);
+	}
+
+	for (let i = 0; i < monsters.length; i++){
+		drawImg(monsters[i]);
+	}
 
 	const draw = (interval, callBack) =>{
 		context.clearRect(0, 0, maxWidth, maxHeight);
@@ -337,18 +343,6 @@ function stage5_startGame(callBack){
 					context.fillStyle = object.color || "black";
 					context.fillRect(object.from[0], object.from[1], object.size[0], object.size[1]);
 					break;
-				
-				case "gif":
-					if(object.life > 0){
-						let imgIndex = (object.gifNum++) % gifLength;
-						let img = new Image();
-						img.src = object.url[imgIndex];
-						img.onload = function(){
-							context.drawImage(img, object.from[0], object.from[1], object.size[0], object.size[1]);
-						}
-					}
-					break;
-
 				default:
 					break;
 			}
@@ -371,8 +365,10 @@ function stage5_startGame(callBack){
 					ballRad = Math.PI - ballRad;  
 					isBounced = true;
 				}
-				if(isBounced)
+				if(isBounced){
 					object.life--;
+					//drawImg();
+				}
 			}
 		}
 
@@ -433,14 +429,11 @@ function stage5_startGame(callBack){
 		}
 	}, 5000);
 
-
-
 	$("#stage5 .back").on("click", () => {
 		clearInterval(gameInterval);
 		setTimeout(gameEnd, 100);
-		
 	});
 
-	const gameInterval = setInterval(() => draw(gameInterval, gameEnd));
+	const gameInterval = setInterval(() => draw(gameInterval, gameEnd), 30);
 	
 }
