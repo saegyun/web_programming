@@ -272,20 +272,21 @@ function stage5_startGame(callBack){
 
 
 	//생명 출력
-	let barHeartImg = [];
     let heartSize = 20;
     let heartStyles = {
     	"position" : "absolute",
     	"width" : heartSize+"px",
     	"height" : heartSize+"px",
-    	"top" : (maxHeight-30)+"px",
     	"z-index" : "2"
     };
 
+    let barHeartImg = [];
 	for(let i = 0; i < barLife; i++){
 		barHeartImg[i] = document.createElement('img');
 		barHeartImg[i].src ="img/heart.png";
+		barHeartImg[i].style.top = (maxHeight-30)+"px";
 		barHeartImg[i].style.left = (maxWidth/2 - barLife*heartSize/2 + i*30)+ "px";
+
     	Object.assign(barHeartImg[i].style, heartStyles); 
     	document.getElementById('stage5').appendChild(barHeartImg[i]);
     }
@@ -298,48 +299,24 @@ function stage5_startGame(callBack){
 	}
 
 
+	let bossHeartImg = [];
+	for(let i = 0; i < bossLife; i++){
+		bossHeartImg[i] = document.createElement('img');
+		bossHeartImg[i].src ="img/heart.png";
+		bossHeartImg[i].style.top = "20px";
+		bossHeartImg[i].style.left = (maxWidth/2 - bossLife*heartSize/2 + i*30)+ "px";
 
-    /*
-    let obj = $('#BossHeart');
-	for(let i = 0; i < obj.length; i++)
-		obj[i].remove();
-
-	heartImg.setAttribute('id', "BossHeart");
-
-	let NowHeartNum = object.life;
-	let heartNum = barLife;
-
-	for(let i = 0; i < NowHeartNum; i++){
-		let styles = {
-			"position" : "absolute",
-			"width" : heartSize+"px",
-			"height" : heartSize+"px",
-			"top" : "20px",
-			"left" : "120px",
-			"z-index" : "2"
-		};
-		Object.assign(heartImg.style, styles); 
-		document.getElementById('stage5').appendChild(heartImg);
-	}
-	heartImg.src = "img/heart_none.png";
-	for(let i = NowHeartNum; i < heartNum; i++){
-		let styles = {
-			"position" : "absolute",
-			"width" : heartSize+"px",
-			"height" : heartSize+"px",
-			"top" : "20px",
-			"left" : "120px",
-			"z-index" : "2"
-		};
-		Object.assign(heartImg.style, styles); 
-		document.getElementById('stage5').appendChild(heartImg);
+    	Object.assign(bossHeartImg[i].style, heartStyles); 
+    	document.getElementById('stage5').appendChild(bossHeartImg[i]);
     }
-    */
 
+    //boss의 체력이 닳으면 현재 체력 update
+	function drawBossLife(){
+		let NowHeartNum = boss.life;
+		for(let i = NowHeartNum; i < bossLife; i++)
+			bossHeartImg[i].src ="img/heart_none.png";
+	}
 
-	
-	
-	
 
 	const draw = (interval, callBack) =>{
 		context.clearRect(0, 0, maxWidth, maxHeight);
@@ -443,10 +420,12 @@ function stage5_startGame(callBack){
 				}
 				if(isBounced){
 					object.life--;
+					if(object.id == bossId)
+						drawBossLife();
 				}
 			}
 			else{
-				if(document.getElementById(object.id)!=null)
+				if(document.getElementById(object.id))
 					document.getElementById(object.id).remove();
 			}
 		}
