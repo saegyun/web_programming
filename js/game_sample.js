@@ -158,7 +158,8 @@ function stage5_startGame(callBack){
 
 	//보스 체력회복 스킬
 	function bossUp(){
-		boss.life++;
+		if(boss.life < bossLife)
+			boss.life++;
 		if(crystal_1.life == 0 && crystal_2.life == 0)
 			clearInterval(bossUpItv);
 		else
@@ -189,9 +190,11 @@ function stage5_startGame(callBack){
     			fbintervalList.push(fbinterval);
 
     			if((fireLoc[0] >= bar.from[0] - fireSize/2 && fireLoc[0] <= bar.from[0] + barWidth + fireSize/2)
-    				&&(fireLoc[1] + fireSize >= bar.from[1] && fireLoc[1] + fireSize <= bar.from[1] + barHeight)){
+    				&&(fireLoc[1] + fireSize >= bar.from[1] && fireLoc[1] + fireSize <= bar.from[1] + barHeight))
+    			{
     				bar.life--;
-    			cancelAnimationFrame(fbinterval);
+    				drawBarLife();
+    				cancelAnimationFrame(fbinterval);
     			}
     		}
     	}
@@ -214,7 +217,7 @@ function stage5_startGame(callBack){
 
     for(let i = 0; i < 3; i++){
     	flameImg[i] = document.createElement('img');
-    	flameImg[i].src ="img/fire_5.png";
+    	flameImg[i].src ="img/fire_5.gif";
     	flameX[i] = Math.floor(Math.random() * (maxWidth - flameSize[0] - (flamePadding * 2)));
     	let styles = {
 			"position" : "absolute",
@@ -267,45 +270,37 @@ function stage5_startGame(callBack){
 		drawMonsterImg(monsters[i]);
 	}
 
-	/*
-	let heartImg = document.createElement('img');
-    heartImg.src ="img/heart.png";
+
+	//생명 출력
+	let barHeartImg = [];
     let heartSize = 20;
+    let heartStyles = {
+    	"position" : "absolute",
+    	"width" : heartSize+"px",
+    	"height" : heartSize+"px",
+    	"top" : (maxHeight-30)+"px",
+    	"z-index" : "2"
+    };
 
-    let Heartlist = $('#BarHeart');
-	for(let i = 0; i < Heartlist.length; i++){
-		Heartlist[i].remove();
-	}
-	heartImg.setAttribute('id', "BarHeart");
-    let NowHeartNum = object.life;
-    let heartNum = barLife;
-
-    for(let i = 0; i < NowHeartNum; i++){
-    	let styles = {
-    		"position" : "absolute",
-    		"width" : heartSize+"px",
-    		"height" : heartSize+"px",
-    		"top" : (maxHeight-30)+"px",
-    		"left" : (maxWidth/2 - NowHeartNum*heartSize/2 + i*30) + 100+"px",
-    		"z-index" : "2"
-    	};
-    	Object.assign(heartImg.style, styles); 
-    	document.getElementById('stage5').appendChild(heartImg);
+	for(let i = 0; i < barLife; i++){
+		barHeartImg[i] = document.createElement('img');
+		barHeartImg[i].src ="img/heart.png";
+		barHeartImg[i].style.left = (maxWidth/2 - barLife*heartSize/2 + i*30)+ "px";
+    	Object.assign(barHeartImg[i].style, heartStyles); 
+    	document.getElementById('stage5').appendChild(barHeartImg[i]);
     }
-    heartImg.src = "img/heart_none.png";
-    for(let i = NowHeartNum; i < heartNum; i++){
-    	let styles = {
-			"position" : "absolute",
-			"width" : heartSize + "px",
-			"height" : heartSize+"px",
-			"top" : (maxHeight-30)+"px",
-			"left" : (maxWidth/2 - NowHeartNum*heartSize/2 + i*30)+ 100 +"px",
-			"z-index" : "2"
-		};
-		Object.assign(heartImg.style, styles); 
-		document.getElementById('stage5').appendChild(heartImg);
+
+    //bar의 체력이 닳으면 현재 체력 update
+	function drawBarLife(){
+		let NowHeartNum = bar.life;
+		for(let i = NowHeartNum; i < barLife; i++)
+			barHeartImg[i].src ="img/heart_none.png";
 	}
-	let obj = $('#BossHeart');
+
+
+
+    /*
+    let obj = $('#BossHeart');
 	for(let i = 0; i < obj.length; i++)
 		obj[i].remove();
 
@@ -339,7 +334,11 @@ function stage5_startGame(callBack){
 		Object.assign(heartImg.style, styles); 
 		document.getElementById('stage5').appendChild(heartImg);
     }
-	*/
+    */
+
+
+	
+	
 	
 
 	const draw = (interval, callBack) =>{
@@ -393,6 +392,7 @@ function stage5_startGame(callBack){
 
 				if (object.loc[1] > deathLine) {
 					bar.life--;
+					drawBarLife();
 					if(bar.life == 0){
 						clearInterval(interval);
 						setTimeout(callBack, 100);
