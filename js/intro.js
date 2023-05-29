@@ -1,6 +1,6 @@
 $(document).ready(() => {
 	let interacted = false;
-    $("*").click(function () {
+    $("*").on("click", function () {
 		if ($(this)[0] === $("#intro > button")[0]) {
 			console.log("skip");
 			interacted = true;
@@ -28,13 +28,14 @@ $(document).ready(() => {
 		$introText.text(texts[page]);
 
 		const nextPg = (cb) => {
-			new Audio("resource/sound/experience.ogg").play();
 			if (page >= texts.length - 1) {
 				if (cb) {
 					cb();
 				}
 				moveNext(0);
+				return;
 			}
+			new Audio("resource/sound/experience.ogg").play();
 			if ($introText.is('.end')) return;
 
 			if (page === 5) {
@@ -56,7 +57,9 @@ $(document).ready(() => {
 		});
 
 		$introText.on('click', function() {
-			nextPg();
+			nextPg(() => {
+				clearInterval(id);
+			});
 		});
 	})
 });
