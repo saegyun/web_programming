@@ -1,6 +1,11 @@
 $(document).ready(() => {
 	let interacted = false;
-    $("*").click(() => {
+    $("*").click(function () {
+		if ($(this)[0] === $("#intro > button")[0]) {
+			console.log("skip");
+			interacted = true;
+			return;
+		}
 		if (interacted) {
 			return;
 		}
@@ -47,7 +52,7 @@ $(document).ready(() => {
 		}, 4000);
 
 		$("#intro > button").on("click", () => {
-				clearInterval(id);
+			clearInterval(id);
 		});
 
 		$introText.on('click', function() {
