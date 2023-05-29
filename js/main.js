@@ -8,7 +8,7 @@ const levels = {
 		brick_intenity: 1,
 		brick_count: 40,
 		bricks_in_row: 8,
-		ball_speed: 2.5,
+		ball_speed: 13,
 		plane_size: 4,
 	},
 	"normal": {
