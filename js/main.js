@@ -8,7 +8,7 @@ const levels = {
 		brick_intenity: 1,
 		brick_count: 40,
 		bricks_in_row: 8,
-		ball_speed: 1,
+		ball_speed: 2.5,
 		plane_size: 4,
 	},
 	"normal": {
@@ -135,12 +135,16 @@ function initPage() {
 		flow[state].value.hidden = true;
 		state = flow[state].next[idx];
 		flow[state].value.hidden = false;
+		$("#ui").css("background-image","none");
+		$("#screen").css("background-image","none");
 	};
 
 	const moveBack = () => {
 		flow[state].value.hidden = true;
 		state = flow[state].prev;
 		flow[state].value.hidden = false;
+		$("#ui").css("background-image","none");
+		$("#screen").css("background-image","none");
 	}
 
 	Object.entries(flow).forEach((page) => {
@@ -159,6 +163,8 @@ function initPage() {
 	for (let i = 0; i < flow["choice"].next.length; i++) {
 		$("#choice .next").eq(i).on("click", () => moveNext(i));
 	}
+
+	
 }
 
 $(document).ready(() => {	
