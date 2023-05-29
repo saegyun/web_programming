@@ -24,6 +24,7 @@ const Stage2 = {
 		$("#stage2-result > img").attr("src",`resource/pickaxe/${PlayStatus.stage2.result}_pickaxe.png`);
 		$("#stage2-result > p").text("Achieved!");
 		Stage2.gameEnd(context);
+		Stage2.failMusic.play();
 		moveNext(0);
 	},
 	successResult: (context) => {
@@ -35,6 +36,7 @@ const Stage2 = {
 		$("#stage2-result > img").attr("src",`resource/pickaxe/${PlayStatus.stage2.result}_pickaxe.png`);
 		$("#stage2-result > p").text("Achieved!");
 		Stage2.gameEnd(context);
+		Stage2.victoryMusic.play();
 		moveNext(0);
 	},
 	startGame: (currentLevel, callBack) => {
