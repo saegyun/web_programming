@@ -32,7 +32,7 @@ $(document).ready(function() {
 				stage5_startGame($(this).val(), () => {
 					$(window).off("mousemove");
 				});
-			} ,1000);
+			} ,16000);
 		}
 	});
 
