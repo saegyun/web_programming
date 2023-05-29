@@ -5,7 +5,7 @@
 	--ui-btn-bg-color: rgb(0, 0, 0);
 	--ui-back-btn-bg-color: rgb(146, 146, 146);
 
-	--main-width: 1000px;
+	--main-width: 800px;
 	--main-height: 800px;
 }
 * {
@@ -43,6 +43,7 @@ img {
 
 	width: var(--main-width);
 	height: var(--main-height);
+	left: 100px;
 }
 #ui button {
 	width: 150px;
@@ -64,7 +65,7 @@ img {
 }
 
 #title > #main-title {
-	margin: 100px;
+	margin: 100px 0px;
 	margin-bottom: 50px;
 	font-size: 60px;
 }
@@ -89,6 +90,9 @@ img {
 	position: absolute;
 	bottom: 0;
 	left: calc(var(--main-width) - 50px);
+}
+#stage5{
+	position: relative;
 }
 
 #screen {	
