@@ -23,7 +23,7 @@ const getPlayerDamage = () => {
 };
 
 let flow;
-let state = "choice";
+let state = "intro";
 
 const moveNext = (idx) => {
 	// flow[state].value.hidden = true;

@@ -23,7 +23,7 @@ $(document).ready(() => {
 		{
 			name: "stage 5",
 			description: "평화를 깬 엔더드래곤! 복수의 시간입니다!",
-			preview: "resource/ui/blank.png",
+			preview: "resource/background/preview/stage5.png",
 		}
 	]
 
