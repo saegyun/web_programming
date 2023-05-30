@@ -15,15 +15,15 @@ class Heart {
 		this.max_health = max_health;
 
 		this.heart_img = new Image();
-		this.heart_img.src = "/resource/ui/heart.png";
+		this.heart_img.src = "resource/ui/heart.png";
 		
 		this.heart_bg_img = new Image();
-		this.heart_bg_img.src = "/resource/ui/heart_background.png";
+		this.heart_bg_img.src = "resource/ui/heart_background.png";
 		
 		this.heart_blink_img = new Image();
-		this.heart_blink_img.src = "/resource/ui/heart_blink.png";
+		this.heart_blink_img.src = "resource/ui/heart_blink.png";
 
-		this.sound = new Audio("/resource/sound/player_hurt.mp3");
+		this.sound = new Audio("resource/sound/player_hurt.mp3");
 	
 		this.status = "";
 	}

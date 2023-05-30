@@ -14,7 +14,7 @@
 
 	margin: 0 auto;
 
-	background-image: url("/resource/ui/book.png");
+	background-image: url("../resource/ui/book.png");
 	background-size: 100% 100%;
 	margin-bottom: 50px;
 }
