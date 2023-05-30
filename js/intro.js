@@ -39,7 +39,7 @@ $(document).ready(() => {
 			if ($introText.is('.end')) return;
 
 			if (page === 5) {
-				$(".intro-image").css('background-image', 'url("/resource/bg/intro2.jpg")');
+				$(".intro-image").css('background-image', 'url("resource/bg/intro2.jpg")');
 			}
 			console.log(page);
 			console.log(texts[page]);
