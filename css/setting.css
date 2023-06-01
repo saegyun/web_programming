@@ -4,10 +4,10 @@
 
 	font-size: 45px;
 	margin-top: 50px;
-	margin-bottom: 35px;
+	margin-bottom: 20px;
 }
 #setting > p {
-	margin-top: 40px;
+	margin-top: 35px;
 
 	width: auto;
 	height: auto;
@@ -18,7 +18,10 @@
 	font-size: 30px;
 }
 .settings {
-	margin: 30px auto;
+	margin-top: 10px;
+	margin-botton: 25px;
+	margin-left: auto;
+	margin-right: auto;
 	width: 590px;
 	height: 50px;
 
@@ -80,4 +83,7 @@
 	position: absolute;
 	bottom: 0;
 	left: calc(var(--main-width) - 50px);
+}
+#setting-music-toggle {
+	grid-column: 2;
 }

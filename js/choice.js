@@ -41,7 +41,7 @@ $(document).ready(() => {
 	for (let i = 0; i < 5; i++) {
 		$(".stages > button").eq(i).on("click", () => {
 			currentStage = stageInfo[i].name;
-			console.log("select", currentStage);
+			//console.log("select", currentStage);
 			$("#stage-info > p").eq(0).text(stageInfo[i].name);
 			$("#stage-info > p").eq(1).text(stageInfo[i].description);
 			$("#stage-info > img").attr("src", stageInfo[i].preview);

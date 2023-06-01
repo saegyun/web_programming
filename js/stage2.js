@@ -406,8 +406,8 @@ const Stage2 = {
 	
 							window.pickaxe.ore = brickPosInfo[collidePos].ore;
 							window.pickaxe.power = brickPosInfo[collidePos].ore.oreHealth;
-							console.log(window.pickaxe.ore);
-							console.log(brickPosInfo[collidePos].ore);
+							//console.log(window.pickaxe.ore);
+							//console.log(brickPosInfo[collidePos].ore);
 						}
 						
 						//check if breaks diamond => end
@@ -470,6 +470,7 @@ $(document).ready(function() {
 
 	$(".level-btn").on("click", function() {
 		if (currentStage === "stage 2") {
+			menuMusic.pause();
 			moveNext(1);
 			$(window).on("mousemove", event => {
 				mousePos = [
@@ -484,6 +485,7 @@ $(document).ready(function() {
 
 	//??
 	$("#stage2 .back").on("click", () => {
+		menuMusic.play();
 		Stage2.stageStatus.isPlaying = false; // 스테이지를 나가면 게임이 끝난 것으로 취급, 아래 코드에서 루프 종료
 		const canvas = document.getElementById("myCanvas");
 		const context = canvas.getContext("2d");

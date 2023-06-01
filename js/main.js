@@ -2,6 +2,8 @@ let currentStage = "stage 1";
 let mousePos = [0, 0];
 let mousePadding = 0;
 let monsterVolume = 1;
+let menuMusic = new Audio("resource/sound/menu_music_" + Math.floor(Math.random() * 4 + 1) + ".ogg");
+let introMusic = new Audio("resource/sound/intro_music.ogg");
 
 const PlayStatus = JSON.parse(localStorage.getItem("record")) || {
 	stat: {
@@ -122,6 +124,8 @@ function initPage() {
 			next: ["choice", "setting"],
 			prev: undefined,
 			onLoad: () => {
+				introMusic.pause(); // title screen intro music stop
+				menuMusic.play(); // menu music start playing
 				context.drawImage(
 					titleBgImg,
 					200,

@@ -615,6 +615,7 @@ $(document).ready(function() {
 
 	$(".level-btn").on("click", function() {
 		if (currentStage === "stage 4") {
+			menuMusic.pause();
 			moveNext(3);
 			$(window).on("mousemove", event => {
 				mousePos = [
@@ -628,6 +629,7 @@ $(document).ready(function() {
 	});
 
 	$("#stage4 .back").on("click", () => {
+		menuMusic.play();
 		const canvas = document.getElementById("myCanvas");
 		const context = canvas.getContext("2d");
 

@@ -24,4 +24,15 @@ $(document).ready(() => {
 			$("#setting > p").eq(2).text(`Monster Sound (${Math.round(monsterVolume * 100)} %)`);
 		});
 	}
+	$("#setting-music-toggle").click(() => {
+		if($("#setting-music-toggle").val() == "off") {
+			menuMusic.volume = 0.0;
+			$("#setting-music-toggle").val("on");
+			$("#setting-music-toggle").text("Turn On");
+		} else {
+			menuMusic.volume = 1.0;
+			$("#setting-music-toggle").val("off");
+			$("#setting-music-toggle").text("Turn Off");
+		}
+	});
 });

@@ -2,13 +2,14 @@ $(document).ready(() => {
 	let interacted = false;
     $("*").on("click", function () {
 		if ($(this)[0] === $("#intro > button")[0]) {
-			console.log("skip");
+			console.log("Intro Skipped");
 			interacted = true;
 			return;
 		}
 		if (interacted) {
 			return;
 		}
+		introMusic.play(); // intro music start
 		interacted = true;
 		const $introText = $('.intro-text');
 
@@ -35,14 +36,16 @@ $(document).ready(() => {
 				moveNext(0);
 				return;
 			}
-			new Audio("resource/sound/experience.ogg").play();
+			let ding = new Audio("resource/sound/experience.ogg");
+			ding.volume = 0.5;
+			ding.play();
 			if ($introText.is('.end')) return;
 
 			if (page === 5) {
 				$(".intro-image").css('background-image', 'url("resource/bg/intro2.jpg")');
 			}
-			console.log(page);
-			console.log(texts[page]);
+			//console.log(page);
+			//console.log(texts[page]);
 			$introText.text(texts[++page]);
 		};
 

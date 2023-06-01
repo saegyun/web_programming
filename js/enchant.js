@@ -72,7 +72,7 @@ $(document).ready(() => {
 			}
 
 			const random = Math.random();
-			console.log("current rand : ", random);
+			//console.log("current rand : ", random);
 
 			for (i = 0; i <= max; i++) {
 				sum += enchants[i].value / total;

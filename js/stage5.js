@@ -13,6 +13,7 @@ $(document).ready(function() {
 	// <button class="next">stage1</button>을 클릭하면 게임 시작
 	$(".level-btn").on("click", function() {
 		if (currentStage === "stage 5") {
+			menuMusic.pause();
 			moveNext(4);
 			$(window).on("mousemove", event => {
 				mousePos = [
@@ -28,6 +29,7 @@ $(document).ready(function() {
 	});
 	
 	$("#stage5 .back").on("click", () => {
+		menuMusic.play();
 		Stage5.gameOn = false; // 스테이지를 나가면 게임이 끝난 것으로 취급, 아래 코드에서 루프 종료
 		const canvas = document.getElementById("myCanvas");
 		const context = canvas.getContext("2d");
@@ -661,6 +663,10 @@ const Stage5 = {
 			return false;
 		}
 		
+		function randomBallRad() {
+			return Math.PI * (Math.random() - 0.5) * 3 / 90; // pi * (-3/180 ~ 3/180): -3도에서 3도 랜덤 각도 
+		}
+		
 		// 패들 크기
 		const barWidth = 105;
 		const barHeight = 114;
@@ -733,11 +739,13 @@ const Stage5 = {
 			// 양 옆 벽과 충돌
 			if (ball.x < ball.radius || ball.x > maxWidth - ball.radius) {
 				ballRad = Math.PI - ballRad;
+				ballRad += randomBallRad();
 			}
 			
 			// 위아래 벽과 충돌
 			if (ball.y <= ball.radius || ball.y > maxHeight - ball.radius) {
 				ballRad = (2 * Math.PI - ballRad);
+				ballRad += randomBallRad();
 			}
 			
 			// 패들과 충돌
@@ -745,6 +753,7 @@ const Stage5 = {
 			if (collideWithBar != 999) { // 충돌했다면 999가 아닌 수를 반환
 				bar.collideSound();
 				ballRad = collideWithBar;
+				ballRad += randomBallRad();
 			}
 			
 			// 블럭과 충돌
@@ -754,6 +763,7 @@ const Stage5 = {
 				
 				if (collideWithBlock != 999) { // 충돌했다면 999가 아닌 수를 반환
 					ballRad = collideWithBlock;
+					ballRad += randomBallRad();
 					
 					if (block.hit(ball.damage)) { // 공에 맞은 블럭이 부숴진 경우, 음식 드롭
 						activeBlocks.splice(i, 1);
@@ -765,6 +775,7 @@ const Stage5 = {
 			let collideWithDragon = checkCollision(ball, dragon, ballRad);
 			if (collideWithDragon != 999) { // 충돌했다면 999가 아닌 수를 반환
 				ballRad = collideWithDragon;
+				ballRad += randomBallRad();
 				
 				if(activeBlocks.length <= 0) {
 					if (dragon.hit(ball.damage)) { // 공에 맞은 블럭이 부숴진 경우, 음식 드롭

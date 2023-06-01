@@ -12,6 +12,7 @@ $(document).ready(function() {
 	// <button class="next">stage1</button>을 클릭하면 게임 시작
 	$(".level-btn").on("click", function() {
 		if (currentStage === "stage 3") {
+			menuMusic.pause();
 			moveNext(2);
 			$(window).on("mousemove", event => {
 				mousePos = [
@@ -27,6 +28,7 @@ $(document).ready(function() {
 	});
 	
 	$("#stage3 .back").on("click", () => {
+		menuMusic.play();
 		Stage3.gameOn = false; // 스테이지를 나가면 게임이 끝난 것으로 취급, 아래 코드에서 루프 종료
 		const canvas = document.getElementById("myCanvas");
 		const context = canvas.getContext("2d");
@@ -612,6 +614,11 @@ const Stage3 = {
 			}
 			return 999; // 충돌하지 않음
 		}
+		
+		function randomBallRad() {
+			return Math.PI * (Math.random() - 0.5) * 3 / 90; // pi * (-3/180 ~ 3/180): -3도에서 3도 랜덤 각도 
+		}
+		
 		// 패들 크기
 		const barWidth = 132;
 		const barHeight = 36;
@@ -690,11 +697,13 @@ const Stage3 = {
 			// 양 옆 벽과 충돌
 			if (ball.x < ball.radius || ball.x > maxWidth - ball.radius) {
 				ballRad = Math.PI - ballRad;
+				ballRad += randomBallRad();
 			}
 			
 			// 위아래 벽과 충돌
 			if (ball.y <= ball.radius || ball.y > maxHeight - ball.radius) {
 				ballRad = (2 * Math.PI - ballRad);
+				ballRad += randomBallRad();
 			}
 			
 			// 패들과 충돌
@@ -702,6 +711,7 @@ const Stage3 = {
 			if (collideWithBar != 999) { // 충돌했다면 999가 아닌 수를 반환
 				bar.collideSound();
 				ballRad = collideWithBar;
+				ballRad += randomBallRad();
 			}
 			
 			// 몹과 충돌
@@ -711,6 +721,7 @@ const Stage3 = {
 				
 				if (collideWithMob != 999) { // 충돌했다면 999가 아닌 수를 반환
 					ballRad = collideWithMob;
+					ballRad += randomBallRad();
 					if (mob.hit(ball.damage)) { // 공에 맞은 몹이 죽은 경우, 경험치 라벨을 표시하고 죽은 몹을 화면에 있는 몹 배열에서 지우기
 						let expLabel = new ExperienceLabel(mob.x, mob.y, mob.exp);
 						expLabel.ding();
