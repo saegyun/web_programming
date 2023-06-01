@@ -21,9 +21,28 @@ $(document).ready(function() {
 					event.pageY
 				];
 			});
-			Stage5.gameOn = true; // 스테이지를 시작하면 게임이 진행 중인 것으로 취급
-			Stage5.startGame($(this).val(), () => {
-				$(window).off("mousemove");
+			//보스 등장 
+			let img = document.createElement("img");
+			img.src = "img/ender_dragon_start.gif";
+			img.style.width = maxHeight + "px"
+			img.style.height = maxHeight + "px";
+			img.style.backgroundColor = "black";
+
+			document.getElementById('stage5').appendChild(img);
+			$("#stage5 .back").hide();//뒤로가기 버튼 잠시 숨기기
+
+			let bossAudio = new Audio("resource/sound/dragon_growl_1.ogg");
+			bossAudio.volume = monsterVolume;
+			bossAudio.play();
+
+			$("#stage5 img").fadeOut(4000, ()=>{
+				img.remove();
+				$("#stage5 .back").show();
+
+				Stage5.gameOn = true; // 스테이지를 시작하면 게임이 진행 중인 것으로 취급
+				Stage5.startGame($(this).val(), () => {
+					$(window).off("mousemove");
+				});
 			});
 		}
 	});
@@ -380,7 +399,7 @@ const Stage5 = {
 			eatAudio.play();
 		}
 		
-		// 불 클래스, 아이템 클래스 상속
+		// FireBall 클래스, 아이템 클래스 상속
 		class FireBall extends Item {
 			constructor(x, y, width, height, damage) {
 				super(x, y, width, height, damage);
@@ -396,6 +415,24 @@ const Stage5 = {
 				super.eat();
 			}
 		}
+
+		// Flame 클래스, 아이템 클래스 상속
+		class Flame extends Item {
+			constructor(x, y, width, height, damage) {
+				super(x, y, width, height, damage);
+				Flame.itemSprite.src = "img/fire_5.gif";
+			}
+			static itemSprite = new Image();
+			
+			draw(context) {
+				super.draw(context, Flame.itemSprite);
+			}
+			
+			eat() {
+				super.eat();
+			}
+		}
+
 		
 		// 하트 - 체력바를 하트 형태로 표시
 		class Heart {
@@ -477,16 +514,18 @@ const Stage5 = {
 		const canvasPosition = $(canvas).position();
 		
 		
-		const spawnLineWidthMin = maxWidth * 0.05; // 동물이 생성되는 x좌표 왼쪽 경계
-		const spawnLineWidthMax = maxWidth * 0.95; // 동물이 생성되는 x좌표 오른쪽 경계
-		const spawnLineHeightMin = maxHeight * 0.3; // 동물이 생성되는 y좌표 위쪽 경계
-		const spawnLineHeightMax = maxHeight * 0.35; // 동물이 생성되는 y좌표 아래쪽 경계
-		const deathLine = maxHeight * 0.98; // 공이 허기를 줄어들게 하는 y좌표 경계
+		const spawnLineWidthMin = maxWidth * 0.05; // 스킬이 생성되는 x좌표 왼쪽 경계
+		const spawnLineWidthMax = maxWidth * 0.95; // 스킬이 생성되는 x좌표 오른쪽 경계
+		const spawnLineHeightMin = maxHeight * 0.3; // 스킬이 생성되는 y좌표 위쪽 경계
+		const spawnLineHeightMax = maxHeight * 0.35; // 스킬이 생성되는 y좌표 아래쪽 경계
+		const deathLine = maxHeight * 0.98; // 공이 생명을 줄어들게 하는 y좌표 경계
 	
-		let maxHealth = 40; // 허기 전체
-		let currentHealth = maxHealth; // 현재 허기
-		let maxSpawns = 7; // 한 화면에서 존재할 수 있는 최대 동물 개수
-		let itemSpawnChance = levelInfo[currentLevel].fireSpawnChance; // 동물 생성 함수가 1초마다 호출될 때 몹이 실제로 생성될 확률, 0 ~ 100 사이
+		let maxHealth = 40; // 생명 전체
+		let currentHealth = maxHealth; // 현재 생명
+		let maxFireBallSpawns = 7; // 한 화면에서 존재할 수 있는 최대 FireBall 개수
+		let maxFlameSpawns = 3; // 한 화면에서 존재할 수 있는 최대 Flame 개수
+		let itemSpawnChance = levelInfo[currentLevel].fireSpawnChance; // FireBall 생성 함수가 1초마다 호출될 때 몹이 실제로 생성될 확률, 0 ~ 100 사이
+		
 		let addedTime = 0; // 걸린 시간을 측정하는 변수
 		let gameEnded = false; // 게임 승패 여부
 		let victory = false;
@@ -541,8 +580,12 @@ const Stage5 = {
 		// 현재 화면에 존재하는 모든 블럭을 배열에 저장
 		let activeBlocks = [];
 		
-		// 현재 화면에 존재하는 모든 음식을 배열에 저장
-		let activeItems = [];
+		// 현재 화면에 존재하는 모든 FireBall을 배열에 저장
+		let activeFireBallItems = [];
+
+		// 현재 화면에 존재하는 모든 Flame 배열에 저장
+		let activeWarningItems = [];
+		let activeFlameItems = [];
 		
 		activeBlocks.push(new EndCrystal(maxWidth * 0.8, maxHeight * 0.5, 10, 0, 150, 236));
 		activeBlocks.push(new EndCrystal(maxWidth * 0.01, maxHeight * 0.5, 10, 0, 150, 236));
@@ -561,10 +604,10 @@ const Stage5 = {
 			100 // exp
 		);
 		
-		// 몹을 생성하는 함수
+		// FireBall을 생성하는 함수
 		function spawnFire() {
 			// 현재 화면에 존재하는 몹 개수가 최대 개수보다 많으면 리턴
-			if (activeItems.length >= maxSpawns)
+			if (activeFireBallItems.length >= maxFireBallSpawns)
 				return;
 			
 			let randomInt = Math.floor(Math.random() * 100);
@@ -580,7 +623,7 @@ const Stage5 = {
 				
 				newItem = new FireBall(randomSpawnX, randomSpawnY, 40, 40, 0);
 				
-				activeItems.push(newItem);
+				activeFireBallItems.push(newItem);
 				
 				let growlAudio = growlAudios[Math.floor(Math.random() * growlAudios.length)];
 				growlAudio.volume = monsterVolume;
@@ -589,8 +632,70 @@ const Stage5 = {
 			else
 				return;
 		}
-		// 몹을 생성하는 함수는 1초마다 실행됨
-		const spawnInterval = setInterval(spawnFire, 1000);
+		// FireBall을 생성하는 함수는 2초마다 실행됨
+		const spawnFireBallInterval = setInterval(spawnFire, 2000);
+
+		// Flame 생성하는 함수
+		function spawnFlame() {
+			activeFlameItems = [];
+			for(let i in activeWarningItems){ //경고했던 Flame 실제로 생성
+				let item = activeWarningItems[i];
+				activeFlameItems.push(item);
+			}
+			activeWarningItems = [];
+			for(let i = 0; i < maxFlameSpawns; i ++){
+				let randomInt = Math.floor(Math.random() * 100);
+				if (randomInt <= itemSpawnChance) // 몹이 몹 생성 확률 안에 있으면 실제로 생성
+				{
+					// 몹이 생성되는 x 좌표
+					const randomSpawnX = Math.floor(Math.random() * (spawnLineWidthMax*0.95 - spawnLineWidthMin + 1)) + spawnLineWidthMin;
+					const randomSpawnY = deathLine - 150;
+					let newItem; // 새로운 몹 변수
+				
+					newItem = new Flame(randomSpawnX, randomSpawnY, 100, 100, 0);
+				
+					activeWarningItems.push(newItem);
+				
+					let growlAudio = growlAudios[Math.floor(Math.random() * growlAudios.length)];
+					growlAudio.volume = monsterVolume;
+					growlAudio.play();
+				}
+				else
+					return;
+			}
+		}
+		// Flame을 생성하는 함수는 4초마다 실행됨
+		const spawnFlameInterval = setInterval(spawnFlame, 4000);
+
+		//Explosion을 생성하는 함수
+		function Explosion(){
+			let explosionImg = document.createElement("img");
+			explosionImg.src = "img/explosion.gif";
+			explosionImg.style.position = "absolute";
+			explosionImg.style.width = maxWidth + "px";
+			explosionImg.style.height = maxHeight + "px";
+			explosionImg.style.left = "100px";
+			explosionImg.style.zIndex = "2";
+			explosionImg.style.opacity = "0.7";
+
+			document.getElementById('stage5').appendChild(explosionImg);
+
+			//반드시 플레이어의 생명력 1 닳음
+			currentHealth = Math.max(currentHealth - 4, 0);
+			heart.hit(4);
+
+			let exlAudio = new Audio("resource/sound/explosion.ogg");
+			exlAudio.volume = monsterVolume;
+			exlAudio.play();
+
+			bar.hurt();
+
+			setTimeout(()=>{
+				explosionImg.remove();
+			}, 1000);
+		}
+		// Explosion을 생성하는 함수는 15초마다 실행됨
+		const spawnExplosionInterval = setInterval(Explosion, 15000);
 		
 		// 시간을 계산하는 함수
 		function updateTimer() {
@@ -698,8 +803,11 @@ const Stage5 = {
 		// 실제 게임 진행 루프가 이루어지는 함수
 		function loop() {
 			if (!self.gameOn) { // 스테이지를 중간에 나갔을 때 수행
-				clearInterval(spawnInterval);
+				clearInterval(spawnFireBallInterval);
+				clearInterval(spawnFlameInterval);
 				clearInterval(timeCountdown);
+				clearInterval(spawnExplosionInterval);
+
 				mainMusic.pause();
 				self.gameEnd(context);
 				return;
@@ -708,21 +816,23 @@ const Stage5 = {
 			if (!gameEnded)
 				requestAnimationFrame(loop);
 			else { // 게임이 끝났을 때 (승패가 갈림)
-				clearInterval(spawnInterval);
+				clearInterval(spawnFireBallInterval);
+				clearInterval(spawnFlameInterval);
 				clearInterval(timeCountdown);
+				clearInterval(spawnExplosionInterval);
 				return;
 			}
 			context.clearRect(0, 0, maxWidth, maxHeight);
 			
 			
-			// 음식이 아래로 떨어짐
-			for (let i in activeItems) {
-				let item = activeItems[i];
+			// FireBall이 아래로 떨어짐
+			for (let i in activeFireBallItems) {
+				let item = activeFireBallItems[i];
 				item.y += 0.8; // food.y + speed
-				// 음식이 먹히지 않고 땅으로 떨어짐
+				// FireBall이 먹히지 않고 땅으로 떨어짐
 				if (item.y + item.height >= maxHeight) {
 					popAudio.play();
-					activeItems.splice(i, 1);
+					activeFireBallItems.splice(i, 1);
 				}
 			}
 			
@@ -784,9 +894,9 @@ const Stage5 = {
 				}
 			}
 			
-			// 패들과 음식이 충돌
-			for (let i in activeItems) {
-				let item = activeItems[i];
+			// 패들과 FireBall이 충돌
+			for (let i in activeFireBallItems) {
+				let item = activeFireBallItems[i];
 				let collideWithItem = checkRectCollision(bar, item);
 				
 				if (collideWithItem) { // 충돌했다면 true
@@ -795,10 +905,25 @@ const Stage5 = {
 					item.eat();
 					bar.hurt();
 					
-					activeItems.splice(i, 1);
+					activeFireBallItems.splice(i, 1);
 				}
 			}
 			
+			// 패들과 Flame 충돌
+			for (let i in activeFlameItems) {
+				let item = activeFlameItems[i];
+				let collideWithItem = checkRectCollision(bar, item);
+				
+				if (collideWithItem) { // 충돌했다면 true
+					currentHealth = Math.max(currentHealth - 4, 0);
+					heart.hit(4);
+					item.eat();
+					bar.hurt();
+					
+					activeFlameItems.splice(i, 1);
+				}
+			}
+
 			// 공 위치를 라디안과 속도에 따라 실제로 변화시키기
 			ball.x = ball.x + Math.cos(ballRad) * ball.speed;
 			ball.y = ball.y + Math.sin(ballRad) * ball.speed;
@@ -840,9 +965,21 @@ const Stage5 = {
 			if(dragon.health >= 0)
 				dragon.draw(context);
 			
-			// 음식 그리기
-			for (let i in activeItems) {
-				let item = activeItems[i];
+			// 스킬 그리기
+			for (let i in activeFireBallItems) {
+				let item = activeFireBallItems[i];
+				item.draw(context);
+			}
+			// Flame 경고지대
+			for (let i in activeWarningItems) {
+				let item = activeWarningItems[i];
+
+				context.fillStyle = 'rgba(255, 0, 0, 0.253)';
+				context.fillRect(item.x, 0, item.width, maxHeight);
+			}
+			//Flame 그리기
+			for (let i in activeFlameItems) {
+				let item = activeFlameItems[i];
 				item.draw(context);
 			}
 			
