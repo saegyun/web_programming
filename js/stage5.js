@@ -420,7 +420,7 @@ const Stage5 = {
 		class Flame extends Item {
 			constructor(x, y, width, height, damage) {
 				super(x, y, width, height, damage);
-				Flame.itemSprite.src = "img/fire_5.gif";
+				Flame.itemSprite.src = "img/fire_5.png";
 			}
 			static itemSprite = new Image();
 			
