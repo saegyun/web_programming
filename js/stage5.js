@@ -694,8 +694,8 @@ const Stage5 = {
 				explosionImg.remove();
 			}, 1000);
 		}
-		// Explosion을 생성하는 함수는 15초마다 실행됨
-		const spawnExplosionInterval = setInterval(Explosion, 15000);
+		// Explosion을 생성하는 함수는 20초마다 실행됨
+		const spawnExplosionInterval = setInterval(Explosion, 20000);
 		
 		// 시간을 계산하는 함수
 		function updateTimer() {
